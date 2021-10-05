@@ -1,0 +1,58 @@
+﻿:root {
+    --color-primary: #1b6ec2;
+    --color-secondary: #007ACC;
+    /* ... */
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.container {
+    @apply max-w-7xl mx-auto px-2;
+}
+
+:focus {
+    outline: none;
+}
+
+body h1, body h2, body h3, body p {
+   @apply mb-2;
+}
+h1 {
+   @apply text-3xl pb-2;
+}
+
+.footer-link {
+    @apply hover:text-blue-400;
+    @apply pt-1;
+}
+
+.Google-btn {
+    background-color: #DB4437 ;
+    color: white;
+}
+
+.GitHub-btn {
+    background-color: black;
+    color : white;
+}
+
+.Microsoft-btn {
+    background-color: #0067B8;
+    color: white
+}
+.Twitter-btn {
+    background-color: #08a0e9;
+    color: white
+}
+
+.Facebook-btn {
+    background-color: #4267B2;
+    color: white;
+}
+
+select {
+    @apply py-1;
+    @apply pl-2;
+}

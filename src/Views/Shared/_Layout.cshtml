@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>@ViewData["Title"] - DPM</title>
+
+	<link rel="search" type="application/opensearchdescription+xml" title="DPM Gallery" href="/opensearch.xml">
+
+	<meta name="twitter:card" content="summary">
+	<meta name="twitter:site" content="@@dpm">
+
+	<meta property="og:title" content="DPM Gallery" />
+	<meta property="og:url" content="https://www.delphipm.org/" />
+	<meta property="og:description" content="The DPM Gallery is the central package repository for DPM, the package manager for Delphi" />
+	<meta property="og:image" content="https://delphipm.org.org/Content/gallery/img/logo-og-600x600.png" />
+	<!-- <link rel="stylesheet" href="~/css/site.css" />-->
+	<link rel="stylesheet" href="~/css/tailwind.css" />
+
+</head>
+<body>
+	<partial name="_CookieConsentPartial" />
+	<div class="py-6">
+		<nav class="bg-primary text-gray-100 text-xl fixed inset-x-0 top-0 h-12">
+			<div class="px-2 max-w-7xl mx-auto justify-content-center items-center">
+				<div class="flex justify-between items-center">
+					<div class="mr-2 items-center">
+						<a class="text-3xl text-gray-200" asp-area="" asp-controller="Home" asp-action="Index">DPM</a>
+					</div>
+					<div class="hidden md:flex items-center space-x-1">
+						<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Packages" asp-action="Index">Packages</a>
+						<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Packages" asp-action="Upload">Upload</a>
+						<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Home" asp-action="Index">Documentation</a>
+						<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Downloads" asp-action="Index">Downloads</a>
+						<a class="py-2 px-3 block hover:text-white" href="https://www.finalbuilder.com/resources/blogs/tag/dpm" target="_blank">Blog</a>
+						@if (User.Identity.IsAuthenticated && User.HasClaim(ClaimTypes.Role, "Administrator"))
+						{
+							<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
+						}
+					</div>
+					<div class="hidden md:flex items-center">
+						<partial name="_LoginPartial" />
+					</div>
+					<div class="md:hidden flex items-center">
+						<button class="mobile-menu-button">
+							<svg xmlns="http://www.w3.org/2000/svg"
+								 id="menu-button"
+								 class="h-6 w-6"
+								 fill="none"
+								 viewBox="0 0 24 24"
+								 stroke="currentColor">
+								<path stroke-linecap="round"
+									  stroke-linejoin="round"
+									  stroke-width="2"
+									  d="M4 6h16M4 12h16M4 18h16" />
+							</svg>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div id="mobile-menu" class="mobile-menu hidden md:hidden text-base bg-primary z-20">
+				<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Packages" asp-action="Index">Packages</a>
+				<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Packages" asp-action="Upload">Upload</a>
+				<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Home" asp-action="Index">Documentation</a>
+				<a class="block px-4 py-2 hover:bg-secondary" href="#">Blog</a>
+				@if (User.Identity.IsAuthenticated && User.HasClaim(ClaimTypes.Role, "Administrator"))
+				{
+					<a class="px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
+				}
+				<partial name="_LoginPartial" />
+			</div>
+		</nav>
+	</div>
+	@RenderBody()
+
+	<footer class="fixed bottom-0 w-full bg-gray-800 text-gray-400 py-2 text-small">
+		<div class="container pb-2">
+			<div class="flex flex-row items-start justify-between text-gray-400 ">
+				<div class="flex flex-col p-2 text-sm">
+					<span class="text-base  text-gray-300 font-semibold mb-2">DPM</span>
+					<a class="footer-link" href="/policies/about">About DPM</a>
+					<a class="footer-link" href="/policies/privacy">Privacy</a>
+					<a class="footer-link" href="/policies/terms">Terms</a>
+				</div>
+				<div class="flex flex-col p-2 text-sm">
+					<span class="text-base text-gray-300 font-semibold mb-2">SUPPORT</span>
+					<a class="footer-link" href="https://github.com/DelphiPackageManager/DPM/discussions">Github Discussions</a>
+					<a class="footer-link" href="https://github.com/DelphiPackageManager/DPM/issues">Github Issues</a>
+				</div>
+				<div class="flex flex-col p-2 text-sm">
+					<span class="text-base text-gray-300 font-semibold mb-2">RESOURCES</span>
+					<a class="footer-link" href="https://www.finalbuilder.com/resources/blogs">Blogs</a>
+				</div>
+			</div>
+
+			<div class="flex flex-row">
+				&copy; Copyright 2021 - delphipm.org
+			</div>
+		</div>
+	</footer>
+	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/js/site.js" asp-append-version="true"></script>
+	@RenderSection("Scripts", required: false)
+</body>
+</html>

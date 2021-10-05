@@ -1,0 +1,155 @@
+﻿@page
+@model LoginModel
+
+@{
+	ViewData["Title"] = "Sign in";
+}
+
+<div class="w-full">
+	<div class="container">
+		<div class="flex flex-col overflow-hidden bg-white max md:flex-row md:flex-1 lg:max-w-screen-md mt-2">
+			<div class="p-4 py-6 text-white bg-primary md:w-80 md:flex-shrink-0 md:flex md:flex-col md:items-center md:justify-evenly">
+				<div class="my-3 text-4xl font-bold tracking-wider text-center">
+					<a href="#">DPM</a>
+				</div>
+				<p class="flex flex-col items-center justify-center mt-10 text-center">
+					<span>Don't have an account?</span>
+					<a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl" class="underline">Get Started!</a>
+				</p>
+				<p class="mt-6 font-normal text-center text-gray-300 md:mt-0">
+					Creating an account is only needed if you wish to publish packages!
+				</p>
+				<p class="mt-6 text-sm text-center text-gray-300">
+					Read our <a href="/policies/terms" class="underline">terms and conditions</a>
+				</p>
+			</div>
+			<div class="p-5 bg-white md:flex-1">
+				<h3 class="my-4 text-2xl font-semibold text-gray-700">Account Sign In</h3>
+				<form id="account" method="post" class="flex flex-col space-y-5" asp-route-returnUrl="@Model.ReturnUrl">
+					<div class="flex flex-col space-y-1">
+						<label asp-for="Input.UserName" class="text-sm font-semibold text-gray-500">User Name</label>
+						<input type="text"
+							   asp-for="Input.UserName"
+							   autofocus
+							   class="px-4 py-2 transition duration-300 border border-gray-300 rounded focus:border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200" />
+					</div>
+					<div class="flex flex-col space-y-1">
+						<div class="flex items-center justify-between">
+							<label asp-for="Input.Password" for="password" class="text-sm font-semibold text-gray-500">Password</label>
+							<a asp-page="./ForgotPassword" class="text-sm text-blue-600 hover:underline focus:text-blue-800">Forgot Password?</a>
+						</div>
+						<input type="password"
+							   id="password"
+							   asp-for="Input.Password"
+							   class="px-4 py-2 transition duration-300 border border-gray-300 rounded focus:border-transparent focus:outline-none focus:ring-4 focus:ring-blue-200" />
+					</div>
+					<div class="flex items-center space-x-2">
+						<input type="checkbox"
+							   id="remember"
+							   asp-for="Input.RememberMe"
+							   class="w-4 h-4 transition duration-300 rounded focus:ring-2 focus:ring-offset-0 focus:outline-none focus:ring-blue-200" />
+						<label asp-for="Input.RememberMe" for="remember" class="text-sm font-semibold text-gray-500">@Html.DisplayNameFor(m => m.Input.RememberMe)</label>
+					</div>
+					<div>
+						<button type="submit"
+								class="w-full px-4 py-2 text-lg font-semibold text-white transition-colors duration-300 bg-blue-500 rounded-md shadow hover:bg-blue-600 focus:outline-none focus:ring-blue-200 focus:ring-4">
+							Sign in
+						</button>
+					</div>
+				</form>
+				@{
+					if ((Model.ExternalLogins?.Count ?? 0) != 0)
+					{
+						<form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="mt-2">
+							<div class="flex flex-col space-y-5">
+								<span class="flex items-center justify-center space-x-2">
+									<span class="h-px bg-gray-400 w-14"></span>
+									<span class="font-normal text-gray-500">or Sign in with</span>
+									<span class="h-px bg-gray-400 w-14"></span>
+								</span>
+								<div class="flex flex-col space-y-4">
+									@foreach (var provider in Model.ExternalLogins.OrderBy(x => x.Name).ToList())
+									{
+										<button type="submit" name="provider" value="@provider.Name" class="text-sm font-medium">
+											<div class="flex items-center justify-center px-4 py-3 space-x-2 rounded-md @(provider.DisplayName.Trim())-btn text-white">
+												<svg class="fill-current w-5 h-5 mr-1">
+													<use xlink:href="#@provider.DisplayName.Trim()"></use>
+												</svg>
+												@provider.DisplayName
+											</div>
+										</button>
+									}
+								</div>
+							</div>
+						</form>
+					}
+				}
+
+			</div>
+		</div>
+	</div>
+</div>
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+
+	<symbol id="GitHub" viewBox="0 0 16 16">
+		<path fill-rule="evenodd"
+			  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+	</symbol>
+
+	<symbol id="Google" viewBox="0 0 488 512">
+		<path fill-rule="evenodd" 
+			  d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z"/>
+
+	</symbol>
+	<symbol id="Microsoft" viewBox="0 0 23 23">
+		<path fill="#f3f3f3" d="M0 0h23v23H0z" />
+		<path fill="#f35325" d="M1 1h10v10H1z" />
+		<path fill="#81bc06" d="M12 1h10v10H12z" />
+		<path fill="#05a6f0" d="M1 12h10v10H1z" />
+		<path fill="#ffba08" d="M12 12h10v10H12z" />
+
+	</symbol>
+</svg>
+
+	<!--
+			<div class="row">
+				<div class="col-md-4">
+					<section>
+						<form id="account" method="post">
+							<h4>Use a local account to log in.</h4>
+							<hr />
+							<div asp-validation-summary="All" class="text-danger"></div>
+							<div class="form-group">
+								<label asp-for="Input.UserName"></label>
+								<input asp-for="Input.UserName" class="form-control" />
+								<span asp-validation-for="Input.UserName" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<label asp-for="Input.Password"></label>
+								<input asp-for="Input.Password" class="form-control" />
+								<span asp-validation-for="Input.Password" class="text-danger"></span>
+							</div>
+							<div class="form-group">
+								<div class="checkbox">
+									<label asp-for="Input.RememberMe">
+										<input asp-for="Input.RememberMe" />
+										@@Html.DisplayNameFor(m => m.Input.RememberMe)
+									</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<button type="submit" class="btn btn-primary">Log in</button>
+							</div>
+							<div class="form-group">
+								<p>
+									<a id="forgot-password" asp-page="./ForgotPassword">Forgot your password?</a>
+								</p>
+								<p>
+									<a asp-page="./Register" asp-route-returnUrl="@@Model.ReturnUrl">Register as a new user</a>
+								</p>
+							</div>
+						</form>
+					</section>
+				</div>
+			</div>
+		-->
