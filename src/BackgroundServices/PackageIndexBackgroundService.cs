@@ -91,10 +91,10 @@ namespace DPMGallery.BackgroundServices
             var storageService = scope.ServiceProvider.GetRequiredService<IStorageService>();
 
             CopyResult result = CopyResult.Failed;
-            string folderName = @$"{targetPlatform.SantisedCompilerVersion}\{targetPlatform.Platform}\{package.PackageId}";
+            string folderName = Path.Combine(targetPlatform.SantisedCompilerVersion, targetPlatform.Platform.ToString(), package.PackageId);
 
             string localFile = Path.Combine(_serverConfig.ProcessingFolder, item.PackageFileName); 
-            string remotePath = @$"{folderName}\{item.PackageFileName}";
+            string remotePath = Path.Combine(folderName,item.PackageFileName);
 
             //this is messy! what happens with s3 if you try to overwrite a file? 
             //TODO : Check for memory leaks - are all streams disposed properly.

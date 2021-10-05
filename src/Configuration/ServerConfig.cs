@@ -29,7 +29,7 @@ namespace DPMGallery
 
             string commonAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
-            _defaultProcessingFolder = System.IO.Path.Combine(commonAppDataPath, "dpm\\dpmserver\\processing");
+            _defaultProcessingFolder = System.IO.Path.Combine(commonAppDataPath, "dpm","dpmserver","processing");
 
         }
 

@@ -26,6 +26,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.10" />
 		<PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
 		<PackageReference Include="nClam" Version="6.0.1" />
 		<PackageReference Include="Npgsql" Version="5.0.10" />
@@ -39,6 +40,12 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Remove="Repositories\SearchRepository1.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Remove="wwwroot\css\site.css" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="wwwroot\css\site.css" />
 	</ItemGroup>
 	<ItemGroup>
 		<UpToDateCheckBuilt Include="wwwroot/css/tailwind.css" Set="Css" />

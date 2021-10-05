@@ -23,7 +23,7 @@ namespace DPMGallery
 
             string commonAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
-            string configFileName = Path.Combine(commonAppDataPath, "dpm\\dpmserver", ServerConfig.ConfigFileName + ".config.json");
+            string configFileName = Path.Combine(commonAppDataPath, "dpm","dpmserver", ServerConfig.ConfigFileName + ".config.json");
 
             if (!File.Exists(configFileName))
                 return ServerConfig.CreateDefaultConfig(configFileName);
@@ -47,7 +47,9 @@ namespace DPMGallery
                .CreateLogger();
 
 
-            var host = CreateHostBuilder(args).ConfigureAppConfiguration((ctx, builder) =>
+            var host = CreateHostBuilder(args)
+                .UseSystemd() // run as a service on linix
+                .ConfigureAppConfiguration((ctx, builder) =>
             {
                 if (ctx.HostingEnvironment.IsDevelopment())
                 {

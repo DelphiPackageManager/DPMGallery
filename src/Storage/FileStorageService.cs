@@ -1,5 +1,6 @@
 ﻿using DPMGallery.Extensions;
 using DPMGallery.Services;
+using Serilog;
 using System;
 using System.IO;
 using System.Linq;
@@ -18,11 +19,13 @@ namespace DPMGallery.Storage
         private const int DefaultCopyBufferSize = 81920;
 
         private readonly string _storePath;
+        private readonly ILogger _logger;
 
 
-        public FileStorageService(ServerConfig serverConfig)
+        public FileStorageService(ServerConfig serverConfig, ILogger logger)
         {
             _serverConfig = serverConfig;
+            _logger = logger;
             // Resolve relative path components ('.'/'..') and ensure there is a trailing slash.
             _storePath = Path.GetFullPath(_serverConfig.Storage.FileStorage.Path);
             if (!_storePath.EndsWith(Path.DirectorySeparatorChar.ToString()))
@@ -132,27 +135,30 @@ namespace DPMGallery.Storage
 
         public async Task<StoragePutResult> PutAsync(string path, Stream content, string contentType, CancellationToken cancellationToken = default)
         {
+            _logger.Debug("[{category}] Error putting {file} on local filesystem", "FileStorageService", path);
             if (content == null) throw new ArgumentNullException(nameof(content));
             if (string.IsNullOrEmpty(contentType)) throw new ArgumentException("Content type is required", nameof(contentType));
 
             cancellationToken.ThrowIfCancellationRequested();
 
             path = GetFullPath(path);
+            try
+            {
+                _logger.Debug("[{category}] Creating path {path} on local filesystem", "FileStorageService", Path.GetDirectoryName(path));
+                // Ensure that the path exists.
+                Directory.CreateDirectory(Path.GetDirectoryName(path));
 
-            // Ensure that the path exists.
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
-
-            //try
-            //{
                 //overrwrite existing file. 
                 using (var fileStream = File.Open(path, FileMode.OpenOrCreate))
                 {
                     await content.CopyToAsync(fileStream, DefaultCopyBufferSize, cancellationToken);
                     return StoragePutResult.Success;
                 }
-            //}
-            //catch (IOException) when (File.Exists(path))
-            //{
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "[{category}] Error putting file on local filesystem", "FileStorageService");
+                throw;
             //    using (var targetStream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
             //    {
             //        content.Position = 0;
@@ -160,7 +166,7 @@ namespace DPMGallery.Storage
             //            ? StoragePutResult.AlreadyExists
             //            : StoragePutResult.Conflict;
             //    }
-            //}
+            }
         }
     }
 }

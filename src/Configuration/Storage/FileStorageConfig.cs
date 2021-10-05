@@ -14,7 +14,7 @@ namespace DPMGallery.Configuration
         {
             string commonAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
-            _defaultFilePath = System.IO.Path.Combine(commonAppDataPath, "dpm\\dpmserver\\packages");
+            _defaultFilePath = System.IO.Path.Combine(commonAppDataPath, "dpm","dpmserver","packages");
 
         }
 
