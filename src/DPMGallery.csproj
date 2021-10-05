@@ -38,10 +38,6 @@
 		<Folder Include="Pages\" />
 	</ItemGroup>
 	<ItemGroup>
-		<None Include="node_modules\tailwindcss\dist\*.css" />
-		<None Include="node_modules\@tailwindcss\forms\dist\*.css" />
-	</ItemGroup>
-	<ItemGroup>
 	  <Compile Remove="Repositories\SearchRepository1.cs" />
 	</ItemGroup>
 	<ItemGroup>
