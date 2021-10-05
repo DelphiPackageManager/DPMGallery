@@ -140,30 +140,21 @@ namespace DPMGallery.Repositories
         private string GetWhereSql(CompilerVersion compilerVersion, Platform platform, string query, bool exact, bool includePrerelease, bool includeCommercial, bool includeTrial)
         {
             string result = includePrerelease ? "pvl.status = @status\n" : "pv.status = @status\n";
-            bool needAnd = true;
-
             
             if (compilerVersion != CompilerVersion.UnknownVersion)
             {
-                result = result + "tp.compiler_version = @compilerVersion \n";
-                needAnd = true;
+                result = result + "and tp.compiler_version = @compilerVersion \n";
             }
             if (platform != Platform.UnknownPlatform)
             {
-                if (needAnd)
-                    result = result + "and ";
-                result = result + "tp.platform = @platform \n";
-                needAnd = true;
+                result = result + "and tp.platform = @platform \n";
             }
 
             string versionAlias;
             if (!includePrerelease)
             {
                 versionAlias = "pv";
-                if (needAnd)
-                    result = result + "and ";
-                result = result + "pv.is_prerelease = false \n";
-                needAnd = true;
+                result = result + "and pv.is_prerelease = false \n";
             }
             else 
             {
@@ -172,31 +163,23 @@ namespace DPMGallery.Repositories
 
             if (!includeCommercial)
             {
-                if (needAnd)
-                    result = result + "and ";
-                result = result + $"{versionAlias}.is_commercial = false" + "\n";
-                needAnd = true;
+                result = result + $"and {versionAlias}.is_commercial = false" + "\n";
             }
             if (!includeTrial)
             {
-                if (needAnd)
-                    result = result + "and ";
-                result = result + $"{versionAlias}.is_trial = false" + "\n";
-                needAnd = true;
+                result = result + $"and {versionAlias}.is_trial = false" + "\n";
             };
 
             if (!string.IsNullOrEmpty(query))
             {
-                if (needAnd)
-                    result = result + "and ";
                 if (exact)
                 {
-                    result = result + "p.packageid = @query \n";
+                    result = result + "and p.packageid = @query \n";
                 }
                 else
                 {
                     //using ILike and C collation to effect case insensitive search
-                    result = result + "p.packageid ILIKE @query COLLATE \"C\" \n";
+                    result = result + "and p.packageid ILIKE @query COLLATE \"C\" \n";
                 }
             }
 
