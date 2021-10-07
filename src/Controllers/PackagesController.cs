@@ -4,6 +4,7 @@ using DPMGallery.Models;
 using DPMGallery.Services;
 using DPMGallery.Types;
 using DPMGallery.Utils;
+using Ganss.XSS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -52,13 +53,24 @@ namespace DPMGallery.Controllers
                     NotFound();
             }
 
-            var take = 10;
+            var take = 15;
             var skip = page > 0 ?  (page - 1) * take : 0;
-
 
             var seachResults = await _searchService.UISearchAsync(query, skip , take, prerelease, commercial, trial, cancellationToken);
 
+            //TODO : mapping from entity to dto to model is wasteful - have the service just return the model? 
             PackagesViewModel model = Mapping<UISearchResponseDTO, PackagesViewModel>.Map(seachResults);
+
+
+            var sanitizer = new HtmlSanitizer();
+            //TODO : Sanitise any text fields - description etc.
+            foreach (var package in model.Packages)
+            {
+                package.Description = sanitizer.Sanitize(package.Description);
+
+            }
+
+
             model.Query = query;
 
             if (model.TotalPackages - (skip + take) > 0)

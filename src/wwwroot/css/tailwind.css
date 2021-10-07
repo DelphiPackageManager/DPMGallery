@@ -790,9 +790,9 @@ select {
   }
 }
 
-@media (min-width: 768px) {
+@media (min-width: 800px) {
   .container {
-    max-width: 768px;
+    max-width: 800px;
   }
 }
 
@@ -820,6 +820,10 @@ select {
 
 .absolute {
   position: absolute;
+}
+
+.relative {
+  position: relative;
 }
 
 .inset-x-0 {
@@ -939,12 +943,16 @@ select {
   height: 3rem;
 }
 
-.h-6 {
-  height: 1.5rem;
+.h-8 {
+  height: 2rem;
 }
 
 .h-10 {
   height: 2.5rem;
+}
+
+.h-6 {
+  height: 1.5rem;
 }
 
 .h-4 {
@@ -967,12 +975,16 @@ select {
   width: 100vw;
 }
 
-.w-6 {
-  width: 1.5rem;
+.w-8 {
+  width: 2rem;
 }
 
 .w-10 {
   width: 2.5rem;
+}
+
+.w-6 {
+  width: 1.5rem;
 }
 
 .w-4 {
@@ -1497,7 +1509,7 @@ select {
   --tw-ring-offset-width: 0px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 800px) {
   .md\:mb-0 {
     margin-bottom: 0px;
   }
@@ -1572,7 +1584,7 @@ select {
 
 @media (min-width: 1024px) {
   .lg\:max-w-screen-md {
-    max-width: 768px;
+    max-width: 800px;
   }
 
   .lg\:px-24 {
