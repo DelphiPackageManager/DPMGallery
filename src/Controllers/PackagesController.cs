@@ -1,7 +1,9 @@
-﻿using DPMGallery.Entities;
+﻿using DPMGallery.DTO;
 using DPMGallery.Extensions;
 using DPMGallery.Models;
 using DPMGallery.Services;
+using DPMGallery.Types;
+using DPMGallery.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -27,12 +29,10 @@ namespace DPMGallery.Controllers
         public async Task<IActionResult> Index([FromQuery] string compiler,
             [FromQuery] string platform,
             [FromQuery(Name = "q")] string query,
-            [FromQuery] bool exact = false,
-            [FromQuery] int skip = 0,
-            [FromQuery] int take = 40,
+            [FromQuery] int page = 1,
             [FromQuery] bool prerelease = true,
             [FromQuery] bool commercial = true,
-            [FromQuery] bool trial = true, 
+            [FromQuery] bool trial = true,
             CancellationToken cancellationToken = default)
         {
             CompilerVersion compilerVersion = CompilerVersion.UnknownVersion;
@@ -52,30 +52,24 @@ namespace DPMGallery.Controllers
                     NotFound();
             }
 
+            var take = 10;
+            var skip = page > 0 ?  (page - 1) * take : 0;
 
-            var seachResults = await _searchService.SearchAsync(compilerVersion, thePlatform, query, exact, skip, take, prerelease, commercial, trial, cancellationToken);
 
-            var model = new PackagesViewModel();
-            model.Compiler = compiler;
-            model.TotalPackages = seachResults.TotalHits;
+            var seachResults = await _searchService.UISearchAsync(query, skip , take, prerelease, commercial, trial, cancellationToken);
+
+            PackagesViewModel model = Mapping<UISearchResponseDTO, PackagesViewModel>.Map(seachResults);
             model.Query = query;
 
-            ViewBag.Compiler = "11.0";
-            var versions = new List<SelectListItem>();
-            foreach (var ver in Enum.GetValues<CompilerVersion>())
+            if (model.TotalPackages - (skip + take) > 0)
             {
-                if (ver == CompilerVersion.UnknownVersion)
-                    continue;
-
-                var item = new SelectListItem
-                {
-                    Value = ver.GetDescription(),
-                    Text = "Delphi " + ver.GetDescription()
-                };
-                item.Selected = item.Value == compiler;
-                versions.Add(item);
+                model.NextPage = page + 1;
             }
-            ViewBag.CompilerVersions = versions;
+
+            if (page > 1)
+            {
+                model.PrevPage = Math.Max(1, page - 1);
+            }
 
 
             return View(model);

@@ -2,6 +2,7 @@
 using DPMGallery.DTO;
 using DPMGallery.Entities;
 using DPMGallery.Repositories;
+using DPMGallery.Types;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -69,7 +70,8 @@ namespace DPMGallery.Services
 
         public async Task<Stream> GetPackageStreamAsync(DownloadFileType fileType, string id, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken)
         {
-            string path = @$"{compilerVersion.Sanitise()}\{platform}\{id}\{id}-{compilerVersion.Sanitise()}-{platform}-{version}.";
+            //we are using all lowercase paths to avoid issues on linux filesystems.  
+            string path = Path.Combine($"{compilerVersion.Sanitise()}",$"{platform.ToString().ToLower()}",$"{id.ToLower()}",$"{id}-{compilerVersion.Sanitise()}-{platform}-{version}.");
             if (fileType == DownloadFileType.icon)
             {
                 path = path + "png";

@@ -10,9 +10,13 @@ namespace DPMGallery.Models
 {
     public class PackagesViewModel
     {
-        public long TotalPackages { get; set; } = 25000;
+        public long TotalPackages { get; set; }
         public string Query { get; set; }
-        public string Compiler { get; set; }
-        public IReadOnlyList<PackageViewModel> Packages { get; set; } = new List<PackageViewModel>();
+
+        public int NextPage { get; set; }
+
+        public int PrevPage { get; set; }
+
+        public IList<PackageViewModel> Packages { get; set; } = new List<PackageViewModel>();
     }
 }

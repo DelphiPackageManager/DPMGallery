@@ -1,23 +1,15 @@
-﻿using System;
+﻿using DPMGallery.Types;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
-using DPMGallery.Types;
 
 namespace DPMGallery.DTO
 {
-    /// <summary>
-    /// A package search result
-    /// </summary>
-    public class SearchResultDTO
+    public class UISearchResultDTO
     {
         [JsonPropertyName("id")]
         public string PackageId { get; set; }
-
-        [JsonPropertyName("compiler")]
-        public CompilerVersion Compiler { get; set; }
-
-        [JsonPropertyName("platform")]
-        public Platform Platform { get; set; }
 
         [JsonPropertyName("latestVersion")]
         public string LatestVersion { get; set; }
@@ -34,7 +26,7 @@ namespace DPMGallery.DTO
         [JsonPropertyName("isTrial")]
         public bool IsTrial { get; set; }
 
-        [JsonPropertyName("isReservedPrefix")] 
+        [JsonPropertyName("isReservedPrefix")]
         public bool IsReservedPrefix { get; set; }
 
         [JsonPropertyName("description")]
@@ -112,7 +104,12 @@ namespace DPMGallery.DTO
         [JsonPropertyName("hashAlgorith")]
         public string HashAlgorithm { get; set; }
 
-        [JsonPropertyName("dependencies")]
-        public IReadOnlyList<DependencyDTO> Dependencies { get; set; }
+        [JsonPropertyName("compilers")]
+        public List<CompilerVersion> CompilerVersions { get; set; }
+
+        [JsonPropertyName("platforms")]
+        public List<Platform> Platforms { get; set; }
+
     }
 }
+

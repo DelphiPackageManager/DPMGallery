@@ -1,5 +1,5 @@
 ﻿using DPMGallery.DTO;
-using DPMGallery.Entities;
+using DPMGallery.Types;
 using DPMGallery.Services;
 using Microsoft.AspNetCore.Mvc;
 using System;

@@ -3,7 +3,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text.Json.Serialization;
 
-namespace DPMGallery.Entities
+namespace DPMGallery.Types
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum CompilerVersion
@@ -41,6 +41,8 @@ namespace DPMGallery.Entities
     {
         public static CompilerVersion ToCompilerVersion(this string value)
         {
+            if (string.IsNullOrEmpty(value))
+                return CompilerVersion.UnknownVersion;
             string theValue = "";
             if (!value.StartsWith("RS", StringComparison.InvariantCultureIgnoreCase))
                 theValue = "RS";

@@ -1,4 +1,5 @@
-﻿using DPMGallery.Data;
+﻿using DPMGallery.Types;
+using DPMGallery.Data;
 using DPMGallery.Entities;
 using System;
 using System.Collections.Generic;

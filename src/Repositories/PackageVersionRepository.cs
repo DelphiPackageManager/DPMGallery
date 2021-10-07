@@ -1,4 +1,5 @@
-﻿using DPMGallery.Data;
+﻿using DPMGallery.Types;
+using DPMGallery.Data;
 using DPMGallery.Entities;
 using Serilog;
 using System;
@@ -56,10 +57,10 @@ namespace DPMGallery.Repositories
         public async Task UpdateAsyncStatus(PackageVersion packageVersion, CancellationToken cancellationToken)
         {
             string updateSql = $@"UPDATE {T.PackageVersion} 
-	                            SET status = @Status, status_message = @StatusMessage
+	                            SET status = @Status, status_message = @StatusMessage, listed = @listed
 	                            WHERE id = @id";
 
-            await Context.ExecuteAsync(updateSql, new { id = packageVersion.Id, Status = packageVersion.Status, StatusMessage = packageVersion.StatusMessage }, cancellationToken: cancellationToken);
+            await Context.ExecuteAsync(updateSql, new { id = packageVersion.Id, Status = packageVersion.Status, StatusMessage = packageVersion.StatusMessage, listed = packageVersion.Listed }, cancellationToken: cancellationToken);
         }
 
         public async Task<PackageVersion> InsertAsync(PackageVersion packageVersion, CancellationToken cancellationToken)

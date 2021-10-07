@@ -1,4 +1,5 @@
-﻿using Dapper.Contrib.Extensions;
+﻿using DPMGallery.Types;
+using Dapper.Contrib.Extensions;
 using DPMGallery.Data;
 using System;
 using System.Collections.Generic;

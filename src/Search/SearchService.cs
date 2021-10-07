@@ -1,4 +1,5 @@
-﻿using DPMGallery.DTO;
+﻿using DPMGallery.Types;
+using DPMGallery.DTO;
 using DPMGallery.Entities;
 using DPMGallery.Repositories;
 using DPMGallery.Utils;
@@ -27,8 +28,19 @@ namespace DPMGallery.Services
             var searchResponse = await _searchRepository.SearchAsync(compilerVersion, platform, query, exact, skip, take, includePrerelease, includeCommercial,
                                                                      includeTrial, cancellationToken);
 
-            return Mapping<SearchResponse, SearchResponseDTO>.Map(searchResponse);
+            return Mapping<ApiSearchResponse, SearchResponseDTO>.Map(searchResponse);
             
         }
+
+        public async Task<UISearchResponseDTO> UISearchAsync(string query = null, int skip = 0, int take = 20,
+                                    bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
+        {
+            var searchResponse = await _searchRepository.UISearchAsync(query, skip, take, includePrerelease, includeCommercial,
+                                                                     includeTrial, cancellationToken);
+
+            return Mapping<UISearchResponse, UISearchResponseDTO>.Map(searchResponse);
+
+        }
+
     }
 }

@@ -14,6 +14,7 @@ using System.Text.Json.Serialization;
 using System.Text.Json;
 using DPMGallery.Services;
 using Serilog;
+using DPMGallery.Models;
 
 namespace DPMGallery
 {
@@ -130,6 +131,7 @@ namespace DPMGallery
 
             });
             DTOMappings.Configure();
+            ModelMappings.Configure();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

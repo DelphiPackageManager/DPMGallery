@@ -1,5 +1,6 @@
 ﻿using BlushingPenguin.JsonPath;
 using DPMGallery.Entities;
+using DPMGallery.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,8 +92,8 @@ namespace DPMGallery.PackageExtraction
             if (element == null)
                 throw new Exception("compiler field in package metadata is empty");
             string compiler = element?.GetString();
-            compiler = "RS" + compiler.Replace('.', '_');
-            return (CompilerVersion)Enum.Parse(typeof(CompilerVersion), compiler);
+
+            return compiler.ToCompilerVersion();
         }
 
         public Platform GetPlatform()
@@ -102,8 +103,7 @@ namespace DPMGallery.PackageExtraction
                 throw new Exception("platforms field in package metadata is empty");
             string platform = element?.GetString();
 
-            return (Platform)Enum.Parse(typeof(Platform), platform);
-
+            return platform.ToPlatform();
         }
 
         public string GetProjectUrl()

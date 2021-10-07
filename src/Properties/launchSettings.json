@@ -19,6 +19,7 @@
       "commandName": "Project",
       "commandLineArgs": "run",
       "launchBrowser": true,
+      "launchUrl": "packages",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

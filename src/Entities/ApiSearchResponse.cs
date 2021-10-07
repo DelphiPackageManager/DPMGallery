@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace DPMGallery.Entities
 {
-    public class SearchResponse
+    public class ApiSearchResponse
     {
         public long TotalCount { get; set; }
 

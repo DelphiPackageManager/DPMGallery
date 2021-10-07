@@ -1,4 +1,4 @@
-﻿using DPMGallery.Entities;
+﻿using DPMGallery.Types;
 using DPMGallery.Extensions;
 using DPMGallery.Models;
 using Microsoft.AspNetCore.Mvc;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DPMGallery.Entities
+namespace DPMGallery.Types
 {
     [Flags]
     public enum PackageDeprecationState

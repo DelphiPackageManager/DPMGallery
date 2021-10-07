@@ -75,6 +75,13 @@ namespace DPMGallery
 
 
             }
+
+            public static class ViewNames
+            {
+                public const string SearchStableVersion = "search_stable_version";
+                public const string SearchLatestVersion = "search_latest_version";
+
+            }
         }
     }
 }

@@ -1,12 +1,15 @@
-﻿using DPMGallery.Data;
-using DPMGallery.Entities;
-using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DPMGallery.Data;
+using DPMGallery.Entities;
+using Serilog;
+using DPMGallery.Types;
 using T = DPMGallery.Constants.Database.TableNames;
+using V = DPMGallery.Constants.Database.ViewNames;
+using SemanticVer = SemanticVersioning.Version;
 
 namespace DPMGallery.Repositories
 {
@@ -18,184 +21,84 @@ namespace DPMGallery.Repositories
             _logger = logger;
         }
 
-        private string GetTables(bool includePrerelease)
+        private string GetCountSelect(bool includePrerelease)
         {
-            string result;
             if (includePrerelease)
             {
-                result = $@"from {T.Package} p 
-                            left join {T.PackageTargetPlatform} tp on
-                            p.id = tp.package_id
-                            left join {T.PackageVersion} pvl
-                            on tp.latest_version = pvl.id
-                            left join {T.PackageVersion} pv
-                            on tp.latest_stable_version = pv.id
-                            ";
+                return $"select count(*) from {V.SearchLatestVersion} \n";
             }
             else
             {
-                result = $@"from {T.Package} p 
-                            left  join {T.PackageTargetPlatform} tp on
-                            p.id = tp.package_id
-                            left join {T.PackageVersion} pv
-                            on tp.latest_version = pv.id
-                            ";
+                return $"select count(*) from {V.SearchStableVersion} \n";
             }
-            return result;
-        }
-
-
-        private string GetCountSelect(bool includePrerelease)
-        {
-            string tables = GetTables(includePrerelease);
-            return  $@"select count(*)
-                       {tables}" + "\n";
         }
 
         private string GetSelectSql(bool includePrerelease)
         {
-            string tables = GetTables(includePrerelease);
-
-            string result;
-
             if (includePrerelease)
             {
-                result = $@"select 
-                            p.id,
-                            pvl.id as versionid,
-                            p.packageid, 
-                            tp.compiler_version, 
-                            tp.platform,
-                            pvl.version as latestversion,
-                            pv.version as lateststableversion,
-                            pvl.is_prerelease, 
-                            pvl.is_commercial, 
-                            pvl.is_trial, 
-                            p.reserved_prefix_id is not null as is_reserved,
-                            pvl.description,
-                            pvl.authors,
-                            pvl.icon,
-                            pvl.read_me,
-                            pvl.release_notes,
-                            pvl.license, 
-                            pvl.project_url,
-                            pvl.repository_url,
-                            pvl.repository_type,
-                            pvl.repository_branch,
-                            pvl.repository_commit,
-                            pvl.listed,
-                            pvl.status,
-                            pvl.published_utc,
-                            pvl.deprecation_state,
-                            pvl.deprecation_message,
-                            pvl.alternate_package,
-                            pvl.hash,
-                            pvl.hash_algorithm,
-                            p.downloads as totaldownloads,
-                            pvl.downloads as versiondownloads    
-                            {tables}" + "\n";
+                return $"select * from {V.SearchLatestVersion} \n";
             }
             else
             {
-                result = $@"select 
-                            p.id,
-                            pv.id as versionid,
-                            p.packageid, 
-                            tp.compiler_version, 
-                            tp.platform,
-                            pv.version as latest_version,
-                            pv.version as latest_stable_version,
-                            pv.is_prerelease, 
-                            pv.is_commercial, 
-                            pv.is_trial, 
-                            p.reserved_prefix_id is not null as is_reserved,
-                            pv.description,
-                            pv.authors,
-                            pv.icon,
-                            pv.read_me,
-                            pv.release_notes,
-                            pv.license, 
-                            pv.project_url,
-                            pv.repository_url,
-                            pv.repository_type,
-                            pv.repository_branch,
-                            pv.repository_commit,
-                            pv.listed,
-                            pv.status,
-                            pv.published_utc,
-                            pv.deprecation_state,
-                            pv.deprecation_message,
-                            pv.alternate_package,
-                            pv.hash,
-                            pv.hash_algorithm,
-                            p.downloads as total_downloads,
-                            pv.downloads as version_downloads    
-                            {tables}" + "\n";
-            
+                return $"select * from {V.SearchStableVersion} \n";
             }
-
-            return result;
         }
 
         private string GetWhereSql(CompilerVersion compilerVersion, Platform platform, string query, bool exact, bool includePrerelease, bool includeCommercial, bool includeTrial)
         {
-            string result = includePrerelease ? "pvl.status = @status\n" : "pv.status = @status\n";
-            
+            string result = "";
+
             if (compilerVersion != CompilerVersion.UnknownVersion)
             {
-                result = result + "and tp.compiler_version = @compilerVersion \n";
+                result = result + "and compiler_version = @compilerVersion \n";
             }
             if (platform != Platform.UnknownPlatform)
             {
-                result = result + "and tp.platform = @platform \n";
-            }
-
-            string versionAlias;
-            if (!includePrerelease)
-            {
-                versionAlias = "pv";
-                result = result + "and pv.is_prerelease = false \n";
-            }
-            else 
-            {
-                versionAlias = "pvl";
+                result = result + "and platform = @platform \n";
             }
 
             if (!includeCommercial)
             {
-                result = result + $"and {versionAlias}.is_commercial = false" + "\n";
+                result = result + $"and is_commercial = false" + "\n";
             }
             if (!includeTrial)
             {
-                result = result + $"and {versionAlias}.is_trial = false" + "\n";
+                result = result + $"and is_trial = false" + "\n";
             };
 
             if (!string.IsNullOrEmpty(query))
             {
                 if (exact)
                 {
-                    result = result + "and p.packageid = @query \n";
+                    result = result + "and packageid = @query \n";
                 }
                 else
                 {
                     //using ILike and C collation to effect case insensitive search
-                    result = result + "and p.packageid ILIKE @query COLLATE \"C\" \n";
+                    result = result + "and packageid ILIKE @query COLLATE \"C\" \n";
                 }
             }
 
             if (!string.IsNullOrEmpty(result))
+            {
+                if (result.StartsWith("and "))
+                {
+                    result = result.Remove(0, 4);
+                }
                 result = "where \n" + result;
+            }
 
             return result;
         }
 
         //used by the api, will not work for the UI
-        public async Task<SearchResponse> SearchAsync(CompilerVersion compilerVersion, Platform platform, string query = null, bool exact = false, int skip = 0, int take = 20,
+        public async Task<ApiSearchResponse> SearchAsync(CompilerVersion compilerVersion, Platform platform, string query = null, bool exact = false, int skip = 0, int take = 20,
                                             bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
         {
             string select = GetSelectSql(includePrerelease);
-            string searchSql = GetWhereSql(compilerVersion, platform,  query, exact, includePrerelease, includeCommercial, includeTrial);
-            
+            string searchSql = GetWhereSql(compilerVersion, platform, query, exact, includePrerelease, includeCommercial, includeTrial);
+
             string countSql = GetCountSelect(includePrerelease);
 
             countSql = @$"{countSql}
@@ -206,15 +109,14 @@ namespace DPMGallery.Repositories
             {
                 compilerVersion,
                 platform,
-                status = PackageStatus.Passed,
                 query = query != null ? exact ? query : query + "%" : null
             };
 
-            
+
 
             int totalCount = await Context.ExecuteScalarAsync<int>(countSql, countParams, cancellationToken: cancellationToken);
 
-            string orderBy = "order by p.id, tp.compiler_version, tp.platform\n";
+            string orderBy = "order by id, compiler_version, platform\n";
             string pagingSql = "offset @skip limit @take";
 
 
@@ -227,21 +129,18 @@ namespace DPMGallery.Repositories
             {
                 compilerVersion,
                 platform,
-                query = exact? query : query + "%",
+                query = exact ? query : query + "%",
                 skip,
-                take,
-                status = PackageStatus.Passed
+                take
             };
 
             var items = await Context.QueryAsync<SearchResult>(sql, sqlParams, cancellationToken: cancellationToken);
-
-
 
             if (items.Any())
             {
                 var versionIds = items.Select(m => m.VersionId).Distinct().ToArray(); //dapper doesn't support lists for values
 
-                var dependencies = await Context.QueryAsync<PackageDependency>($"select * from {T.PackageDependency} where packageversion_id = ANY (@versionIds)", new { versionIds }, cancellationToken : cancellationToken);
+                var dependencies = await Context.QueryAsync<PackageDependency>($"select * from {T.PackageDependency} where packageversion_id = ANY (@versionIds)", new { versionIds }, cancellationToken: cancellationToken);
 
                 if (dependencies.Any())
                 {
@@ -267,7 +166,7 @@ namespace DPMGallery.Repositories
                 {
                     foreach (var item in items)
                     {
-                        var itemOwners = owners.Where(x => x.package_id == item.Id).Select(x => x.owner).ToArray(); 
+                        var itemOwners = owners.Where(x => x.package_id == item.Id).Select(x => x.owner).ToArray();
                         if (itemOwners.Any())
                             item.Owners = string.Join(' ', itemOwners);
                     }
@@ -275,63 +174,175 @@ namespace DPMGallery.Repositories
 
             }
 
-            return new SearchResponse()
+            return new ApiSearchResponse()
             {
                 TotalCount = totalCount,
                 searchResults = items.ToList()
             };
         }
 
-        public async Task<bool> Test(CompilerVersion compilerVersion, Platform platform, string query = null, bool exact = false, int skip = 0, int take = 20,
+        private string GetUIWhereSql(bool includeCommercial, bool includeTrial)
+        {
+            string result = "where id = ANY (@ids)\n";
+
+            if (!includeCommercial)
+            {
+                result = result + "and is_commercial = false \n";
+            }
+            if (!includeTrial)
+            {
+                result = result + "and is_trial = false \n";
+            };
+
+            return result;
+        }
+
+
+        public async Task<UISearchResponse> UISearchAsync(string query = null, int skip = 0, int take = 20,
                                             bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
         {
 
-            SearchResponse searchResponse = await SearchAsync(CompilerVersion.UnknownVersion, Platform.UnknownPlatform, query, exact, skip, take,
-                                            includePrerelease, includeCommercial, includeTrial, cancellationToken);
-
-            string lastId = "";
-            string latestVersion = "";
-            string latestStable = "";
-
-            //CompilerVersion lastCompiler = CompilerVersion.UnknownVersion;
-            //Platform lastPlatform = Platform.UnknownPlatform;
-
-
-            List<CompilerVersion> compilers = new();
-            List<Platform> platforms = new();
-
-            foreach (var result in searchResponse.searchResults)
+            var result = new UISearchResponse()
             {
-                if (result.PackageId != lastId)
-                {
-                    //record compilers and platform against a result item.
-                 
-                    //new package, start again
-                    _logger.Debug("[SearchRepository] found new package {result.PackageId}");
-                    lastId = result.PackageId;
-                    latestVersion = result.LatestVersion;
-                    latestStable = result.LatestStableVersion;
-                    compilers.Clear();
-                    platforms.Clear();
-                    compilers.Add(result.Compiler);
-                    platforms.Add(result.Platform);
-                }
-                else
-                {
-                    //if we encounter a new version, then we need to see if it is newer
-                    if (latestVersion != result.LatestVersion)
-                    {
+                TotalCount = 0
+            };
 
+            string countSql = $"select count(*) from {T.Package}\n";
 
-                    }
-
-                }
-
+            if (!string.IsNullOrEmpty(query))
+            {
+                countSql = countSql + $@"where 
+                                         packageid ILIKE @query COLLATE ""C"" ";
             }
 
 
-            return false;
+            var sqlParams = new
+            {
+                query = query != null ? $"%{query}%" : null
+            };
+
+            result.TotalCount = await Context.ExecuteScalarAsync<int>(countSql, sqlParams , cancellationToken: cancellationToken);
+            if (result.TotalCount == 0)
+                return result;
+
+
+            string sql = $"select id from {T.Package} \n";
+            if (!string.IsNullOrEmpty(query))
+            {
+                sql = sql + @$"where
+                               packageid ILIKE @query COLLATE ""C""";
+            }
+            sql = sql + @"order by id
+                           offset @skip limit @take";
+
+
+            var idParams = new
+            {
+                query = query != null ? $"%{query}%" : null,
+                skip,
+                take
+            };
+
+            var ids = await Context.QueryAsync<int>(sql, idParams, cancellationToken: cancellationToken);
+
+            if (!ids.Any())
+            {
+                return result;
+            }
+
+            string versionsSql;
+
+            if (includePrerelease)
+            {
+
+                versionsSql = $"select * from {V.SearchLatestVersion}";
+            }
+            else
+            {
+                versionsSql = $"select * from {V.SearchStableVersion}";
+            }
+
+            var whereSql = GetUIWhereSql(includeCommercial, includeTrial);
+
+            var orderBySql = @"order by packageid, latestversion, compiler_version , platform";
+
+            versionsSql = $@"{versionsSql} 
+                             {whereSql}
+                             {orderBySql}";
+
+            var versionsParams = new
+            {
+                ids = ids.ToArray()
+            };
+
+            var items = await Context.QueryAsync<UISearchResult>(versionsSql, versionsParams, cancellationToken: cancellationToken);
+
+            if (!items.Any())
+                return result;
+
+            string prevPackageId = "";
+            string prevVersion = "0.0.0";
+
+            List<CompilerVersion> compilers = new();
+            List<Platform> platforms = new();
+            UISearchResult currentItem = null;
+
+
+            foreach (var item in items)
+            {
+                if (item.PackageId != prevPackageId)
+                {
+                    _logger.Debug("[SearchRepository] found new package {result.PackageId}");
+                    if (currentItem != null)
+                    {
+                        currentItem.CompilerVersions = compilers.Distinct().ToList();
+                        currentItem.Platforms = platforms.Distinct().ToList();
+                        result.searchResults.Add(currentItem);
+                    }
+                    compilers.Clear();
+                    platforms.Clear();
+
+                    //new package, start again
+                    currentItem = item;
+                    prevPackageId = item.PackageId;
+                    prevVersion = item.LatestVersion;
+
+                    compilers.Add(item.Compiler);
+                    platforms.Add(item.Platform);
+                }
+                else
+                {
+                    //if we encounter a different version, then we need to see if it is newer
+                    //if it is newer, then we start again
+                    if (item.LatestVersion != prevVersion)
+                    {
+                        SemanticVer newVer = SemanticVer.Parse(item.LatestVersion);
+                        SemanticVer currentVer = SemanticVer.Parse(prevVersion);
+
+                        if (newVer > currentVer)
+                        {
+                            //higher version, take this!
+                            currentItem = item;
+                            prevVersion = item.LatestVersion;
+                            compilers.Clear();
+                            platforms.Clear();
+                            compilers.Add(item.Compiler);
+                            platforms.Add(item.Platform);
+                            continue;
+                        }
+                        //not newer, so we just add the compiler
+                        compilers.Add(item.Compiler);
+                        platforms.Add(item.Platform);
+                    }
+                }
+            }
+            if (currentItem != null)
+            {
+                currentItem.CompilerVersions = compilers.Distinct().ToList();
+                currentItem.Platforms = platforms.Distinct().ToList();
+                result.searchResults.Add(currentItem);
+            }
+            return result;
         }
     }
-
 }

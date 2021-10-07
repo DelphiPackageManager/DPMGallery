@@ -37,6 +37,8 @@ namespace DPMGallery.Services
         private const string ReadmeContentType = "text/markdown";
         private const string IconContentType = "image/xyz";
 
+
+        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         public PackageIndexService(ILogger logger, IUnitOfWork unitOfWork, ApiKeyRepository apiKeyRepository, PackageRepository packageRepository, PackageVersionRepository packageVersionRepository,
                                    PackageVersionProcessRepository packageVersionProcessRepository, TargetPlatformRepository targetPlatformRepository, PackageOwnerRepository packageOwnerRepository, 
                                    OrganisationRepository organisationRepository, IStorageService storageService, ServerConfig serverConfig, IAntivirusService antivirusService)
@@ -148,44 +150,56 @@ namespace DPMGallery.Services
                         return PackageIndexingResult.Error;
                     }
 
-                    //TODO :check if there is a reserved prefix, and if so that the user is a prefix owner
-
-                    var thePackage = await _packageRepository.GetPackageByPackageIdAsync(package.PackageId, cancellationToken);
-                    if (thePackage == null)
+                    Package thePackage = null;
+                    //we have to do this to avoid race conditions where another thread could jump in and add package or targetplatform
+                    //between us checking and committing. This will slow down inserts but should not be a problem since we're unlike
+                    //to get tons of concurrent inserts of the same packageid and targetplatforms (mostly in testing). 
+                    await _semaphoreSlim.WaitAsync();
+                    try
                     {
-                        isNew = true;
-
-                        //check that the api key has permission to create package 
-                        if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage))
+                        //TODO :check if there is a reserved prefix, and if so that the user is a prefix owner
+                        thePackage = await _packageRepository.GetPackageByPackageIdAsync(package.PackageId, cancellationToken);
+                        if (thePackage == null)
                         {
-                            return PackageIndexingResult.Forbidden;
+                            isNew = true;
+
+                            //check that the api key has permission to create package 
+                            if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage))
+                            {
+                                return PackageIndexingResult.Forbidden;
+                            }
+
+                            //new package
+                            thePackage = await _packageRepository.InsertAsync(package, cancellationToken);
+
+                            var packageOwner = new PackageOwner()
+                            {
+                                OwnerId = apiKey.UserId,
+                                PackageId = thePackage.Id
+                            };
+
+                            await _packageOwnerRepository.InsertAsync(packageOwner);
+                            //This could throw if another request creates the package between us checking and committing. 
+                            _unitOfWork.Commit();
                         }
-
-                        //new package
-                        thePackage = await _packageRepository.InsertAsync(package, cancellationToken);
-
-                        var packageOwner = new PackageOwner()
+                        else
                         {
-                            OwnerId = apiKey.UserId,
-                            PackageId = thePackage.Id
-                        };
-
-                        await _packageOwnerRepository.InsertAsync(packageOwner);
-
+                            //package exists - so check if the user is a package owner. 
+                            var isOwner = GetIsOwner(thePackage.Id, apiKey.UserId, cancellationToken).Result;
+                            if (!isOwner)
+                            {
+                                return PackageIndexingResult.Forbidden;
+                            }
+                            //check that the api key actually has permissions to push a new version
+                            if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion))
+                            {
+                                return PackageIndexingResult.Forbidden;
+                            }
+                        }
                     }
-                    else
+                    finally
                     {
-                        //package exists - so check if the user is a package owner. 
-                        var isOwner = await GetIsOwner(thePackage.Id, apiKey.UserId, cancellationToken);
-                        if (!isOwner)
-                        {
-                            return PackageIndexingResult.Forbidden;
-                        }
-                        //check that the api key actually has permissions to push a new version
-                        if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion))
-                        {
-                            return PackageIndexingResult.Forbidden;
-                        }
+                        _semaphoreSlim.Release();
                     }
                     if (thePackage == null)
                         return PackageIndexingResult.Error;
@@ -193,14 +207,24 @@ namespace DPMGallery.Services
                     PackageVersion thePackageVersion;
                     PackageTargetPlatform theTargetPlatform;
 
-                    theTargetPlatform = await _targetPlatformRepository.GetByIdCompilerPlatformAsync(thePackage.Id, packageTargetPlatform.CompilerVersion, packageTargetPlatform.Platform, cancellationToken);
-
-                    if (theTargetPlatform == null)
+                    await _semaphoreSlim.WaitAsync();
+                    try
                     {
-                        //there has never been a packageversion for this combo of package/compiler/platform
-                        packageTargetPlatform.PackageId = thePackage.Id;
-                        theTargetPlatform = await _targetPlatformRepository.InsertAsync(packageTargetPlatform, cancellationToken);
-                        isNew = true;
+
+                        theTargetPlatform = await _targetPlatformRepository.GetByIdCompilerPlatformAsync(thePackage.Id, packageTargetPlatform.CompilerVersion, packageTargetPlatform.Platform, cancellationToken);
+
+                        if (theTargetPlatform == null)
+                        {
+                            //there has never been a packageversion for this combo of package/compiler/platform
+                            packageTargetPlatform.PackageId = thePackage.Id;
+                            theTargetPlatform = await _targetPlatformRepository.InsertAsync(packageTargetPlatform, cancellationToken);
+                            isNew = true;
+                            _unitOfWork.Commit(); //will throw early if there is an issue.
+                        }
+                    }
+                    finally
+                    {
+                        _semaphoreSlim.Release();
                     }
 
                     if (!isNew) //skip this if we created a new Package, there won't be any versions

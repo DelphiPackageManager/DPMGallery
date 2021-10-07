@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DPMGallery.Types;
 using DPMGallery.Data;
 using DPMGallery.Repositories;
 using DPMGallery.Services;
@@ -53,7 +54,7 @@ namespace DPMGallery.BackgroundServices
                         var packageVersionProcessRepository = scope.ServiceProvider.GetRequiredService<PackageVersionProcessRepository>();
                         
                         //get any packageversionprocess records not marked as completed.
-                        var toBeProcessed = await packageVersionProcessRepository.GetNotCompleted(1, stoppingToken);
+                        var toBeProcessed = await packageVersionProcessRepository.GetNotCompleted(100, stoppingToken);
                         if (stoppingToken.IsCancellationRequested) //might have been signalled while we were querying the db
                             return;
 
@@ -73,9 +74,9 @@ namespace DPMGallery.BackgroundServices
                     _logger.Error(ex, "[{category}] Error occurred during processing.", "PackageIndexBackgroundService");
                 }
 
-                //waiting 20s before checking again. 
+                //waiting 30s before checking again. 
                 //TODO : make this configurable
-                await Task.Delay(20000, stoppingToken);
+                await Task.Delay(30000, stoppingToken);
             }
 
         }
@@ -94,7 +95,9 @@ namespace DPMGallery.BackgroundServices
             string folderName = Path.Combine(targetPlatform.SantisedCompilerVersion, targetPlatform.Platform.ToString(), package.PackageId);
 
             string localFile = Path.Combine(_serverConfig.ProcessingFolder, item.PackageFileName); 
-            string remotePath = Path.Combine(folderName,item.PackageFileName);
+            //lowercase the directory always!
+            string remotePath = Path.Combine(folderName.ToLower(),item.PackageFileName);
+            _logger.Information("[{processing}] Copying to filesystem : {localFile} to : {remotePath}", "PackageIndexBackgroundService", localFile, remotePath);
 
             //this is messy! what happens with s3 if you try to overwrite a file? 
             //TODO : Check for memory leaks - are all streams disposed properly.
@@ -117,20 +120,36 @@ namespace DPMGallery.BackgroundServices
                             throw new Exception("Uploadin dspec failed");
                         if (packageVersion.HasIcon)
                         {
-                            remotePath = Path.ChangeExtension(remotePath, Path.GetExtension(packageVersion.Icon));
-                            using var iconStream = reader.GetStream(packageVersion.Icon);
-                            putResult = await storageService.PutAsync(remotePath, iconStream, IconContentType, cancellationToken);
-                            if (putResult != StoragePutResult.Success)
-                                throw new Exception("Uploadin icon failed");
+                            try { 
+                                remotePath = Path.ChangeExtension(remotePath, Path.GetExtension(packageVersion.Icon));
+                                _logger.Information("[{processing}] Copying icon to filesystem", "Copy to CDN - file : {remotePath}", remotePath);
+                                using var iconStream = reader.GetStream(packageVersion.Icon);
+                                putResult = await storageService.PutAsync(remotePath, iconStream, IconContentType, cancellationToken);
+                                if (putResult != StoragePutResult.Success)
+                                    throw new Exception("Uploadin icon failed");
+                                }
+                            catch(FileNotFoundException ex)
+                            {
+                                _logger.Warning(ex, $"Package {item.PackageFileName} metadata says it has an icon, but the icon wasn't found in the package!");
+                            }
                         }
 
                         if (packageVersion.HasReadMe)
                         {
-                            remotePath = Path.ChangeExtension(remotePath, ".readme");
-                            using var readmeStream = reader.GetStream(packageVersion.ReadMe);
-                            putResult = await storageService.PutAsync(remotePath, readmeStream, ReadmeContentType, cancellationToken);
-                            if (putResult != StoragePutResult.Success)
-                                throw new Exception("Uploadin readme failed");
+                            try
+                            { 
+                                remotePath = Path.ChangeExtension(remotePath, ".readme");
+                                _logger.Information("[{processing}] Copying readme to filesystem", "Copy to CDN - file : {remotePath}", remotePath);
+                                using var readmeStream = reader.GetStream(packageVersion.ReadMe);
+
+                                putResult = await storageService.PutAsync(remotePath, readmeStream, ReadmeContentType, cancellationToken);
+                                if (putResult != StoragePutResult.Success)
+                                    throw new Exception("Uploadin readme failed");
+                            }
+                            catch (FileNotFoundException ex)
+                            {
+                                _logger.Warning(ex, $"Package {item.PackageFileName} metadata says it has a readme, but the readme wasn't found in the package!");
+                            }
                         }
                         result = CopyResult.Ok;
                     }
@@ -150,7 +169,7 @@ namespace DPMGallery.BackgroundServices
                 else
                 {
                     result = CopyResult.Failed;
-                    packageVersion.StatusMessage = "Failed to copy to CDN - out of retries - contact support.";
+                    packageVersion.StatusMessage = $"Failed to copy to CDN - out of retries {ex.Message}\nContact Support!.";
                     _logger.Error(ex, "Error copying to CD, no retries left");
                 }
             }
@@ -167,6 +186,10 @@ namespace DPMGallery.BackgroundServices
                 Message = "No Av enabled",
                 Result = true
             };
+            if (!avServices.Any())
+                return aVScanResult;
+
+
             foreach (var service in avServices)
             {
                 _logger.Information("[{category}] {service} Scanning file : {filePath}", "Antivirus", service.ServiceName, filePath);
@@ -177,6 +200,8 @@ namespace DPMGallery.BackgroundServices
                     return aVScanResult; //don't bother doing the next one.
                 }
             }
+            _logger.Information("[{category}] Scanning file : {filePath} completed : {aVScanResult.Message}", "Antivirus", filePath, aVScanResult.Message);
+
             //NOTe : if no av is enabled we'll just return true - should this ever happen (except in dev?)
             return aVScanResult;
         }
@@ -247,6 +272,8 @@ namespace DPMGallery.BackgroundServices
                     break; //if failed AV then we are done.
 
                 case PackageStatus.CopyToFileSystem:
+                    _logger.Information("[{processing}] Copying to filesystem", "PackageIndexBackgroundService");
+
                     CopyResult copyResult = await DoCopyToFileSystem(scope, package, packageVersion, item, targetPlatform, cancellationToken);
 
                     switch (copyResult)
@@ -265,6 +292,8 @@ namespace DPMGallery.BackgroundServices
                             item.Completed = true;
                             item.LastUpdatedUtc = DateTime.UtcNow;
                             packageVersion.Status = PackageStatus.Passed;
+                            packageVersion.StatusMessage = "Ok";
+                            packageVersion.Listed = true;
                             break;
                     }
 

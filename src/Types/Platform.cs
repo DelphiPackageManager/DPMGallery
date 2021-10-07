@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace DPMGallery.Entities
+namespace DPMGallery.Types
 {
 
     public enum Platform
@@ -18,8 +18,6 @@ namespace DPMGallery.Entities
         AndroidArm64 = 9,
         AndroidIntel32 = 10, //reserved for future use
         AndroidIntel64 = 11, //reserved for future use
-        Android = AndroidArm32, //for backwards compat with old packages
-        Andriod64 = AndroidArm64,
         iOS32 = 12,
         iOS64 = 13, //reserved for future use
         LinuxIntel32 = 14, //reserved for future use
@@ -32,6 +30,16 @@ namespace DPMGallery.Entities
     {
         public static Platform ToPlatform(this string value)
         {
+            if (string.IsNullOrEmpty(value))
+                return Platform.UnknownPlatform;
+
+            //some old package versions have bad values.
+            if (value == "Android64")
+                value = "AndroidArm64";
+            if (value == "Android")
+                value = "AndroidArm32";
+
+
             if (Enum.TryParse(value, true, out Platform platform))
                 return platform;
             return Platform.UnknownPlatform;

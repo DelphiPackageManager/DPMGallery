@@ -4,9 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DPMGallery.Data;
 using DPMGallery.DTO;
-using DPMGallery.Entities;
+using DPMGallery.Types;
 using DPMGallery.Services;
 using Microsoft.AspNetCore.Mvc;
 using Semver = SemanticVersioning.Version;
@@ -104,12 +103,13 @@ namespace DPMGallery.Controllers.Api
                     return Problem("CDN Is not configured for storage provider", statusCode: 503);
                 }
 
-                string packageUrl = _serverConfig.Storage.CDNBaseUri;
+                string packageUrl = _serverConfig.Storage.CDNBaseUri?.ToLower();
                 if (packageUrl.EndsWith('/'))
                     packageUrl = packageUrl.TrimEnd('/');
                 //add path elements
 
-                packageUrl = $"{packageUrl}/{compilerVersion}/{platform}/{id}/{id}-{compilerVersion}-{platform}-{version}.{fileType}";
+                //make sure the path to the file is lowercase
+                packageUrl = $"{packageUrl}/{compilerVersion.ToLower()}/{platform.ToLower()}/{id.ToLower()}/{id}-{compilerVersion}-{platform}-{version}.{fileType}";
 
                 return Redirect(packageUrl);
             }

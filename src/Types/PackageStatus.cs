@@ -1,4 +1,4 @@
-﻿namespace DPMGallery.Entities
+﻿namespace DPMGallery.Types
 {
     public enum PackageStatus
     {

@@ -1,5 +1,5 @@
 ﻿using DPMGallery.DTO;
-using DPMGallery.Entities;
+using DPMGallery.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;

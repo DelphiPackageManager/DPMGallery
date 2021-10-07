@@ -50,15 +50,15 @@ namespace DPMGallery
             var host = CreateHostBuilder(args)
                 .UseSystemd() // run as a service on linix
                 .ConfigureAppConfiguration((ctx, builder) =>
-            {
-                if (ctx.HostingEnvironment.IsDevelopment())
                 {
-                    builder.AddUserSecrets<Program>();
+                    if (ctx.HostingEnvironment.IsDevelopment())
+                    {
+                        builder.AddUserSecrets<Program>();
 
-                }
-                TypeMapper.Initialize("DPMGallery.Entities");
+                    }
+                    TypeMapper.Initialize("DPMGallery.Entities");
 
-            }).Build();
+                }).Build();
 
 
             try

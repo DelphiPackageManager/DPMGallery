@@ -1,4 +1,4 @@
-﻿using DPMGallery.Entities;
+﻿using DPMGallery.Types;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 

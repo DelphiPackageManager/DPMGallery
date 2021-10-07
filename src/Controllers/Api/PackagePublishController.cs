@@ -101,7 +101,7 @@ namespace DPMGallery.Controllers
                         case PackageIndexingResult.Forbidden:
                             return Forbid();
                         case PackageIndexingResult.PackageAlreadyExists:
-                            return StatusCode(400, "Package already exists");
+                            return StatusCode(409, "Package already exists");
                         case PackageIndexingResult.Error:
                             return StatusCode(500);
                         case PackageIndexingResult.FailedAVScan:

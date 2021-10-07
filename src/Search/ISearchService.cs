@@ -1,5 +1,5 @@
 ﻿using DPMGallery.DTO;
-using DPMGallery.Entities;
+using DPMGallery.Types;
 using System;
 using System.Linq;
 using System.Threading;
@@ -22,5 +22,9 @@ namespace DPMGallery.Services
         /// <returns></returns>
         Task<SearchResponseDTO> SearchAsync(CompilerVersion compilerVersion, Platform platform, string query = null, bool exact = false, int skip = 0, int take = 20,
                                             bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default);
+
+        Task<UISearchResponseDTO> UISearchAsync(string query = null, int skip = 0, int take = 20,
+                                            bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default);
+
     }
 }

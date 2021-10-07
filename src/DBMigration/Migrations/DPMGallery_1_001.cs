@@ -2,14 +2,105 @@
 
 using FL = DPMGallery.Constants.Database.FieldLength;
 using T = DPMGallery.Constants.Database.TableNames;
+using V = DPMGallery.Constants.Database.ViewNames;
 
 using DB = DPMGallery.Constants.Database;
 
 namespace DPMGallery.DBMigration.Conventions
 {
+
+
 	[Migration(1, "Initial Schema creation")]
 	public class DPMGallery_1_001 : Migration
 	{
+		private const string LatestStableVersionView = @"create view " + V.SearchStableVersion + @" as
+														select 
+															p.id,
+															pv.id as versionid,
+															p.packageid, 
+															tp.compiler_version, 
+															tp.platform,
+															pv.version as latest_version,
+															pv.version as latest_stable_version,
+															pv.is_prerelease, 
+															pv.is_commercial, 
+															pv.is_trial, 
+															p.reserved_prefix_id is not null as is_reserved,
+															pv.description,
+															pv.authors,
+															pv.icon,
+															pv.read_me,
+															pv.release_notes,
+															pv.license, 
+															pv.project_url,
+															pv.repository_url,
+															pv.repository_type,
+															pv.repository_branch,
+															pv.repository_commit,
+															pv.listed,
+															pv.status,
+															pv.published_utc,
+															pv.deprecation_state,
+															pv.deprecation_message,
+															pv.alternate_package,
+															pv.hash,
+															pv.hash_algorithm,
+															p.downloads as total_downloads,                           
+															pv.downloads as version_downloads   
+														from package p 
+														left  join package_targetplatform tp on
+														p.id = tp.package_id
+														left join package_version pv
+														on tp.latest_version = pv.id							
+														where pv.status = 200
+														and pv.listed = true
+														order by p.id, tp.compiler_version, tp.platform";
+
+		private const string LatestVersionView = @"create view " + V.SearchLatestVersion + @" as
+													select 
+														p.id,
+														pvl.id as versionid,
+														p.packageid, 
+														tp.compiler_version, 
+														tp.platform,
+														pvl.version as latestversion,
+														pv.version as lateststableversion,
+														pvl.is_prerelease, 
+														pvl.is_commercial, 
+														pvl.is_trial, 
+														p.reserved_prefix_id is not null as is_reserved,
+														pvl.description,
+														pvl.authors,
+														pvl.icon,
+														pvl.read_me,
+														pvl.release_notes,
+														pvl.license, 
+														pvl.project_url,
+														pvl.repository_url,
+														pvl.repository_type,
+														pvl.repository_branch,
+														pvl.repository_commit,
+														pvl.listed,
+														pvl.status,
+														pvl.published_utc,
+														pvl.deprecation_state,
+														pvl.deprecation_message,
+														pvl.alternate_package,
+														pvl.hash,
+														pvl.hash_algorithm,
+														p.downloads as totaldownloads,
+														pvl.downloads as versiondownloads
+													from package p 
+													left join package_targetplatform tp on
+													p.id = tp.package_id
+													left join package_version pvl
+													on tp.latest_version = pvl.id
+													left join package_version pv
+													on tp.latest_stable_version = pv.id
+													where pvl.status = 200
+													and pvl.listed = true
+													order by p.id, tp.compiler_version, tp.platform";
+
 		public override void Up()
 		{
 			// Case insentive collation for use in equals statements
@@ -121,6 +212,7 @@ namespace DPMGallery.DBMigration.Conventions
 
 			Create.Index("ix_apikeys_user_id").OnTable(T.ApiKey).OnColumn("user_id").Ascending();
 			Create.ForeignKey($"fk_{T.ApiKey}_{T.Users}_user_id").FromTable(T.ApiKey).ForeignColumn("user_id").ToTable(T.Users).PrimaryColumn("id");
+			Create.Index("ix_apikeys_user_id_name").OnTable(T.ApiKey).OnColumn("user_id").Ascending().OnColumn("name").Unique();
 
 			Create.Table(T.Package)
 				.WithIntPrimaryKeyColumn().Identity()
@@ -220,9 +312,10 @@ namespace DPMGallery.DBMigration.Conventions
 				.FromTable(T.PackageVersionProcess).ForeignColumn("packageversion_id")
 				.ToTable(T.PackageVersion).PrimaryColumn("id");
 
+			Execute.Sql(LatestStableVersionView);
+			Execute.Sql(LatestVersionView);
+
 		}
-
-
 
 		public override void Down()
 		{
