@@ -25,6 +25,8 @@ namespace DPMGallery.Services
         public async Task<SearchResponseDTO> SearchAsync(CompilerVersion compilerVersion, Platform platform, string query = null, bool exact = false, int skip = 0, int take = 20,
                                                    bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
         {
+            //TODO : Enabled searching by tags or by owner.
+
             var searchResponse = await _searchRepository.SearchAsync(compilerVersion, platform, query, exact, skip, take, includePrerelease, includeCommercial,
                                                                      includeTrial, cancellationToken);
 

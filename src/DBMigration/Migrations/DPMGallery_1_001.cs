@@ -39,6 +39,7 @@ namespace DPMGallery.DBMigration.Conventions
 															pv.repository_commit,
 															pv.listed,
 															pv.status,
+															pv.tags,
 															pv.published_utc,
 															pv.deprecation_state,
 															pv.deprecation_message,
@@ -82,6 +83,7 @@ namespace DPMGallery.DBMigration.Conventions
 														pvl.repository_commit,
 														pvl.listed,
 														pvl.status,
+													    pvl.tags,
 														pvl.published_utc,
 														pvl.deprecation_state,
 														pvl.deprecation_message,
@@ -272,6 +274,7 @@ namespace DPMGallery.DBMigration.Conventions
 				.WithColumn("alternate_package").AsString(FL.Long, DB.Collation).Nullable()
 				.WithColumn("status").AsInt32().WithDefaultValue(0).NotNullable()
 				.WithColumn("status_message").AsString(FL.VeryLong).Nullable()
+				.WithColumn("tags").AsString(FL.Long).Nullable()
 				.WithColumn("hash").AsString(FL.Long).Nullable()
 				.WithColumn("hash_algorithm").AsString(FL.Short).Nullable();
 

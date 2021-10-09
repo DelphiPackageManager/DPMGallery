@@ -15,24 +15,24 @@
 	<meta property="og:url" content="https://www.delphipm.org/" />
 	<meta property="og:description" content="The DPM Gallery is the central package repository for DPM, the package manager for Delphi" />
 	<meta property="og:image" content="https://delphipm.org.org/Content/gallery/img/logo-og-600x600.png" />
-	<!-- <link rel="stylesheet" href="~/css/site.css" />-->
-	<link rel="stylesheet" href="~/css/tailwind.css" />
+	<link rel="stylesheet" type="text/css" href="~/icofont.min.css">
+	<link rel="stylesheet" href="~/css/site.css" />
 
 </head>
-<body class="flex flex-col m-0 h-screen">
+<body class="flex flex-col m-0 h-screen bg-gray-50">
 	<partial name="_CookieConsentPartial" />
-	<nav class="bg-primary text-gray-100 text-xl inset-x-0 top-0 h-12">
+	<nav class="bg-primary text-gray-100 text-xl inset-x-0 top-0 py-2 ">
 		<div class="px-2 max-w-7xl mx-auto justify-content-center items-center">
 			<div class="flex justify-between items-center">
 				<div class="mr-2 items-center">
 					<a class="text-3xl text-gray-200" asp-area="" asp-controller="Home" asp-action="Index">DPM</a>
 				</div>
 				<div class="hidden md:flex items-center space-x-1 text-2xl">
-					<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Packages" asp-action="Index">Packages</a>
-					<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Packages" asp-action="Upload">Upload</a>
-					<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Home" asp-action="Index">Documentation</a>
-					<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Downloads" asp-action="Index">Downloads</a>
-					<a class="py-2 px-3 block hover:text-white" href="https://www.finalbuilder.com/resources/blogs/tag/dpm" target="_blank">Blog</a>
+					<a class="py-2 px-3 hover:text-white" asp-area="" asp-controller="Packages" asp-action="Index">Packages</a>
+					<a class="py-2 px-3 hover:text-white" asp-area="" asp-controller="Packages" asp-action="Upload">Upload</a>
+					<a class="py-2 px-3 hover:text-white" asp-area="" asp-controller="Home" asp-action="Index">Documentation</a>
+					<a class="hidden lg:flex py-2 px-3 hover:text-white" asp-area="" asp-controller="Downloads" asp-action="Index">Downloads</a>
+					<a class="hidden lg:flex py-2 px-3 hover:text-white" href="https://www.finalbuilder.com/resources/blogs/tag/dpm" target="_blank">Blog</a>
 					@if (User.Identity.IsAuthenticated && User.HasClaim(ClaimTypes.Role, "Administrator"))
 					{
 						<a class="py-2 px-3 block hover:text-white" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
@@ -41,27 +41,28 @@
 				<div class="hidden md:flex items-center">
 					<partial name="_LoginPartial" />
 				</div>
-				<div class="md:hidden flex items-center">
+				<div class="md:hidden flex items-center p-2">
 					<button class="mobile-menu-button">
 						<svg xmlns="http://www.w3.org/2000/svg"
-								id="menu-button"
-								class="h-8 w-8"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke="currentColor">
+							 id="menu-button"
+							 class="h-8 w-8"
+							 fill="none"
+							 viewBox="0 0 24 24"
+							 stroke="currentColor">
 							<path stroke-linecap="round"
-									stroke-linejoin="round"
-									stroke-width="2"
-									d="M4 6h16M4 12h16M4 18h16" />
+								  stroke-linejoin="round"
+								  stroke-width="2"
+								  d="M4 6h16M4 12h16M4 18h16" />
 						</svg>
 					</button>
 				</div>
 			</div>
 		</div>
-		<div id="mobile-menu" class="relative flex flex-col mobile-menu hidden md:hidden text-lg bg-primary z-20">
+		<div id="mobile-menu" class="relative flex flex-col mobile-menu md:hidden text-lg bg-primary z-20">
 			<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Packages" asp-action="Index">Packages</a>
 			<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Packages" asp-action="Upload">Upload</a>
 			<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Home" asp-action="Index">Documentation</a>
+			<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Home" asp-action="Index">Downloads</a>
 			<a class="block px-4 py-2 hover:bg-secondary" href="#">Blog</a>
 			@if (User.Identity.IsAuthenticated && User.HasClaim(ClaimTypes.Role, "Administrator"))
 			{
@@ -70,25 +71,26 @@
 			<partial name="_LoginPartial" />
 		</div>
 	</nav>
+	@RenderSection("SearchBar", false)
 	<div class="flex-grow overflow-y-auto">
 		@RenderBody()
 	</div>
 
-	<footer class="w-full h-100 bg-gray-800 text-gray-400 py-2">
+	<footer class="w-full h-100 bg-primary text-gray-400 py-2">
 		<div class="container pb-2">
-			<div class="flex flex-row items-start justify-between text-gray-400  text-xl">
-				<div class="flex flex-col p-2 text-xl">
+			<div class="flex flex-row items-start justify-between text-gray-400 text-base md:text-xl">
+				<div class="flex flex-col p-2">
 					<span class="text-base  text-gray-200 font-semibold text-2xl mb-2">DPM</span>
 					<a class="footer-link" href="/policies/about">About DPM</a>
 					<a class="footer-link" href="/policies/privacy">Privacy</a>
 					<a class="footer-link" href="/policies/terms">Terms</a>
 				</div>
-				<div class="flex flex-col p-2 text-xl">
+				<div class="flex flex-col p-2">
 					<span class="text-base text-gray-200 font-semibold text-2xl mb-2">SUPPORT</span>
 					<a class="footer-link" href="https://github.com/DelphiPackageManager/DPM/discussions">Github Discussions</a>
 					<a class="footer-link" href="https://github.com/DelphiPackageManager/DPM/issues">Github Issues</a>
 				</div>
-				<div class="flex flex-col p-2 text-xl">
+				<div class="flex flex-col p-2">
 					<span class="text-base text-gray-200 font-semibold text-2xl mb-2">RESOURCES</span>
 					<a class="footer-link" href="https://www.finalbuilder.com/resources/blogs">Blogs</a>
 				</div>
@@ -100,6 +102,7 @@
 		</div>
 	</footer>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
+	<script src="~/js/js.cookie.min.js" asp-append-version="true"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	@RenderSection("Scripts", required: false)
 

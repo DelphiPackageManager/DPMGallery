@@ -1,5 +1,4 @@
 ﻿using DPMGallery.DTO;
-using DPMGallery.Extensions;
 using DPMGallery.Models;
 using DPMGallery.Services;
 using DPMGallery.Types;
@@ -17,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace DPMGallery.Controllers
 {
-    public class PackagesController : Controller
+    public class PackagesController : DPMController
     {
         private readonly ILogger _logger;
         private readonly ISearchService _searchService;
@@ -29,7 +28,7 @@ namespace DPMGallery.Controllers
 
         public async Task<IActionResult> Index([FromQuery] string compiler,
             [FromQuery] string platform,
-            [FromQuery(Name = "q")] string query,
+            [FromQuery] string q,
             [FromQuery] int page = 1,
             [FromQuery] bool prerelease = true,
             [FromQuery] bool commercial = true,
@@ -53,17 +52,29 @@ namespace DPMGallery.Controllers
                     NotFound();
             }
 
-            var take = 15;
-            var skip = page > 0 ?  (page - 1) * take : 0;
 
-            var seachResults = await _searchService.UISearchAsync(query, skip , take, prerelease, commercial, trial, cancellationToken);
+            var query = (q ?? string.Empty).Trim();
+
+            //borrowed from nuget - we use sql params anyway but filter out sql injection attempts            
+            if (query.ToLowerInvariant().Contains("char(")
+                || query.ToLowerInvariant().Contains("union select")
+                || query.ToLowerInvariant().Contains("/*")
+                || query.ToLowerInvariant().Contains("--"))
+            {
+                return BadRequest();
+            }
+
+
+            var take = 15;
+            var skip = page > 0 ? (page - 1) * take : 0;
+
+            var seachResults = await _searchService.UISearchAsync(query, skip, take, prerelease, commercial, trial, cancellationToken);
 
             //TODO : mapping from entity to dto to model is wasteful - have the service just return the model? 
             PackagesViewModel model = Mapping<UISearchResponseDTO, PackagesViewModel>.Map(seachResults);
-
-
+            
             var sanitizer = new HtmlSanitizer();
-            //TODO : Sanitise any text fields - description etc.
+            //Sanitise any text fields - description etc. 
             foreach (var package in model.Packages)
             {
                 package.Description = sanitizer.Sanitize(package.Description);

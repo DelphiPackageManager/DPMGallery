@@ -106,6 +106,9 @@ namespace DPMGallery.PackageExtraction
                 Dependencies = DSpecReader.GetDependencies()
             };
 
+            //mistakes on old packages, client needs to fix this.
+            packageVersion.Tags = packageVersion.Tags.Replace(',', ' ');
+
             //if we got here, then the package metadata is ok.
 
             return (package, targetPlatform, packageVersion);

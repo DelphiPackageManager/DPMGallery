@@ -7,6 +7,15 @@ btn.addEventListener("click", () => {
     menu.classList.toggle("hidden");
 });
 
+function clearOnEscape(evt, input) {
+    var code = evt.charCode || evt.keyCode;
+    if (code == 27) {
+        input.value = '';
+        event.preventDefault();
+        document.querySelector('form').submit();
+    }
+}
+
 
 function closeMobileMenu() {
     var v = document.getElementById("mobile-menu");
@@ -14,3 +23,4 @@ function closeMobileMenu() {
 }
 
 window.addEventListener('resize', closeMobileMenu);
+

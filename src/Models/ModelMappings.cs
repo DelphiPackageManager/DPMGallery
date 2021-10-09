@@ -54,7 +54,6 @@ namespace DPMGallery.Models
                 model.Packages = Mapping<UISearchResultDTO, PackageViewModel>.Map(dto.Results);
             });
 
-
         }
 
     }

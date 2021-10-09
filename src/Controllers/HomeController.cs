@@ -14,7 +14,7 @@ using System.Xml.Linq;
 
 namespace DPMGallery.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : DPMController
     {
         private readonly ILogger<HomeController> _logger;
         private byte[] _cache;

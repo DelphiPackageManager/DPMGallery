@@ -37,7 +37,7 @@ namespace DPMGallery.Repositories
 
             string cq = $"select count(*) from {T.PackageVersion} where targetplatform_id = @targetPlatformId ";
             string q = $"select * from {T.PackageVersion} where targetplatform_id = @targetPlatformId order by version" + PagingSQL;
-            int totalCount = await Context.ExecuteScalarAsync<int>(cq, new { targetPlatformId });
+            int totalCount = await Context.ExecuteScalarAsync<int>(cq, new { targetPlatformId }, cancellationToken : cancellationToken);
 
             List<PackageVersion> versions;
 
@@ -60,18 +60,18 @@ namespace DPMGallery.Repositories
 	                            SET status = @Status, status_message = @StatusMessage, listed = @listed
 	                            WHERE id = @id";
 
-            await Context.ExecuteAsync(updateSql, new { id = packageVersion.Id, Status = packageVersion.Status, StatusMessage = packageVersion.StatusMessage, listed = packageVersion.Listed }, cancellationToken: cancellationToken);
+            await Context.ExecuteAsync(updateSql, new { id = packageVersion.Id, packageVersion.Status, packageVersion.StatusMessage, listed = packageVersion.Listed }, cancellationToken: cancellationToken);
         }
 
         public async Task<PackageVersion> InsertAsync(PackageVersion packageVersion, CancellationToken cancellationToken)
         {
             string insertSql = $@"INSERT INTO {T.PackageVersion} (targetplatform_id, version, description, copyright, is_prerelease, is_commercial, is_trial, authors, icon, license, 
                                                             project_url, repository_url, repository_type, repository_branch, repository_commit,read_me, release_notes, filesize, 
-                                                            listed, published_utc, downloads, deprecation_state, deprecation_message, alternate_package, status, hash, hash_algorithm)
+                                                            listed, published_utc, downloads, deprecation_state, deprecation_message, alternate_package, status, tags, hash, hash_algorithm)
 	                                                        VALUES (@TargetPlatformId, @Version, @Description, @Copyright, @IsPrerelease, @IsCommercial, @IsTrial, @Authors, @Icon, 
                                                                     @License, @ProjectUrl, @RepositoryUrl, @RepositoryType, @RepositoryBranch, @RepositoryCommit, @ReadMe, @ReleaseNotes,
-                                                                    @FileSize, @Listed, @PublishedUtc, @Downloads, @DeprecationState, @DeprecatedMessage, @AlternatePackage, @Status, @Hash,
-                                                                    @HashAlgorithm) RETURNING id;";
+                                                                    @FileSize, @Listed, @PublishedUtc, @Downloads, @DeprecationState, @DeprecatedMessage, @AlternatePackage, @Status, @Tags,
+                                                                    @Hash, @HashAlgorithm) RETURNING id;";
 
             try
             {
@@ -103,6 +103,7 @@ namespace DPMGallery.Repositories
                         packageVersion.DeprecatedMessage,
                         packageVersion.AlternatePackage,
                         packageVersion.Status,
+                        packageVersion.Tags,
                         packageVersion.Hash,
                         packageVersion.HashAlgorithm
 
@@ -155,7 +156,7 @@ namespace DPMGallery.Repositories
             var Ids = versions.Select(m => m.Id).Distinct().ToArray();
 
             //strange postgresql syntax for where in 
-            var dependencies = await Context.QueryAsync<PackageDependency>($"select * from {T.PackageDependency} where packageversion_id = ANY (@Ids)", new { Ids });
+            var dependencies = await Context.QueryAsync<PackageDependency>($"select * from {T.PackageDependency} where packageversion_id = ANY (@Ids)", new { Ids }, cancellationToken : cancellationToken);
 
             if (dependencies.Any())
             {

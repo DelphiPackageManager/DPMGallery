@@ -27,21 +27,14 @@ namespace DPMGallery.Services
         private readonly PackageVersionProcessRepository _packageVersionProcessRepository;
         private readonly PackageOwnerRepository _packageOwnerRepository;
         private readonly OrganisationRepository _organisationRepository;
-        private readonly IStorageService _storageService;
         private readonly ILogger _logger;
         private readonly ServerConfig _serverConfig;
-        private readonly IAntivirusService _antivirusService;
-
-        private const string PackageContentType = "binary/octet-stream";
-        private const string DspecContentType = "application/json";
-        private const string ReadmeContentType = "text/markdown";
-        private const string IconContentType = "image/xyz";
 
 
-        private static SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
+        private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         public PackageIndexService(ILogger logger, IUnitOfWork unitOfWork, ApiKeyRepository apiKeyRepository, PackageRepository packageRepository, PackageVersionRepository packageVersionRepository,
                                    PackageVersionProcessRepository packageVersionProcessRepository, TargetPlatformRepository targetPlatformRepository, PackageOwnerRepository packageOwnerRepository, 
-                                   OrganisationRepository organisationRepository, IStorageService storageService, ServerConfig serverConfig, IAntivirusService antivirusService)
+                                   OrganisationRepository organisationRepository, ServerConfig serverConfig)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
@@ -52,9 +45,7 @@ namespace DPMGallery.Services
             _packageVersionProcessRepository = packageVersionProcessRepository;
             _packageOwnerRepository = packageOwnerRepository;
             _organisationRepository = organisationRepository;
-            _storageService = storageService;
             _serverConfig = serverConfig;
-            _antivirusService = antivirusService;
         }
 
         private async Task<bool> GetIsOwner(int packageId, int userId, CancellationToken cancellationToken)
@@ -104,11 +95,11 @@ namespace DPMGallery.Services
         }
 
 
-        private async Task<string> ComputePackageHash(Stream stream, CancellationToken cancellationToken)
+        private static async Task<string> ComputePackageHash(Stream stream, CancellationToken cancellationToken)
         {
             var hashAlgo = new SHA512Managed();
             stream.Seek(0, SeekOrigin.Begin);
-            var bytes = await hashAlgo.ComputeHashAsync(stream);
+            var bytes = await hashAlgo.ComputeHashAsync(stream, cancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
             return Convert.ToBase64String(bytes);
         }
@@ -154,7 +145,7 @@ namespace DPMGallery.Services
                     //we have to do this to avoid race conditions where another thread could jump in and add package or targetplatform
                     //between us checking and committing. This will slow down inserts but should not be a problem since we're unlike
                     //to get tons of concurrent inserts of the same packageid and targetplatforms (mostly in testing). 
-                    await _semaphoreSlim.WaitAsync();
+                    await _semaphoreSlim.WaitAsync(cancellationToken);
                     try
                     {
                         //TODO :check if there is a reserved prefix, and if so that the user is a prefix owner
@@ -207,7 +198,7 @@ namespace DPMGallery.Services
                     PackageVersion thePackageVersion;
                     PackageTargetPlatform theTargetPlatform;
 
-                    await _semaphoreSlim.WaitAsync();
+                    await _semaphoreSlim.WaitAsync(cancellationToken);
                     try
                     {
 
@@ -246,12 +237,11 @@ namespace DPMGallery.Services
 
                     //update the targetplatform with the latest versions
 
-                    SemanticVersion version = null;
                     SemanticVersion latestVer = null;
                     SemanticVersion latestStableVer = null;
                     bool updateVersions = false;
 
-                    if (!SemanticVersion.TryParse(thePackageVersion.Version, out version))
+                    if (!SemanticVersion.TryParse(thePackageVersion.Version, out SemanticVersion version))
                     {
                         _logger.Error("Package version is not a valid semantic version : {thePackageVersion.Version}");
                         return PackageIndexingResult.Error;

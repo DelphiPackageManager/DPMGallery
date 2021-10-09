@@ -10,9 +10,9 @@
     "@tailwindcss/forms": "^0.3.3",
     "autoprefixer": "^10.2.6",
     "postcss": "^8.3.5",
-    "tailwindcss": "^2.2.15"
+    "tailwindcss": "2.2.16"
   },
   "scripts": {
-    "css:build": "npx tailwindcss build -i ./wwwroot/css/site.css -o ./wwwroot/css/tailwind.css --jit --purge \"./Views/**/*.cshtml,./Pages/**/*.cshtml,./Areas/Identity/Pages/**/*.cshtml\""
+    "css:build": "npx tailwindcss build -i ./wwwroot/css/tailwind.css -o ./wwwroot/css/site.css --jit --purge \"./Views/**/*.cshtml,./Pages/**/*.cshtml,./Areas/Identity/Pages/**/*.cshtml\""
   }
 }

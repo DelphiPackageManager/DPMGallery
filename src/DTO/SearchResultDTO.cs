@@ -44,7 +44,7 @@ namespace DPMGallery.DTO
         public string Authors { get; set; }
 
         [JsonPropertyName("owners")]
-        public string Owners { get; set; }
+        public List<string> Owners { get; set; }
 
         [JsonPropertyName("icon")]
         public string Icon { get; set; }

@@ -76,7 +76,7 @@ namespace DPMGallery.BackgroundServices
 
                 //waiting 30s before checking again. 
                 //TODO : make this configurable
-                await Task.Delay(30000, stoppingToken);
+                await Task.Delay(10000, stoppingToken);
             }
 
         }

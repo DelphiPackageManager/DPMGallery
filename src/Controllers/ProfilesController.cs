@@ -9,6 +9,7 @@ namespace DPMGallery.Controllers
         [Route("/profiles/{profileName}")]
         public IActionResult Index(string profileName)
         {
+            ViewBag.ProfileName = profileName;
             return View();
         }
     }

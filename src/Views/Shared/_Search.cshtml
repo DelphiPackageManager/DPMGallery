@@ -1,12 +1,13 @@
 ﻿<div class="flex justify-center items-center py-4">
 	<form action="/packages" method="get" class="w-full flex flex-col">
-		<div class="w-full flex justify-center items-center">
-			<input name="q" type="text" class="w-full text-gray-900 text-xl" id="search" aria-label="Enter packages to search" placeholder="Search for packages..." autocomplete="off" value="" autofocus="">
+		<div class="w-full flex justify-center items-center px-3 rounded-full">
 			<button class="w-10 h-10 p-2 hover:bg-secondary" type="submit" title="Search for packages" aria-label="Search">
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 20 20" fill="currentColor">
 					<path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
 				</svg>
 			</button>
+			<input name="q" type="text" class="w-full text-gray-900 text-2xl" id="search" aria-label="Enter packages to search" placeholder="Search Packages"
+				   autocomplete="off" value="@ViewBag.Query" autofocus="" onkeydown="clearOnEscape(event, this);">
 		</div>
 	</form>
 </div>

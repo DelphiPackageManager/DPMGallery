@@ -36,7 +36,7 @@ namespace DPMGallery.DTO
         public string Authors { get; set; }
 
         [JsonPropertyName("owners")]
-        public string Owners { get; set; }
+        public List<string> Owners { get; set; }
 
         [JsonPropertyName("icon")]
         public string Icon { get; set; }
@@ -75,7 +75,7 @@ namespace DPMGallery.DTO
         public string ReportUrl { get; set; }
 
         [JsonPropertyName("tags")]
-        public string Tags { get; set; }
+        public List<string> Tags { get; set; }
 
         [JsonPropertyName("totalDownloads")]
         public long TotalDownloads { get; set; }

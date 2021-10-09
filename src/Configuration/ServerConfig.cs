@@ -13,9 +13,9 @@ namespace DPMGallery
 
         public const string ConfigFileName = "dpm.server";
 
-        private static JsonSerializerOptions serializerOptions;
+        private static readonly JsonSerializerOptions serializerOptions;
 
-        private static string _defaultProcessingFolder;
+        private static readonly string _defaultProcessingFolder;
 
         static ServerConfig()
         {
