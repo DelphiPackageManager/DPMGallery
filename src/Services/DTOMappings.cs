@@ -97,7 +97,8 @@ namespace DPMGallery.Services
                 dto.DeprecatedMessage = r.DeprecatedMessage;
                 dto.DeprecationState = r.DeprecationState;
                 dto.AlternatePackage = r.AlternatePackage;
-                dto.Tags = string.IsNullOrEmpty(r.Tags) ? null : r.Tags.Split(' ').ToList();
+                //some older packages have comma separated tags
+                dto.Tags = string.IsNullOrEmpty(r.Tags) ? null : r.Tags.Replace(',',' ').Split(' ').Select(x => x.Trim().ToLower()).ToList();
                 dto.Hash = r.Hash;
                 dto.HashAlgorithm = r.HashAlgorithm;
                 dto.TotalDownloads = r.TotalDownloads;

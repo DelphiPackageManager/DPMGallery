@@ -318,6 +318,8 @@ namespace DPMGallery.DBMigration.Conventions
 			Execute.Sql(LatestStableVersionView);
 			Execute.Sql(LatestVersionView);
 
+			//TODO : Add tables for statistics - downloads per week, month
+
 		}
 
 		public override void Down()

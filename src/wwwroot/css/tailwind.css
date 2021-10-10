@@ -68,13 +68,14 @@ select {
     /* /transform: translateY(-50%);
     /* move to right */
     top: 100%;
-    left : 100%
+    left : 0%;
     @apply ml-1;
     /* basic styles */
-    width: 200px;
+    width: 15rem;
     @apply p-1;
-    @apply rounded-sm;
-    @apply bg-gray-400;
+    @apply rounded-md;
+    @apply bg-gray-300;
+    @apply text-gray-700;
     text-align: center;
     display: none; /* hide by default */
 }

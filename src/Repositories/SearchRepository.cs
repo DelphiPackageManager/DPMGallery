@@ -264,7 +264,8 @@ namespace DPMGallery.Repositories
 
             if (!string.IsNullOrEmpty(query) && query.StartsWith("Tags:", StringComparison.InvariantCultureIgnoreCase))
             {
-                string tagName = query.Substring(5).Trim('"');
+                string tagName = query.Substring(5).Trim('"').Replace(',', ' ').Trim();
+
 
                 var packageIds = await GetTagSearchIds(tagName, skip, take, includePrerelease, cancellationToken);
                 if (!packageIds.Any())

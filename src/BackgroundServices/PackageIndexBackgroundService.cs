@@ -176,7 +176,7 @@ namespace DPMGallery.BackgroundServices
             return result;
         }
 
-        private async Task<AVScanResult> DoVirusScan(IServiceScope scope, PackageVersion packageVersion, PackageVersionProcess item, CancellationToken cancellationToken)
+        private async Task<AVScanResult> DoVirusScan(IServiceScope scope, PackageVersionProcess item, CancellationToken cancellationToken)
         {
             var filePath = Path.Combine(_serverConfig.ProcessingFolder, item.PackageFileName);
 
@@ -250,7 +250,7 @@ namespace DPMGallery.BackgroundServices
                     unitOfWork.Commit();
                     goto case PackageStatus.ProcessingAV;
                 case PackageStatus.ProcessingAV:
-                    var aVScanResult = await DoVirusScan(scope, packageVersion, item, cancellationToken);
+                    var aVScanResult = await DoVirusScan(scope, item, cancellationToken);
                     if (aVScanResult.Result)
                     {
                         packageVersion.Status = PackageStatus.CopyToFileSystem;
