@@ -30,6 +30,7 @@ namespace DPMGallery.Types
     {
         public static Platform ToPlatform(this string value)
         {
+            value = value.Trim();
             if (string.IsNullOrEmpty(value))
                 return Platform.UnknownPlatform;
 

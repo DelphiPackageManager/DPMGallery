@@ -49,6 +49,13 @@ namespace DPMGallery.Services
 					},
 					new ServiceIndexItemDTO()
 					{
+						ResourceType = "ListService",
+						ResourceUrl = GenerateInternalUrl("api/v1/list"),
+						Comment = "List endpoint of DPM Search service"
+					},
+
+					new ServiceIndexItemDTO()
+					{
 						ResourceType = "SearchService",
 						ResourceUrl = GenerateInternalUrl("api/v1/search"),
 						Comment = "Search endpoint of DPM Search service"

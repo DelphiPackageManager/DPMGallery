@@ -7,7 +7,8 @@ namespace DPMGallery
 	public class RouteConstants
 	{
 		public const string IndexRouteName = "index";
-		public const string SearchRouteName = "query";
+		public const string SearchRouteName = "search";
+		public const string ListRouteName = "list";
 		public const string UploadPackageRouteName = "uploadpackage";
 		public const string DelistRouteName = "delistpackage";
 

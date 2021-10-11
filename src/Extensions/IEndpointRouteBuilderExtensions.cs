@@ -28,6 +28,12 @@ namespace DPMGallery.Extensions
                 defaults: new { controller = "Search", action = "Search" });
 
             endpoints.MapControllerRoute(
+                name: RouteConstants.ListRouteName,
+                pattern: "api/v1/list",
+                defaults: new { controller = "Search", action = "List" });
+
+
+            endpoints.MapControllerRoute(
                 name: RouteConstants.DelistRouteName,
                 pattern: RouteConstants.Templates.PackageDelistTemplate,
                 defaults: new { controller = "PackagePublish", action = "Delist" },

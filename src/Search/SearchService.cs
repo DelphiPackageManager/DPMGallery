@@ -8,7 +8,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-
+using System.Collections.Generic;
 
 namespace DPMGallery.Services
 {
@@ -21,6 +21,19 @@ namespace DPMGallery.Services
             _logger = logger;
             _searchRepository = searchRepository;
         }
+
+        public async Task<ListResponseDTO> ListAsync(CompilerVersion compilerVersion, List<Platform> platforms, string query = null, bool exact = false, int skip = 0, int take = 20,
+                                                   bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
+        {
+            //TODO : Enabled searching by tags or by owner.
+
+            var searchResponse = await _searchRepository.ListAsync(compilerVersion, platforms, query, exact, skip, take, includePrerelease, includeCommercial,
+                                                                     includeTrial, cancellationToken);
+
+            return Mapping<ApiListResponse, ListResponseDTO>.Map(searchResponse);
+
+        }
+
 
         public async Task<SearchResponseDTO> SearchAsync(CompilerVersion compilerVersion, Platform platform, string query = null, bool exact = false, int skip = 0, int take = 20,
                                                    bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)

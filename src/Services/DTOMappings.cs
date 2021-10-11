@@ -69,6 +69,20 @@ namespace DPMGallery.Services
                 dto.Results = Mapping<SearchResult, SearchResultDTO>.Map(r.searchResults);
             });
 
+            Mapping<ListResult, ListResultDTO>.Configure((r, dto) =>
+            {
+                dto.PackageId = r.PackageId;
+                dto.Compiler = r.Compiler;
+                dto.Platform = r.Platform;
+                dto.LatestVersion = r.LatestVersion;
+            });
+
+            Mapping<ApiListResponse, ListResponseDTO>.Configure((r, dto) =>
+            {
+                dto.TotalHits = r.TotalCount;
+
+                dto.Results = Mapping<ListResult, ListResultDTO>.Map(r.searchResults);
+            });
 
             Mapping<UISearchResult, UISearchResultDTO>.Configure((r, dto) =>
             {

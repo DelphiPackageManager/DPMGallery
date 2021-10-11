@@ -21,13 +21,13 @@
 </head>
 <body class="flex flex-col m-0 h-screen bg-gray-50">
 	<partial name="_CookieConsentPartial" />
-	<nav class="bg-primary text-gray-100 text-xl inset-x-0 top-0 py-2 ">
+	<nav class="bg-primary text-gray-100 inset-x-0 top-0 py-2 ">
 		<div class="px-2 max-w-7xl mx-auto justify-content-center items-center">
 			<div class="flex justify-between items-center">
 				<div class="mr-2 items-center">
 					<a class="text-3xl text-gray-200" asp-area="" asp-controller="Home" asp-action="Index">DPM</a>
 				</div>
-				<div class="hidden md:flex items-center space-x-1 text-2xl">
+				<div class="hidden md:flex items-center space-x-1 text-xl">
 					<a class="py-2 px-3 hover:text-white" asp-area="" asp-controller="Packages" asp-action="Index">Packages</a>
 					<a class="py-2 px-3 hover:text-white" asp-area="" asp-controller="Packages" asp-action="Upload">Upload</a>
 					<a class="py-2 px-3 hover:text-white" asp-area="" asp-controller="Home" asp-action="Index">Documentation</a>
@@ -102,7 +102,6 @@
 		</div>
 	</footer>
 	<script src="~/lib/jquery/dist/jquery.min.js"></script>
-	<script src="~/js/js.cookie.min.js" asp-append-version="true"></script>
 	<script src="~/js/site.js" asp-append-version="true"></script>
 	@RenderSection("Scripts", required: false)
 
