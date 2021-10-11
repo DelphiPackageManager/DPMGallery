@@ -174,7 +174,7 @@ namespace DPMGallery.Repositories
             {
                 compilerVersion,
                 platform,
-                query = query != null ? exact ? query : "%" + query + "%" : null
+                query = query != null ? exact ? query : $"%{query}%" : null
             };
 
 
@@ -194,7 +194,7 @@ namespace DPMGallery.Repositories
             {
                 compilerVersion,
                 platform,
-                query = exact ? query : query + "%",
+                query = exact ? query : $"%{query}%",
                 skip,
                 take
             };
@@ -261,7 +261,7 @@ namespace DPMGallery.Repositories
             {
                 compilerVersion,
                 platforms = platformsArray,
-                query = query != null ? exact ? query : "%" + query + "%" : null
+                query = query != null ? exact ? query : $"%{query}%" : null
             };
 
 
@@ -281,7 +281,7 @@ namespace DPMGallery.Repositories
             {
                 compilerVersion,
                 platforms = platformsArray,
-                query = exact ? query : "%" + query + "%",
+                query = exact ? query : $"%{query}%",
                 skip,
                 take
             };

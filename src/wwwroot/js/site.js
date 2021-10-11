@@ -23,4 +23,3 @@ function closeMobileMenu() {
 }
 
 window.addEventListener('resize', closeMobileMenu);
-

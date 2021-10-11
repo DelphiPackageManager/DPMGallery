@@ -58,15 +58,15 @@
 				</div>
 			</div>
 		</div>
-		<div id="mobile-menu" class="relative flex flex-col mobile-menu md:hidden text-lg bg-primary z-20">
-			<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Packages" asp-action="Index">Packages</a>
-			<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Packages" asp-action="Upload">Upload</a>
-			<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Home" asp-action="Index">Documentation</a>
-			<a class="block px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Home" asp-action="Index">Downloads</a>
-			<a class="block px-4 py-2 hover:bg-secondary" href="#">Blog</a>
+		<div id="mobile-menu" class="hidden fixed w-full flex flex-col mobile-menu md:hidden text-lg bg-primary z-50 overflow-hidden">
+			<a class="block px-6 py-2 hover:bg-secondary" asp-area="" asp-controller="Packages" asp-action="Index">Packages</a>
+			<a class="block px-6 py-2 hover:bg-secondary" asp-area="" asp-controller="Packages" asp-action="Upload">Upload</a>
+			<a class="block px-6 py-2 hover:bg-secondary" asp-area="" asp-controller="Home" asp-action="Index">Documentation</a>
+			<a class="block px-6 py-2 hover:bg-secondary" asp-area="" asp-controller="Home" asp-action="Index">Downloads</a>
+			<a class="block px-6 py-2 hover:bg-secondary" href="#">Blog</a>
 			@if (User.Identity.IsAuthenticated && User.HasClaim(ClaimTypes.Role, "Administrator"))
 			{
-				<a class="px-4 py-2 hover:bg-secondary" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
+				<a class="px-6 py-2 hover:bg-secondary" asp-area="" asp-controller="Admin" asp-action="Index">Admin</a>
 			}
 			<partial name="_LoginPartial" />
 		</div>
@@ -76,27 +76,27 @@
 		@RenderBody()
 	</div>
 
-	<footer class="w-full h-100 bg-primary text-gray-400 py-2">
+	<footer class="w-full h-100 bg-primary text-gray-400 text-sm md:text-base">
 		<div class="container pb-2">
-			<div class="flex flex-row items-start justify-between text-gray-400 text-base md:text-xl">
-				<div class="flex flex-col p-2">
-					<span class="text-base  text-gray-200 font-semibold text-2xl mb-2">DPM</span>
+			<div class="flex flex-row items-start justify-between text-gray-400">
+				<div class="flex flex-col p-1">
+					<span class="text-base  text-gray-200 font-semibold text-base md:text-lg">DPM</span>
 					<a class="footer-link" href="/policies/about">About DPM</a>
 					<a class="footer-link" href="/policies/privacy">Privacy</a>
 					<a class="footer-link" href="/policies/terms">Terms</a>
 				</div>
-				<div class="flex flex-col p-2">
-					<span class="text-base text-gray-200 font-semibold text-2xl mb-2">SUPPORT</span>
+				<div class="flex flex-col p-1">
+					<span class="text-base text-gray-200 font-semibold text-base md:text-lg">SUPPORT</span>
 					<a class="footer-link" href="https://github.com/DelphiPackageManager/DPM/discussions">Github Discussions</a>
 					<a class="footer-link" href="https://github.com/DelphiPackageManager/DPM/issues">Github Issues</a>
 				</div>
-				<div class="flex flex-col p-2">
-					<span class="text-base text-gray-200 font-semibold text-2xl mb-2">RESOURCES</span>
+				<div class="flex flex-col p-1">
+					<span class="text-base text-gray-200 font-semibold text-base md:text-lg">RESOURCES</span>
 					<a class="footer-link" href="https://www.finalbuilder.com/resources/blogs">Blogs</a>
 				</div>
 			</div>
 
-			<div class="flex flex-row text-base">
+			<div class="flex flex-row text-sm md:text-base">
 				&copy; Copyright 2021 - delphipm.org
 			</div>
 		</div>
