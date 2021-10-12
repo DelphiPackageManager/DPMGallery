@@ -43,75 +43,54 @@ namespace DPMGallery.Services
 				{
 					new ServiceIndexItemDTO ()
 					{
-						ResourceType = "PackagePublish",
-						ResourceUrl = GenerateInternalUrl("api/v1/package"),
-						Comment = "The url for publishing DPM packages."
+						ResourceType = Constants.ResourceNames.PackagePublish,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackagePublish),
+						Comment = "The url for publishing DPM packages (PUT)."
 					},
 					new ServiceIndexItemDTO()
 					{
-						ResourceType = "ListService",
-						ResourceUrl = GenerateInternalUrl("api/v1/list"),
-						Comment = "List endpoint of DPM Search service"
-					},
-
-					new ServiceIndexItemDTO()
-					{
-						ResourceType = "SearchService",
-						ResourceUrl = GenerateInternalUrl("api/v1/search"),
-						Comment = "Search endpoint of DPM Search service"
-					},
-					new ServiceIndexItemDTO()
-					{
-						ResourceType = "SearchAutocompleteService",
-						ResourceUrl = GenerateInternalUrl("api/v1/autocomplete"),
-						Comment = "Autocomplete endpoint of DPM Search service"
-					},
-					new ServiceIndexItemDTO()
-					{
-						ResourceType = "PackageDetailsTemplate",
-						ResourceUrl = GenerateInternalUrl(RouteConstants.Templates.PackageDetailsTemplate),
-						Comment = $"Template URL of where the package details can be viewed on the server, in the format https://delphipm.org/{RouteConstants.Templates.PackageDetailsTemplate}"
+						ResourceType = Constants.ResourceNames.PackageList,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageList),
+						Comment = "List endpoint of DPM Search service (GET)"
 					},
 
 					new ServiceIndexItemDTO()
 					{
-						ResourceType = "PackageDownloadTemplate",
-						ResourceUrl = GenerateInternalUrl(RouteConstants.Templates.PackageDownloadTemplate),
-						Comment = $"Template URL of where DPM package content is stored, in the format https://delphipm.org/{RouteConstants.Templates.PackageDownloadTemplate}"
+						ResourceType = Constants.ResourceNames.PackageSearch,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageSearch),
+						Comment = "Search endpoint of DPM Search service (GET)"
 					},
 					new ServiceIndexItemDTO()
 					{
-						ResourceType = "PackageMetaDataTemplate",
-						ResourceUrl = GenerateInternalUrl(RouteConstants.Templates.PackageMetadataTemplate),
-						Comment = $"Base URL of where DPM package metadata is stored, in the format https://delphipm.org/{RouteConstants.Templates.PackageMetadataTemplate}"
+						ResourceType = Constants.ResourceNames.PackageVersions,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageVersions),
+						Comment = $"Get a list of package versions in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageVersions} (GET)"
+					},
+					new ServiceIndexItemDTO()
+					{
+						ResourceType = Constants.ResourceNames.PackageDownload,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageDownload),
+						Comment = $"Base url of where DPM package files are stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageDownload} (GET)"
+					},
+					new ServiceIndexItemDTO()
+					{
+						ResourceType = Constants.ResourceNames.PackageMetadata,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageMetadata),
+						Comment = $"Base URL of where DPM package metadata is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageMetadata} (GET)"
 
 					},
 					new ServiceIndexItemDTO()
 					{
-						ResourceType = "PackageReadMeTemplate",
-						ResourceUrl = GenerateInternalUrl(RouteConstants.Templates.PackageReadmeTemplate),
-						Comment = $"Base URL of where DPM package readme is stored, in the format https://delphipm.org/{RouteConstants.Templates.PackageReadmeTemplate}"
+						ResourceType = Constants.ResourceNames.PackageReadMe,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageReadme),
+						Comment = $"Base URL of where DPM package readme is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageReadme} (GET)"
 
 					},
 					new ServiceIndexItemDTO()
 					{
-						ResourceType = "PackageIconTemplate",
-						ResourceUrl = GenerateInternalUrl(RouteConstants.Templates.PackageIconTemplate),
-						Comment = $"Template URL of where DPM package icon is stored, in the format https://delphipm.org/{RouteConstants.Templates.PackageIconTemplate}"
-
-					},
-					new ServiceIndexItemDTO()
-					{
-						ResourceType = "PackageIcon",
-						ResourceUrl = GenerateInternalUrl(RouteConstants.Templates.PackageIconTemplate),
-						Comment = $"Template URL of where DPM package icon is stored, in the format https://delphipm.org/{RouteConstants.Templates.PackageIconTemplate}"
-
-					},
-					new ServiceIndexItemDTO()
-					{
-						ResourceType = "PackageVersions",
-						ResourceUrl = GenerateInternalUrl(RouteConstants.Templates.PackageVersionsTemplate),
-						Comment = $"Template Url to get a list of known package versions, in the format https://delphipm.org/{RouteConstants.Templates.PackageVersionsTemplate}"
+						ResourceType = Constants.ResourceNames.PackageIcon,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageIcon),
+						Comment = $"Template URL of where DPM package icon is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageIcon} (GET)"
 					},
 				}
 			};

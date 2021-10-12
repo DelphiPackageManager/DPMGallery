@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using AspNetCoreRateLimit;
 
 namespace DPMGallery
 {
@@ -22,8 +23,9 @@ namespace DPMGallery
             serializerOptions = new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
-                    
+                WriteIndented = true,
+                AllowTrailingCommas = true,
+                IgnoreReadOnlyProperties = true                   
             };
             serializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 
@@ -93,5 +95,9 @@ namespace DPMGallery
         public AntivirusConfig AntivirusConfig { get; set; } = new AntivirusConfig();
 
         public string ProcessingFolder { get; set; } = _defaultProcessingFolder;
+
+        public IpRateLimitOptions IpRateLimitOptions { get; set; } = new IpRateLimitOptions();
+
+        public IpRateLimitPolicies IpRateLimitPolicies { get; set; } = new IpRateLimitPolicies();
     }
 }

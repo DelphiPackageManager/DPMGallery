@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DPMGallery.Utils;
+using NuGet.Versioning;
 
 namespace DPMGallery.Services
 {
@@ -46,7 +47,7 @@ namespace DPMGallery.Services
         }
 
 
-        public async Task<PackageVersionsWithDependenciesResponseDTO> GetPackageVersionsWithDependenciesOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken, bool listed = true)
+        public async Task<PackageVersionsWithDependenciesResponseDTO> GetPackageVersionsWithDependenciesOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, VersionRange range,  CancellationToken cancellationToken, bool listed = true)
         {
             var versions = await _packageVersionRepository.GetPackageVersionsAsync(packageId, compilerVersion, platform, true, cancellationToken);
 

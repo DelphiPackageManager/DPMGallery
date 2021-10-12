@@ -3,8 +3,9 @@ using System.Linq;
 
 namespace DPMGallery
 {
-    public class Constants
+    public partial class Constants
     {
+        public const string DefaultSiteUrl = "https://delphipm.org";
         public static class Claims
         {
             public const string UserName = "claim.username";

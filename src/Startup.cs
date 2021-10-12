@@ -15,6 +15,7 @@ using System.Text.Json;
 using DPMGallery.Services;
 using Serilog;
 using DPMGallery.Models;
+using AspNetCoreRateLimit;
 
 namespace DPMGallery
 {
@@ -35,12 +36,30 @@ namespace DPMGallery
             var serverConfig = ServerConfig.Current;
             _configuration.Bind(serverConfig);
             services.AddSingleton(serverConfig);
-            
+
+
+
             services.AddSingleton<Serilog.ILogger>(provider =>
             {
                 return Serilog.Log.Logger;
             });
 
+
+            // needed to store rate limit counters and ip rules
+            services.AddMemoryCache();
+
+            var x = _configuration.GetSection("IpRateLimitOptions");
+
+            ////load general configuration from appsettings.json
+            services.Configure<IpRateLimitOptions>(x);
+
+            ////load ip rules from appsettings.json
+            services.Configure<IpRateLimitPolicies>(_configuration.GetSection("ipRateLimitPolicies"));
+
+
+
+            // inject counter and rules stores
+            services.AddInMemoryRateLimiting();
 
             services.AddDPMServices(serverConfig);
 
@@ -132,6 +151,9 @@ namespace DPMGallery
             });
             DTOMappings.Configure();
             ModelMappings.Configure();
+            // configuration (resolvers, counter key builders)
+            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -147,6 +169,7 @@ namespace DPMGallery
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+            app.UseIpRateLimiting();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -165,6 +188,7 @@ namespace DPMGallery
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
         }
     }
 }

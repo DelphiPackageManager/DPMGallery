@@ -12,6 +12,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.15" />
+		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.1" />
 		<PackageReference Include="AWSSDK.S3" Version="3.7.3.12" />
 		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.69" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.3" />
@@ -36,11 +37,12 @@
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
 		<PackageReference Include="nClam" Version="6.0.1" />
 		<PackageReference Include="Npgsql" Version="5.0.10" />
-		<PackageReference Include="SemanticVersioning" Version="2.0.0" />
+		<PackageReference Include="NuGet.Versioning" Version="5.11.0" />
 		<PackageReference Include="Serilog.AspNetCore" Version="4.1.0" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.1-dev-00940" />
 	</ItemGroup>
 	<ItemGroup>
+		<Folder Include="Configuration\RateLimiting\" />
 		<Folder Include="Statistics\" />
 		<Folder Include="Serialization\" />
 		<Folder Include="Pages\" />

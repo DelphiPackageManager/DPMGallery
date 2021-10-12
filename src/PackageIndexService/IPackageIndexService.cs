@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using NuGet.Versioning;
 
 namespace DPMGallery.Services
 {
@@ -44,6 +45,6 @@ namespace DPMGallery.Services
     {
         Task<PackageIndexingResult> IndexAsync(Stream stream, int apiKeyId, CancellationToken cancellationToken);
 
-        Task<bool> TryDeletePackageAsync(string id, SemanticVersioning.Version version, CancellationToken cancellationToken);
+        Task<bool> TryDeletePackageAsync(string id, SemanticVersion version, CancellationToken cancellationToken);
     }
 }

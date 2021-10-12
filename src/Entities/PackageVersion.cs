@@ -3,6 +3,7 @@ using Dapper.Contrib.Extensions;
 using DPMGallery.Data;
 using System;
 using System.Collections.Generic;
+using NuGet.Versioning;
 
 namespace DPMGallery.Entities
 {
@@ -111,7 +112,7 @@ namespace DPMGallery.Entities
             Dependencies = new List<PackageDependency>();
         }
 
-        public SemanticVersioning.Version SemVer => SemanticVersioning.Version.Parse(Version);
+        public SemanticVersion SemVer => SemanticVersion.Parse(Version);
 
         public IList<PackageDependency> Dependencies { get; set; }
     }

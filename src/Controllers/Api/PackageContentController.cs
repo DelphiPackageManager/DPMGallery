@@ -8,7 +8,7 @@ using DPMGallery.DTO;
 using DPMGallery.Types;
 using DPMGallery.Services;
 using Microsoft.AspNetCore.Mvc;
-using Semver = SemanticVersioning.Version;
+using NuGet.Versioning;
 
 namespace DPMGallery.Controllers.Api
 {
@@ -29,7 +29,7 @@ namespace DPMGallery.Controllers.Api
             _storageService = storageService;
         }
 
-        public async Task<ActionResult<PackageVersionsWithDependenciesResponseDTO>> GetPackageVersionsWithDependenciesAsync(string id, string compilerVersion, string platform, CancellationToken cancellationToken)
+        public async Task<ActionResult<PackageVersionsWithDependenciesResponseDTO>> GetPackageVersionsWithDependenciesAsync(string id, string compilerVersion, string platform, string versionRange,  CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
             if (compiler == CompilerVersion.UnknownVersion)
@@ -39,7 +39,9 @@ namespace DPMGallery.Controllers.Api
             if (thePlatform == Platform.UnknownPlatform)
                 return NotFound();
 
-            var versions = await _packageContentService.GetPackageVersionsWithDependenciesOrNullAsync(id, compiler, thePlatform, cancellationToken);
+            var range = VersionRange.All;
+
+            var versions = await _packageContentService.GetPackageVersionsWithDependenciesOrNullAsync(id, compiler, thePlatform, range,  cancellationToken);
             if (versions == null)
             {
                 return NotFound();
@@ -79,7 +81,7 @@ namespace DPMGallery.Controllers.Api
             if (thePlatform == Platform.UnknownPlatform)
                 return NotFound();
 
-            if (!Semver.TryParse(version, out _))
+            if (!SemanticVersion.TryParse(version, out _))
             {
                 return NotFound();
             }
@@ -127,11 +129,6 @@ namespace DPMGallery.Controllers.Api
             }
             else
                 fileName = fileName + fileType;
-
-            if (downloadFileType == DownloadFileType.dpkg)
-            {
-                
-            }
 
             return File(packageStream, downloadFileType.ToContentType(), fileName);
         }

@@ -8,9 +8,8 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using SemanticVersion = SemanticVersioning.Version;
 using System.Security.Cryptography;
-using DPMGallery.Antivirus;
+using NuGet.Versioning;
 
 namespace DPMGallery.Services
 {
@@ -247,7 +246,7 @@ namespace DPMGallery.Services
                         return PackageIndexingResult.Error;
                     }
 
-                    if (!version.IsPreRelease)
+                    if (!version.IsPrerelease)
                     {
                         //test against the lateststable
                         if (theTargetPlatform.LatestStableVersionId.HasValue)
@@ -271,7 +270,7 @@ namespace DPMGallery.Services
                             }
                         }
                     }
-                    if (!version.IsPreRelease) //stable
+                    if (!version.IsPrerelease) //stable
                     {
 
                         if (latestStableVer != null)
@@ -356,7 +355,7 @@ namespace DPMGallery.Services
 
         }
 
-        public async Task<bool> TryDeletePackageAsync(string id, SemanticVersioning.Version version, CancellationToken cancellationToken)
+        public async Task<bool> TryDeletePackageAsync(string id, SemanticVersion version, CancellationToken cancellationToken)
         {
             return await Task.FromResult(false);
         }

@@ -1,4 +1,5 @@
 ﻿using DPMGallery.Entities;
+using NuGet.Versioning;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -79,7 +80,7 @@ namespace DPMGallery.PackageExtraction
             };
 
 
-            if (!SemanticVersioning.Version.TryParse(DSpecReader.GetVersion(), out SemanticVersioning.Version version))
+            if (!SemanticVersion.TryParse(DSpecReader.GetVersion(), out SemanticVersion version))
                 throw new ArgumentNullException("version field in package metadata is not valid");
 
             var packageVersion = new PackageVersion()
@@ -99,7 +100,7 @@ namespace DPMGallery.PackageExtraction
                 ReleaseNotes = DSpecReader.GetReleaseNotes(),
                 IsCommercial = DSpecReader.GetIsCommercial(),
                 IsTrial = DSpecReader.GetIsTrial(),
-                IsPrerelease = version.IsPreRelease,
+                IsPrerelease = version.IsPrerelease,
                 Icon = DSpecReader.GetIcon(),
                 Tags = DSpecReader.GetTags(),
                 Listed = false,
