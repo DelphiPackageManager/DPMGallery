@@ -85,6 +85,10 @@ namespace DPMGallery.Entities
         [Column("tags")]
         public string Tags { get; set; }
 
+        [Column("search_paths")]
+        public string SearchPaths { get; set; }
+
+
         [Column("total_downloads")]
         public long TotalDownloads { get; set; }
 

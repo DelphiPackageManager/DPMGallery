@@ -17,6 +17,8 @@ namespace DPMGallery
     public class Program
     {
 
+        private static IConfigurationRoot _configuration;
+
         private static ServerConfig LoadServerConfig()
         {
             //need to get the datashare path from the server service config file.
@@ -28,7 +30,14 @@ namespace DPMGallery
             if (!File.Exists(configFileName))
                 return ServerConfig.CreateDefaultConfig(configFileName);
 
-            return ServerConfig.Load(configFileName);
+            _configuration = new ConfigurationBuilder()
+                .AddJsonFile(configFileName)
+                .AddEnvironmentVariables().Build();
+
+            ServerConfig.Current.FileName = configFileName;
+            _configuration.Bind(ServerConfig.Current);
+
+            return ServerConfig.Current;
 
         }
 
@@ -135,8 +144,10 @@ namespace DPMGallery
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.UseConfiguration(_configuration);
                     webBuilder.UseStartup<Startup>();
                 }).UseSerilog();
     }

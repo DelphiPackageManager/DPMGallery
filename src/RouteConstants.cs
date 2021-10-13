@@ -19,6 +19,7 @@ namespace DPMGallery
 			public const string PackageVersionsRouteName = "package-versions";
 			public const string PackageVersionsWithDepsRouteName = "package-versions-deps";
 			public const string PackageDownloadRouteName = "package-download";
+			public const string PackageInfoRouteName = "package-info";
 
 			public const string PackageDownloadMetadataRouteName = "package-download-manifest";
 			public const string PackageDownloadReadmeRouteName = "package-download-readme";
@@ -37,6 +38,8 @@ namespace DPMGallery
 			public const string PackageMetadata = "PackageMetadata";
 			public const string PackageIcon		= "PackageIcon";
 			public const string PackageReadMe	= "PackageReadme";
+			public const string PackageInfo		= "PackageInfo";
+			public const string PackageVersionsWithDeps = "PackageVersionsWithDeps";
 		}
 
 		//service index resource uri
@@ -50,6 +53,8 @@ namespace DPMGallery
 			public const string PackageMetadata = "api/v1/package";
 			public const string PackageIcon		= "api/v1/package";
 			public const string PackageReadme	= "api/v1/package";
+			public const string PackageInfo		= "api/v1/package";
+			public const string PackageVersionsWithDeps = "api/v1/package";
 
 		}
 
@@ -59,11 +64,12 @@ namespace DPMGallery
 			public const string PackageDetails			= "packages/{id}/{compilerVersion}/{platform}/{version}";
 			public const string PackageDelist			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/delist";
 			public const string PackageVersions			= "api/v1/package/{id}/{compilerVersion}/{platform}/versions";
-			public const string PackageVersionsWithDeps = "api/v1/package/{id}/{compilerVersion}/{platform}/versionswithdependencies";
+			public const string PackageVersionsWithDeps = "api/v1/package/{id}/{compilerVersion}/{platform}/{versionRange}/versionswithdependencies";
 			public const string PackageDownload			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/dpkg";
 			public const string PackageMetadata			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/dspec";
 			public const string PackageReadme			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/readme";
 			public const string PackageIcon				= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/icon";
+			public const string PackageInfo				= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/info";
 		}
 
 		//used for asp.net routing
@@ -71,6 +77,8 @@ namespace DPMGallery
         {
 			public const string PackageDelist			= RouteTemplates.PackageDelist;
 			public const string PackagePublish			= ResourceUri.PackagePublish;
+			public const string PackageInfo				= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/info";
+
 			//sharing route  across multiple resources.
 			public const string PackageDownloadFile		= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/{fileType}";
             public const string PackageDetails			= RouteTemplates.PackageDetails;

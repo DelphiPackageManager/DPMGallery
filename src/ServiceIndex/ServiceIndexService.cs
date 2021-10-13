@@ -62,10 +62,17 @@ namespace DPMGallery.Services
 					},
 					new ServiceIndexItemDTO()
 					{
+						ResourceType = Constants.ResourceNames.PackageVersionsWithDeps,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageVersionsWithDeps),
+						Comment = $"Get a list of package versions with dependencies in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageVersionsWithDeps} (GET)"
+					},
+					new ServiceIndexItemDTO()
+					{
 						ResourceType = Constants.ResourceNames.PackageVersions,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageVersions),
 						Comment = $"Get a list of package versions in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageVersions} (GET)"
 					},
+
 					new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageDownload,
@@ -90,7 +97,13 @@ namespace DPMGallery.Services
 					{
 						ResourceType = Constants.ResourceNames.PackageIcon,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageIcon),
-						Comment = $"Template URL of where DPM package icon is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageIcon} (GET)"
+						Comment = $"Base URL of where DPM package icon is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageIcon} (GET)"
+					},
+					new ServiceIndexItemDTO()
+					{
+						ResourceType = Constants.ResourceNames.PackageInfo,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageInfo),
+						Comment = $"Base URL of where DPM package info is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageInfo} (GET)"
 					},
 				}
 			};

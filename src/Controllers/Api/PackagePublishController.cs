@@ -94,19 +94,19 @@ namespace DPMGallery.Controllers
                     }
 
                     var result = await _packageIndexService.IndexAsync(uploadStream, apiKeyId, cancellationToken);
-                    switch (result)
+                    switch (result.Status)
                     {
-                        case PackageIndexingResult.InvalidPackage:
-                            return BadRequest();
-                        case PackageIndexingResult.Forbidden:
-                            return Forbid();
-                        case PackageIndexingResult.PackageAlreadyExists:
+                        case PackageIndexingStatus.InvalidPackage:
+                            return BadRequest(result.Message);
+                        case PackageIndexingStatus.Forbidden:
+                            return Forbid(result.Message);
+                        case PackageIndexingStatus.PackageAlreadyExists:
                             return StatusCode(409, "Package already exists");
-                        case PackageIndexingResult.Error:
-                            return StatusCode(500);
-                        case PackageIndexingResult.FailedAVScan:
+                        case PackageIndexingStatus.Error:
+                            return StatusCode(500, result.Message);
+                        case PackageIndexingStatus.FailedAVScan:
                             return StatusCode(400, "Package failed Antivirus Scan");
-                        case PackageIndexingResult.Success:
+                        case PackageIndexingStatus.Success:
                             return StatusCode(201);
                         default:
                             return StatusCode(201);

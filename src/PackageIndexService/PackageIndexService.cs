@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
 using NuGet.Versioning;
+using DPMGallery.Types;
 
 namespace DPMGallery.Services
 {
@@ -103,6 +104,7 @@ namespace DPMGallery.Services
             return Convert.ToBase64String(bytes);
         }
 
+        //TODO : This has no way of telling the client what is wrong with a package when it's rejected.
         public async Task<PackageIndexingResult> IndexAsync(Stream stream, int apiKeyId, CancellationToken cancellationToken)
         {
             Package package;
@@ -114,6 +116,26 @@ namespace DPMGallery.Services
                 using (var packageReader = new PackageArchiveReader(stream))
                 {
                     (package, packageTargetPlatform, packageVersion) = packageReader.GetPackageMetaData();
+                    if (packageTargetPlatform.CompilerVersion == CompilerVersion.UnknownVersion)
+                    {
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.InvalidPackage,
+                            Message = "Invalid compilerVersion" 
+                        };
+                       
+                    }
+
+                    if (packageTargetPlatform.Platform == Platform.UnknownPlatform)
+                    {
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.InvalidPackage,
+                            Message = "Invalid platform"
+                        };
+                    }
+
+
                     //if we get here, the metadata is probably ok
                     bool isNew = false;
 
@@ -137,7 +159,12 @@ namespace DPMGallery.Services
                     var apiKey = await _apiKeyRepository.GetApiKeyById(apiKeyId, cancellationToken);
                     if (apiKey == null)
                     {
-                        return PackageIndexingResult.Error;
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.Forbidden,
+                            Message = "I don't know who you are!"
+                        };
+
                     }
 
                     Package thePackage = null;
@@ -156,7 +183,12 @@ namespace DPMGallery.Services
                             //check that the api key has permission to create package 
                             if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage))
                             {
-                                return PackageIndexingResult.Forbidden;
+                                return new PackageIndexingResult()
+                                {
+                                    Status = PackageIndexingStatus.Forbidden,
+                                    Message = "Api Key does not have the required scope (push new package)"
+                                };
+                                
                             }
 
                             //new package
@@ -178,12 +210,21 @@ namespace DPMGallery.Services
                             var isOwner = GetIsOwner(thePackage.Id, apiKey.UserId, cancellationToken).Result;
                             if (!isOwner)
                             {
-                                return PackageIndexingResult.Forbidden;
+                                return new PackageIndexingResult()
+                                {
+                                    Status = PackageIndexingStatus.Forbidden,
+                                    Message = "You are not an ower of package " + package.PackageId
+                                };
+                                
                             }
                             //check that the api key actually has permissions to push a new version
                             if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion))
                             {
-                                return PackageIndexingResult.Forbidden;
+                                return new PackageIndexingResult()
+                                {
+                                    Status = PackageIndexingStatus.Forbidden,
+                                    Message = "Api Key does not have the required scope (push new package version)"
+                                };
                             }
                         }
                     }
@@ -192,7 +233,12 @@ namespace DPMGallery.Services
                         _semaphoreSlim.Release();
                     }
                     if (thePackage == null)
-                        return PackageIndexingResult.Error;
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.Error,
+                            Message = "Something went wrong creating the package db entry"
+                        };
+
 
                     PackageVersion thePackageVersion;
                     PackageTargetPlatform theTargetPlatform;
@@ -221,7 +267,12 @@ namespace DPMGallery.Services
                     {
                          thePackageVersion = await _packageVersionRepository.GetByIdAndVersion(theTargetPlatform.Id , packageVersion.Version, cancellationToken);
                          if (thePackageVersion != null)
-                             return PackageIndexingResult.PackageAlreadyExists;
+                            return new PackageIndexingResult()
+                            {
+                                Status = PackageIndexingStatus.PackageAlreadyExists,
+                                Message = "This package version already exists on the server - you cannot overwrite a pacakge, delist it and publish a new version"
+                            };
+
                     }
 
                     //the packaged version doesn't exist                    
@@ -232,18 +283,27 @@ namespace DPMGallery.Services
                     thePackageVersion = await _packageVersionRepository.InsertAsync(packageVersion, cancellationToken);
 
                     if (thePackageVersion == null)
-                        return PackageIndexingResult.Error;
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.Error,
+                            Message = "Something went wrong writing the package version to the db"
+                        };
 
                     //update the targetplatform with the latest versions
 
-                    SemanticVersion latestVer = null;
-                    SemanticVersion latestStableVer = null;
+                    NuGetVersion latestVer = null;
+                    NuGetVersion latestStableVer = null;
                     bool updateVersions = false;
 
-                    if (!SemanticVersion.TryParse(thePackageVersion.Version, out SemanticVersion version))
+                    if (!NuGetVersion.TryParseStrict(thePackageVersion.Version, out NuGetVersion version))
                     {
-                        _logger.Error("Package version is not a valid semantic version : {thePackageVersion.Version}");
-                        return PackageIndexingResult.Error;
+                        _logger.Error("Package version is not a valid semantic version : {thePackageVersion.Version}", thePackageVersion.Version);
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.InvalidPackage,
+                            Message = $"Package version is not a valid semantic version : {thePackageVersion.Version}"
+                        };
+
                     }
 
                     if (!version.IsPrerelease)
@@ -313,7 +373,12 @@ namespace DPMGallery.Services
                         catch (Exception ex)
                         {
                             _logger.Error(ex, "[PackageIndexService] Error updating package versions");
-                            return PackageIndexingResult.Error;
+                            return new PackageIndexingResult()
+                            {
+                                Status = PackageIndexingStatus.Error,
+                                Message = $"Something went wrong updating the package target platform"
+                            };
+
                         }
 
                     }
@@ -333,29 +398,50 @@ namespace DPMGallery.Services
                     //copy the file to the processing folder so we can scan it for viruses etc in a background task.
                     var copyResult = await WriteToProcessingFolderAsync(stream, fileNameBase + ".dpkg", cancellationToken);
                     if (!copyResult)
-                        return PackageIndexingResult.Error;
-        
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.Error,
+                            Message = $"Something went wrong saving the package file to the processing folder"
+                        };
+
                     try
                     {
                         _unitOfWork.Commit();
-                        return PackageIndexingResult.Success;
-                    }catch
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.Success,
+                            Message = "Package queued for processing, it may take a few minutes to appear on the site"
+                        };
+
+                    }
+                    catch (Exception ex)
                     {
                         //db commit failed, we want to clean up the filesystem.
-                            
-                        return PackageIndexingResult.Error;
+
+                        //TODO: remove file from processing.
+
+                        return new PackageIndexingResult()
+                        {
+                            Status = PackageIndexingStatus.Error,
+                            Message = $"Something went wrong committing db transaction : {ex.Message}"
+                        };
+                        
                     }
                 }
             }
             catch (Exception ex)
             {
                 _logger.Error(ex, "[PackageIndexService] Error creating package");
-                return await Task.FromResult(PackageIndexingResult.InvalidPackage);
+                return new PackageIndexingResult()
+                {
+                    Status = PackageIndexingStatus.Error,
+                    Message = $"Something went wrong  : {ex.Message}"
+                };
             }
 
         }
 
-        public async Task<bool> TryDeletePackageAsync(string id, SemanticVersion version, CancellationToken cancellationToken)
+        public async Task<bool> TryDeletePackageAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
         {
             return await Task.FromResult(false);
         }

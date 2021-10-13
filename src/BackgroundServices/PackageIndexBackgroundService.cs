@@ -54,7 +54,7 @@ namespace DPMGallery.BackgroundServices
                         var packageVersionProcessRepository = scope.ServiceProvider.GetRequiredService<PackageVersionProcessRepository>();
                         
                         //get any packageversionprocess records not marked as completed.
-                        var toBeProcessed = await packageVersionProcessRepository.GetNotCompleted(100, stoppingToken);
+                        var toBeProcessed = await packageVersionProcessRepository.GetNotCompleted(1000, stoppingToken);
                         if (stoppingToken.IsCancellationRequested) //might have been signalled while we were querying the db
                             return;
 

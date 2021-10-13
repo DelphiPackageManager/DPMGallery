@@ -13,6 +13,48 @@ namespace DPMGallery.DBMigration.Conventions
 	[Migration(1, "Initial Schema creation")]
 	public class DPMGallery_1_001 : Migration
 	{
+
+		private const string SearchPackageVersionView = @"create view " + V.SearchPackageVersion + @" as
+													     SELECT p.id,
+															pv.id as versionid,
+															p.packageid, 
+															tp.compiler_version, 
+															tp.platform,
+															pv.version as latestversion,
+															pv.version as lateststableversion,
+															pv.is_prerelease, 
+															pv.is_commercial, 
+															pv.is_trial, 
+															p.reserved_prefix_id is not null as is_reserved,
+															pv.description,
+															pv.authors,
+															pv.icon,
+															pv.read_me,
+															pv.release_notes,
+															pv.license, 
+															pv.project_url,
+															pv.repository_url,
+															pv.repository_type,
+															pv.repository_branch,
+															pv.repository_commit,
+															pv.listed,
+															pv.status,
+															pv.tags,
+															pv.search_paths,
+															pv.published_utc,
+															pv.deprecation_state,
+															pv.deprecation_message,
+															pv.alternate_package,
+															pv.hash,
+															pv.hash_algorithm,
+															p.downloads as total_downloads,                           
+															pv.downloads as version_downloads   
+															FROM package p
+															left join package_targetplatform tp on  tp.package_id = p.id
+															left join package_version pv on pv.targetplatform_id = tp.id
+															order by p.id, tp.compiler_version, tp.platform, pv.published_utc";
+
+
 		private const string LatestStableVersionView = @"create view " + V.SearchStableVersion + @" as
 														select 
 															p.id,
@@ -40,6 +82,7 @@ namespace DPMGallery.DBMigration.Conventions
 															pv.listed,
 															pv.status,
 															pv.tags,
+															pv.search_paths,
 															pv.published_utc,
 															pv.deprecation_state,
 															pv.deprecation_message,
@@ -84,6 +127,7 @@ namespace DPMGallery.DBMigration.Conventions
 														pvl.listed,
 														pvl.status,
 													    pvl.tags,
+														pvl.search_paths,
 														pvl.published_utc,
 														pvl.deprecation_state,
 														pvl.deprecation_message,
@@ -275,6 +319,7 @@ namespace DPMGallery.DBMigration.Conventions
 				.WithColumn("status").AsInt32().WithDefaultValue(0).NotNullable()
 				.WithColumn("status_message").AsString(FL.VeryLong).Nullable()
 				.WithColumn("tags").AsString(FL.Long).Nullable()
+				.WithColumn("search_paths").AsString(FL.VeryLong).Nullable()
 				.WithColumn("hash").AsString(FL.Long).Nullable()
 				.WithColumn("hash_algorithm").AsString(FL.Short).Nullable();
 

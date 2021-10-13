@@ -51,6 +51,12 @@ namespace DPMGallery.Extensions
 
             endpoints.MapControllerRoute(
                 name: Constants.RouteNames.PackageDownloadRouteName,
+                pattern: Constants.RoutePatterns.PackageInfo,
+                defaults: new { controller = "PackageContent", action = "GetPackageInfo" });
+
+
+            endpoints.MapControllerRoute(
+                name: Constants.RouteNames.PackageDownloadRouteName,
                 pattern: Constants.RoutePatterns.PackageDownloadFile,
                 defaults: new { controller = "PackageContent", action = "DownloadFile" });
 

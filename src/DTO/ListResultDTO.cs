@@ -13,7 +13,7 @@ namespace DPMGallery.DTO
         public string PackageId { get; set; }
 
         [JsonPropertyName("compiler")]
-        public CompilerVersion Compiler { get; set; }
+        public string Compiler { get; set; }
 
         [JsonPropertyName("platform")]
         public Platform Platform { get; set; }

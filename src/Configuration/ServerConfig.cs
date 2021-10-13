@@ -22,12 +22,12 @@ namespace DPMGallery
         {
             serializerOptions = new JsonSerializerOptions()
             {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                //PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                 WriteIndented = true,
                 AllowTrailingCommas = true,
-                IgnoreReadOnlyProperties = true                   
+                IgnoreReadOnlyProperties = true
             };
-            serializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+            serializerOptions.Converters.Add(new JsonStringEnumConverter(/*JsonNamingPolicy.CamelCase*/));
 
             string commonAppDataPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
 
@@ -40,7 +40,7 @@ namespace DPMGallery
 
 
         [JsonIgnore]
-        public string FileName { get; private set; }
+        public string FileName { get; set; }
 
 
         public void Save()

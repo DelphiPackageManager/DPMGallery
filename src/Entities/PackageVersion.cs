@@ -98,6 +98,9 @@ namespace DPMGallery.Entities
         [Column("tags")]
         public string Tags { get; set; }
 
+        [Column("search_paths")]
+        public string SearchPaths { get; set; }
+
         [Column("hash")]
         public string Hash { get; set; }
 
@@ -112,8 +115,9 @@ namespace DPMGallery.Entities
             Dependencies = new List<PackageDependency>();
         }
 
-        public SemanticVersion SemVer => SemanticVersion.Parse(Version);
+        public NuGetVersion SemVer => NuGetVersion.Parse(Version);
 
         public IList<PackageDependency> Dependencies { get; set; }
+
     }
 }

@@ -9,7 +9,7 @@ namespace DPMGallery.Services
     /// The result of attempting to index a package.
     /// See <see cref="IPackageIndexingService.IndexAsync(Stream, CancellationToken)"/>.
     /// </summary>
-    public enum PackageIndexingResult
+    public enum PackageIndexingStatus
     {
         /// <summary>
         /// An internal error occurred.
@@ -40,11 +40,17 @@ namespace DPMGallery.Services
         Success,
     }
 
+    public class PackageIndexingResult
+    {
+        public PackageIndexingStatus Status { get; set; }
+        public string Message { get; set; }
+    }
+
 
     public interface IPackageIndexService
     {
         Task<PackageIndexingResult> IndexAsync(Stream stream, int apiKeyId, CancellationToken cancellationToken);
 
-        Task<bool> TryDeletePackageAsync(string id, SemanticVersion version, CancellationToken cancellationToken);
+        Task<bool> TryDeletePackageAsync(string id, NuGetVersion version, CancellationToken cancellationToken);
     }
 }

@@ -47,23 +47,6 @@ namespace DPMGallery.Services
         }
 
 
-        public async Task<PackageVersionsWithDependenciesResponseDTO> GetPackageVersionsWithDependenciesOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, VersionRange range,  CancellationToken cancellationToken, bool listed = true)
-        {
-            var versions = await _packageVersionRepository.GetPackageVersionsAsync(packageId, compilerVersion, platform, true, cancellationToken);
-
-            if (versions == null)
-                return null;
-
-            var dtos = Mapping<PackageVersion, VersionWithDependenciesDTO>.Map(versions);
-
-            return new PackageVersionsWithDependenciesResponseDTO()
-            {
-                Versions = dtos.ToList()
-            };
-        }
-
-
-
         public async Task<bool> GetPackageVersionExistsAsync(string packageId, string version, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken)
         {
             return await _packageVersionRepository.GetPackageVersionExistsAsync(packageId, version, compilerVersion, platform, cancellationToken);
@@ -72,7 +55,7 @@ namespace DPMGallery.Services
         public async Task<Stream> GetPackageStreamAsync(DownloadFileType fileType, string id, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken)
         {
             //we are using all lowercase paths to avoid issues on linux filesystems.  
-            string path = Path.Combine($"{compilerVersion.Sanitise()}",$"{platform.ToString().ToLower()}",$"{id.ToLower()}",$"{id}-{compilerVersion.Sanitise()}-{platform}-{version}.");
+            string path = Path.Combine($"{compilerVersion.Sanitise()}", $"{platform.ToString().ToLower()}", $"{id.ToLower()}", $"{id}-{compilerVersion.Sanitise()}-{platform}-{version}.");
             if (fileType == DownloadFileType.icon)
             {
                 path = path + "png";
@@ -90,7 +73,7 @@ namespace DPMGallery.Services
                         throw new Exception($"Could not find PackageVersion {id}-{compilerVersion.Sanitise()}-{platform}-{version}");
                     }
                     await _packageVersionRepository.IncrementDownloads(packageVersion, cancellationToken);
-                  //  _unitOfWork.Commit();
+                    //  _unitOfWork.Commit();
                     await _packageRepository.UpdateDownloads(id, cancellationToken);
                     _unitOfWork.Commit();
                 }
@@ -103,7 +86,11 @@ namespace DPMGallery.Services
 
             return await _storageService.GetAsync(path, cancellationToken);
         }
+        public async Task<string> GetPackageIconFileExtAsync(string id, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken)
+        {
+            var packageVersion = await _packageVersionRepository.GetPackageVersionByPackageIdAsync(id, version, compilerVersion, platform, cancellationToken);
 
-
+            return Path.GetExtension(packageVersion.Icon);
+        }
     }
 }

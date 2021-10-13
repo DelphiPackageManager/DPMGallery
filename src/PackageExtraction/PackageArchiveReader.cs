@@ -80,7 +80,7 @@ namespace DPMGallery.PackageExtraction
             };
 
 
-            if (!SemanticVersion.TryParse(DSpecReader.GetVersion(), out SemanticVersion version))
+            if (!NuGetVersion.TryParseStrict(DSpecReader.GetVersion(), out NuGetVersion version))
                 throw new ArgumentNullException("version field in package metadata is not valid");
 
             var packageVersion = new PackageVersion()
@@ -104,7 +104,8 @@ namespace DPMGallery.PackageExtraction
                 Icon = DSpecReader.GetIcon(),
                 Tags = DSpecReader.GetTags(),
                 Listed = false,
-                Dependencies = DSpecReader.GetDependencies()
+                Dependencies = DSpecReader.GetDependencies(),
+                SearchPaths = string.Join(';',DSpecReader.GetSearchPaths())
             };
 
             //mistakes on old packages, client needs to fix this.

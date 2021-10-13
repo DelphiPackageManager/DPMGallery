@@ -81,7 +81,7 @@ namespace DPMGallery
             {
                 public const string SearchStableVersion = "search_stable_version";
                 public const string SearchLatestVersion = "search_latest_version";
-
+                public const string SearchPackageVersion = "search_package_version";
             }
         }
     }

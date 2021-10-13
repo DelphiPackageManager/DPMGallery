@@ -7,6 +7,7 @@ namespace DPMGallery.DTO
 {
     public class DependencyDTO
     {
+        
         public string PackageId { get; set; }
 
         public string VersionRange { get; set; }

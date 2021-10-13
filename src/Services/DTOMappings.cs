@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using DPMGallery.Utils;
 using DPMGallery.DTO;
 using DPMGallery.Entities;
+using DPMGallery.Types;
 
 namespace DPMGallery.Services
 {
@@ -24,11 +25,10 @@ namespace DPMGallery.Services
                 dto.Dependencies = Mapping<PackageDependency, DependencyDTO>.Map(v.Dependencies).ToList();
             });
 
-
             Mapping<SearchResult, SearchResultDTO>.Configure((r, dto) =>
             {
                 dto.PackageId = r.PackageId;
-                dto.Compiler = r.Compiler;
+                dto.Compiler = r.Compiler.Sanitise();
                 dto.Platform = r.Platform;
                 dto.LatestVersion = r.LatestVersion;
                 dto.LatestStableVersion = r.LatestStableVersion;
@@ -55,6 +55,7 @@ namespace DPMGallery.Services
                 dto.DeprecationState = r.DeprecationState;
                 dto.AlternatePackage = r.AlternatePackage;
                 dto.Tags = r.Tags;
+                dto.SearchPaths = r.SearchPaths;
                 dto.Hash = r.Hash;
                 dto.HashAlgorithm = r.HashAlgorithm;
                 dto.TotalDownloads = r.TotalDownloads;
@@ -72,7 +73,7 @@ namespace DPMGallery.Services
             Mapping<ListResult, ListResultDTO>.Configure((r, dto) =>
             {
                 dto.PackageId = r.PackageId;
-                dto.Compiler = r.Compiler;
+                dto.Compiler = r.Compiler.Sanitise();
                 dto.Platform = r.Platform;
                 dto.LatestVersion = r.LatestVersion;
             });

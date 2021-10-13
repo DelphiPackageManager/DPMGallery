@@ -7,6 +7,6 @@ namespace DPMGallery.DTO
 {
     public class PackageVersionsWithDependenciesResponseDTO
     {
-        public IReadOnlyList<VersionWithDependenciesDTO> Versions { get; set; }
+        public IList<SearchResultDTO> Versions { get; set; }
     }
 }

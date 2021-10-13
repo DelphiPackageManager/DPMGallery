@@ -34,10 +34,8 @@ namespace DPMGallery
         public void ConfigureServices(IServiceCollection services)
         {
             var serverConfig = ServerConfig.Current;
-            _configuration.Bind(serverConfig);
             services.AddSingleton(serverConfig);
-
-
+            //_configuration.Bind(serverConfig);
 
             services.AddSingleton<Serilog.ILogger>(provider =>
             {
@@ -48,13 +46,15 @@ namespace DPMGallery
             // needed to store rate limit counters and ip rules
             services.AddMemoryCache();
 
-            var x = _configuration.GetSection("IpRateLimitOptions");
-
             ////load general configuration from appsettings.json
-            services.Configure<IpRateLimitOptions>(x);
+            services.Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimitOptions"));
 
             ////load ip rules from appsettings.json
-            services.Configure<IpRateLimitPolicies>(_configuration.GetSection("ipRateLimitPolicies"));
+            services.Configure<IpRateLimitPolicies>(_configuration.GetSection("IpRateLimitPolicies"));
+
+            //_configuration.Bind("IpRateLimitOptions", serverConfig.IpRateLimitOptions);
+
+            //_configuration.Bind("ipRateLimitPolicies", serverConfig.IpRateLimitPolicies);
 
 
 

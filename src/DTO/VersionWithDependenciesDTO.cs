@@ -8,8 +8,19 @@ namespace DPMGallery.DTO
 {
     public class VersionWithDependenciesDTO
     {
+        [JsonPropertyName("id")]
+        public string PackageId { get; set; }
+
+        [JsonPropertyName("compiler")]
+        public string Compiler { get; set; }
+
+        [JsonPropertyName("platform")]
+        public string Platform { get; set; }
+
+        [JsonPropertyName("version")]
         public string Version { get; set; }
 
+        [JsonPropertyName("dependencies")]
         public IReadOnlyList<DependencyDTO> Dependencies { get; set; }
     }
 }

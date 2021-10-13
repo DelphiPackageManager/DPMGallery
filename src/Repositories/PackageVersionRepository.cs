@@ -68,10 +68,11 @@ namespace DPMGallery.Repositories
         {
             string insertSql = $@"INSERT INTO {T.PackageVersion} (targetplatform_id, version, description, copyright, is_prerelease, is_commercial, is_trial, authors, icon, license, 
                                                             project_url, repository_url, repository_type, repository_branch, repository_commit,read_me, release_notes, filesize, 
-                                                            listed, published_utc, downloads, deprecation_state, deprecation_message, alternate_package, status, tags, hash, hash_algorithm)
+                                                            listed, published_utc, downloads, deprecation_state, deprecation_message, alternate_package, status, tags, search_paths, hash, hash_algorithm)
 	                                                        VALUES (@TargetPlatformId, @Version, @Description, @Copyright, @IsPrerelease, @IsCommercial, @IsTrial, @Authors, @Icon, 
                                                                     @License, @ProjectUrl, @RepositoryUrl, @RepositoryType, @RepositoryBranch, @RepositoryCommit, @ReadMe, @ReleaseNotes,
-                                                                    @FileSize, @Listed, @PublishedUtc, @Downloads, @DeprecationState, @DeprecatedMessage, @AlternatePackage, @Status, @Tags,
+                                                                    @FileSize, @Listed, @PublishedUtc, @Downloads, @DeprecationState, @DeprecatedMessage, @AlternatePackage, @Status, @Tags, 
+                                                                    @SearchPaths,
                                                                     @Hash, @HashAlgorithm) RETURNING id;";
 
             try
@@ -105,6 +106,7 @@ namespace DPMGallery.Repositories
                         packageVersion.AlternatePackage,
                         packageVersion.Status,
                         packageVersion.Tags,
+                        packageVersion.SearchPaths,
                         packageVersion.Hash,
                         packageVersion.HashAlgorithm
 
@@ -133,7 +135,7 @@ namespace DPMGallery.Repositories
 
         public async Task<IEnumerable<PackageVersion>> GetPackageVersionsAsync(string packageId, CompilerVersion compilerVersion, Platform platform, bool listed = true, CancellationToken cancellationToken = default)
         {
-            string @sql = @"select pv.*
+            string @sql = @"select  pv.*
                         from package p
                         inner join package_targetplatform tp on
                         p.id = tp.package_id
@@ -204,7 +206,7 @@ namespace DPMGallery.Repositories
             return count == 1; //should never be more than 1!!!!
         }
 
-        public async Task<PackageVersion> GetPackageVersionByPackageIdAsync(string packageId, string version, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken)
+        public async Task<PackageVersion> GetPackageVersionByPackageIdAsync(string packageId, string version, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken, bool includeDependencies = false )
         {
             string sql = $@"select pv.* from  package_version pv
                             inner join package_targetplatform tp
@@ -216,7 +218,21 @@ namespace DPMGallery.Repositories
                             and tp.platform = @platform
                             and pv.version = @version";
 
-            return await Context.QueryFirstOrDefaultAsync<PackageVersion>(sql, new { packageId,  version, compilerVersion, platform }, cancellationToken: cancellationToken);
+            var result = await Context.QueryFirstOrDefaultAsync<PackageVersion>(sql, new { packageId,  version, compilerVersion, platform }, cancellationToken: cancellationToken);
+
+
+            if (result != null && includeDependencies)
+            {
+                //strange postgresql syntax for where in 
+                var dependencies = await Context.QueryAsync<PackageDependency>($"select * from {T.PackageDependency} where packageversion_id = @Id", new { result.Id }, cancellationToken: cancellationToken);
+
+                if (dependencies.Any())
+                {
+                    result.Dependencies = dependencies.ToList();
+                }
+            }
+
+            return result;
         }
 
         public async Task<int> IncrementDownloads(PackageVersion packageVersion, CancellationToken cancellationToken)

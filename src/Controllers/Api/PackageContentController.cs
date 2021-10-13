@@ -9,6 +9,7 @@ using DPMGallery.Types;
 using DPMGallery.Services;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Versioning;
+using DPMGallery.Utils;
 
 namespace DPMGallery.Controllers.Api
 {
@@ -19,35 +20,37 @@ namespace DPMGallery.Controllers.Api
     public class PackageContentController : Controller
     {
         private readonly IPackageContentService _packageContentService;
+        private readonly ISearchService _searchService;
         private readonly IStorageService _storageService;
         private readonly ServerConfig _serverConfig;
         
-        public PackageContentController(ServerConfig serverConfig, IPackageContentService packageContentService, IStorageService storageService)
+        public PackageContentController(ServerConfig serverConfig, IPackageContentService packageContentService, ISearchService searchService, IStorageService storageService)
         {
             _serverConfig = serverConfig;
             _packageContentService = packageContentService;
+            _searchService = searchService;
             _storageService = storageService;
         }
 
-        public async Task<ActionResult<PackageVersionsWithDependenciesResponseDTO>> GetPackageVersionsWithDependenciesAsync(string id, string compilerVersion, string platform, string versionRange,  CancellationToken cancellationToken)
+        public async Task<ActionResult<PackageVersionsWithDependenciesResponseDTO>> GetPackageVersionsWithDependenciesAsync(string id, string compilerVersion, string platform, string versionRange, [FromQuery] bool includePrerelease, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
             if (compiler == CompilerVersion.UnknownVersion)
-                return NotFound();
+                return BadRequest();
 
             Platform thePlatform = platform.ToPlatform();
             if (thePlatform == Platform.UnknownPlatform)
-                return NotFound();
+                return BadRequest();
 
-            var range = VersionRange.All;
+            ;
 
-            var versions = await _packageContentService.GetPackageVersionsWithDependenciesOrNullAsync(id, compiler, thePlatform, range,  cancellationToken);
-            if (versions == null)
+            if (!VersionRange.TryParse(versionRange, out VersionRange range))
             {
-                return NotFound();
+                return BadRequest();
             }
 
-            return versions;
+            return await _searchService.GetPackageVersionsWithDependenciesOrNullAsync(id, compiler, thePlatform, range, includePrerelease,  cancellationToken);
+               
         }
 
 
@@ -71,6 +74,32 @@ namespace DPMGallery.Controllers.Api
             return versions;
         }
 
+        public async Task<ActionResult<SearchResultDTO>> GetPackageInfo(string id, string compilerVersion, string platform, string version, string fileType, CancellationToken cancellationToken)
+        {
+            CompilerVersion compiler = compilerVersion.ToCompilerVersion();
+            if (compiler == CompilerVersion.UnknownVersion)
+                return NotFound();
+
+            Platform thePlatform = platform.ToPlatform();
+            if (thePlatform == Platform.UnknownPlatform)
+                return NotFound();
+
+            if (!NuGetVersion.TryParseStrict(version, out _))
+            {
+                return NotFound();
+            }
+
+            //TODO : Validate package id
+
+            var result = await _searchService.GetPackageInfoAsync(id, compiler, thePlatform, version, cancellationToken);
+
+            if (result != null)
+                return result;
+
+            return NotFound();
+
+        }
+
         public async Task<IActionResult> DownloadFileAsync(string id, string compilerVersion, string platform, string version, string fileType, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
@@ -81,7 +110,7 @@ namespace DPMGallery.Controllers.Api
             if (thePlatform == Platform.UnknownPlatform)
                 return NotFound();
 
-            if (!SemanticVersion.TryParse(version, out _))
+            if (!NuGetVersion.TryParseStrict(version, out _))
             {
                 return NotFound();
             }
@@ -115,7 +144,12 @@ namespace DPMGallery.Controllers.Api
 
                 return Redirect(packageUrl);
             }
-            var packageStream = await _packageContentService.GetPackageStreamAsync(downloadFileType, id, compiler, thePlatform, version, cancellationToken);
+            string fileExt = "";
+            if (downloadFileType == DownloadFileType.icon)
+            {
+                fileExt = await _packageContentService.GetPackageIconFileExtAsync(id, compiler, thePlatform, version, cancellationToken);
+            }
+             var packageStream = await _packageContentService.GetPackageStreamAsync(downloadFileType, id, compiler, thePlatform, version, cancellationToken);
             if (packageStream == null)
             {
                 return NotFound();
@@ -125,12 +159,12 @@ namespace DPMGallery.Controllers.Api
             //TODO : how do we deal with different icon file types? perhaps just stick to png?
             if (downloadFileType == DownloadFileType.icon)
             {
-                fileName = fileName + "png";
+                fileName = fileName + fileExt;
             }
             else
                 fileName = fileName + fileType;
-
-            return File(packageStream, downloadFileType.ToContentType(), fileName);
+            
+            return File(packageStream, downloadFileType.ToContentType(fileExt), fileName);
         }
 
     }

@@ -21,7 +21,7 @@ namespace DPMGallery.Services
 
     public static class DownloadFileTypeExtensions
     {
-        public static string ToContentType(this DownloadFileType fileType)
+        public static string ToContentType(this DownloadFileType fileType, string ext = "")
         {
             switch (fileType)
             {
@@ -30,6 +30,10 @@ namespace DPMGallery.Services
                 case DownloadFileType.dspec:
                     return "application/json";
                 case DownloadFileType.icon:
+                    if (ext == ".png")
+                        return "image/png";
+                    if (ext == ".svg")
+                        return "image/svg+xml";
                     return "image/xyz";
                 case DownloadFileType.readme:
                     return "text/markdown";
@@ -41,13 +45,13 @@ namespace DPMGallery.Services
 
     public interface IPackageContentService
     {
+        //TODO: move to searchservice 
         Task<PackageVersionsResponseDTO> GetPackageVersionsOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken);
-
-        Task<PackageVersionsWithDependenciesResponseDTO> GetPackageVersionsWithDependenciesOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, VersionRange versionRange, CancellationToken cancellationToken, bool listed = true);
 
         Task<bool> GetPackageVersionExistsAsync(string packageId, string version, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken);
 
         Task<Stream> GetPackageStreamAsync(DownloadFileType fileType, string id, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken);
 
+        Task<string> GetPackageIconFileExtAsync(string id, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken);
     }
 }

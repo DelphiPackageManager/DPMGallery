@@ -184,7 +184,22 @@ namespace DPMGallery.PackageExtraction
             return Boolean.Parse(element?.GetString());
         }
 
-        public IList<PackageDependency> GetDependencies()
+        public IList<string> GetSearchPaths()
+        {
+            var result = new List<string>();
+            var paths = _jsonDocument.SelectToken("targetPlatforms[0].searchPaths");
+            if (!paths.HasValue)
+                return result;
+            var enumerator = paths.Value.EnumerateArray();
+            foreach (var item in enumerator)
+            {
+                var pathElement = item.GetProperty("path");
+                result.Add(pathElement.GetString());
+            }
+            return result;
+        }
+
+         public IList<PackageDependency> GetDependencies()
         {
             var result = new List<PackageDependency>();
             var dependenciesElement = _jsonDocument.SelectToken("targetPlatforms[0].dependencies");

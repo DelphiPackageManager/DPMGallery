@@ -9,6 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using NuGet.Versioning;
 
 namespace DPMGallery.Services
 {
@@ -56,6 +57,30 @@ namespace DPMGallery.Services
             return Mapping<UISearchResponse, UISearchResponseDTO>.Map(searchResponse);
 
         }
+
+        public async Task<SearchResultDTO> GetPackageInfoAsync(string packageId, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken = default)
+        {
+            var result = await _searchRepository.GetPackageInfo(packageId, compilerVersion, platform, version, cancellationToken);
+
+            if (result == null)
+                return null;
+
+            return Mapping<SearchResult, SearchResultDTO>.Map(result);
+        }
+
+        public async Task<PackageVersionsWithDependenciesResponseDTO> GetPackageVersionsWithDependenciesOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, VersionRange range, bool includePrerelease, CancellationToken cancellationToken)
+        {
+
+            var results = await _searchRepository.GetPackageVersionsWithDependenciesAsync(packageId, compilerVersion, platform, range, includePrerelease, cancellationToken); 
+
+            var result = new PackageVersionsWithDependenciesResponseDTO()
+            {
+                Versions = Mapping<SearchResult, SearchResultDTO>.Map(results)
+            };
+
+            return result;
+        }
+
 
     }
 }

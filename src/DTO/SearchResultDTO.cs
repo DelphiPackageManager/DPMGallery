@@ -14,7 +14,7 @@ namespace DPMGallery.DTO
         public string PackageId { get; set; }
 
         [JsonPropertyName("compiler")]
-        public CompilerVersion Compiler { get; set; }
+        public string Compiler { get; set; }
 
         [JsonPropertyName("platform")]
         public Platform Platform { get; set; }
@@ -84,6 +84,9 @@ namespace DPMGallery.DTO
 
         [JsonPropertyName("tags")]
         public string Tags { get; set; }
+
+        [JsonPropertyName("searchPaths")]
+        public string SearchPaths { get; set; }
 
         [JsonPropertyName("totalDownloads")]
         public long TotalDownloads { get; set; }

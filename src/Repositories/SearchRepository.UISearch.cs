@@ -231,8 +231,8 @@ namespace DPMGallery.Repositories
                     //if it is newer, then we start again
                     if (item.LatestVersion != prevVersion)
                     {
-                        SemanticVersion newVer = SemanticVersion.Parse(item.LatestVersion);
-                        SemanticVersion currentVer = SemanticVersion.Parse(prevVersion);
+                        NuGetVersion newVer = NuGetVersion.Parse(item.LatestVersion);
+                        NuGetVersion currentVer = NuGetVersion.Parse(prevVersion);
 
                         if (newVer > currentVer)
                         {
@@ -284,6 +284,5 @@ namespace DPMGallery.Repositories
 
             return result;
         }
-
     }
 }
