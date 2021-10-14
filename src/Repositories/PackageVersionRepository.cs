@@ -173,7 +173,7 @@ namespace DPMGallery.Repositories
 
         }
 
-        public async Task<IEnumerable<string>> GetPackageVersionStringsAsync(string packageId, CompilerVersion compilerVersion, Platform platform, bool listed = true, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<string>> GetPackageVersionStringsAsync(string packageId, CompilerVersion compilerVersion, Platform platform, bool includePrerelease, CancellationToken cancellationToken = default)
         {
             string @sql = @"select pv.version
                         from package p
@@ -184,7 +184,10 @@ namespace DPMGallery.Repositories
                         where pv.listed = true
                         and p.packageid = @packageId
                         and tp.compiler_version = @compilerVersion
-                        and tp.platform = @platform";
+                        and tp.platform = @platform
+                        ";
+                        if (!includePrerelease)
+                            sql = sql + "and pv.is_prerelease = false\n";
             var versions = await Context.QueryAsync<string>(sql, new { packageId, compilerVersion, platform }, cancellationToken: cancellationToken);
             return versions.Any() ? versions : null;
         }

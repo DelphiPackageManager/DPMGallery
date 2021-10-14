@@ -11,10 +11,10 @@
 		<RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.15" />
+		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="5.0.16" />
 		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.1" />
-		<PackageReference Include="AWSSDK.S3" Version="3.7.3.12" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.69" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.3.14" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.71" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.3" />
 		<PackageReference Include="Dapper" Version="2.0.90" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
@@ -25,12 +25,12 @@
 		<PackageReference Include="HtmlSanitizer" Version="6.0.441" />
 		<PackageReference Include="MailKit" Version="2.15.0" />
 		<PackageReference Include="Markdig" Version="0.26.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.10" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.10" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="5.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="5.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="5.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="5.0.11" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.10" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="5.0.11" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.11" />
 		<PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.2.2" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="5.0.1" />

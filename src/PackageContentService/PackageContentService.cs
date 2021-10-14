@@ -31,19 +31,18 @@ namespace DPMGallery.Services
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<PackageVersionsResponseDTO> GetPackageVersionsOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken)
+        public async Task<PackageVersionsResponseDTO> GetPackageVersionsOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, bool includePrerelease, CancellationToken cancellationToken)
         {
-            var versions = await _packageVersionRepository.GetPackageVersionStringsAsync(packageId, compilerVersion, platform, true, cancellationToken);
+            var versions = await _packageVersionRepository.GetPackageVersionStringsAsync(packageId, compilerVersion, platform, includePrerelease, cancellationToken);
+
+            var result = new PackageVersionsResponseDTO();
 
             if (versions != null) //
             {
-                return new PackageVersionsResponseDTO()
-                {
-                    Versions = versions.ToList()
-                };
+                result.Versions = versions.ToList();
             }
 
-            return null;
+            return result;
         }
 
 

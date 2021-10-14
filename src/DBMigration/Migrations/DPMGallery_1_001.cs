@@ -362,6 +362,7 @@ namespace DPMGallery.DBMigration.Conventions
 
 			Execute.Sql(LatestStableVersionView);
 			Execute.Sql(LatestVersionView);
+			Execute.Sql(SearchPackageVersionView);
 
 			//TODO : Add tables for statistics - downloads per week, month
 

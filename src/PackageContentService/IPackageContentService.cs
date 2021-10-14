@@ -46,7 +46,7 @@ namespace DPMGallery.Services
     public interface IPackageContentService
     {
         //TODO: move to searchservice 
-        Task<PackageVersionsResponseDTO> GetPackageVersionsOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken);
+        Task<PackageVersionsResponseDTO> GetPackageVersionsOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, bool includePrerelease, CancellationToken cancellationToken);
 
         Task<bool> GetPackageVersionExistsAsync(string packageId, string version, CompilerVersion compilerVersion, Platform platform, CancellationToken cancellationToken);
 

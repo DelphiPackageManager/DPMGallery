@@ -36,17 +36,17 @@ namespace DPMGallery.Controllers.Api
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
             if (compiler == CompilerVersion.UnknownVersion)
-                return BadRequest();
+                return BadRequest("Invalid Compiler Version");
 
             Platform thePlatform = platform.ToPlatform();
             if (thePlatform == Platform.UnknownPlatform)
-                return BadRequest();
+                return BadRequest("Invalid Platform");
 
             ;
 
             if (!VersionRange.TryParse(versionRange, out VersionRange range))
             {
-                return BadRequest();
+                return BadRequest("Invalid Semantic Version");
             }
 
             return await _searchService.GetPackageVersionsWithDependenciesOrNullAsync(id, compiler, thePlatform, range, includePrerelease,  cancellationToken);
@@ -55,17 +55,17 @@ namespace DPMGallery.Controllers.Api
 
 
 
-        public async Task<ActionResult<PackageVersionsResponseDTO>> GetPackageVersionsAsync(string id, string compilerVersion, string platform, CancellationToken cancellationToken)
+        public async Task<ActionResult<PackageVersionsResponseDTO>> GetPackageVersionsAsync(string id, string compilerVersion, string platform, [FromQuery] bool includePrerelease = true, CancellationToken cancellationToken = default)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
             if (compiler == CompilerVersion.UnknownVersion)
-                return NotFound();
+                return BadRequest("Invalid Compiler Version");
 
             Platform thePlatform = platform.ToPlatform();
             if (thePlatform == Platform.UnknownPlatform)
-                return NotFound();
+                return BadRequest("Invalid Platform");
 
-            var versions = await _packageContentService.GetPackageVersionsOrNullAsync(id, compiler, thePlatform, cancellationToken);
+            var versions = await _packageContentService.GetPackageVersionsOrNullAsync(id, compiler, thePlatform, includePrerelease, cancellationToken);
             if (versions == null)
             {
                 return NotFound();
@@ -74,19 +74,19 @@ namespace DPMGallery.Controllers.Api
             return versions;
         }
 
-        public async Task<ActionResult<SearchResultDTO>> GetPackageInfo(string id, string compilerVersion, string platform, string version, string fileType, CancellationToken cancellationToken)
+        public async Task<ActionResult<SearchResultDTO>> GetPackageInfo(string id, string compilerVersion, string platform, string version, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
             if (compiler == CompilerVersion.UnknownVersion)
-                return NotFound();
+                return BadRequest("Invalid Compiler Version");
 
             Platform thePlatform = platform.ToPlatform();
             if (thePlatform == Platform.UnknownPlatform)
-                return NotFound();
+                return BadRequest("Invalid Platform");
 
             if (!NuGetVersion.TryParseStrict(version, out _))
             {
-                return NotFound();
+                return BadRequest("Invalid Semantic Version");
             }
 
             //TODO : Validate package id
@@ -104,16 +104,20 @@ namespace DPMGallery.Controllers.Api
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
             if (compiler == CompilerVersion.UnknownVersion)
-                return NotFound();
+                return BadRequest("Invalid Compiler Version");
 
             Platform thePlatform = platform.ToPlatform();
             if (thePlatform == Platform.UnknownPlatform)
-                return NotFound();
+                return BadRequest("Invalid Platform");
 
             if (!NuGetVersion.TryParseStrict(version, out _))
             {
-                return NotFound();
+                return BadRequest("Invalid Semantic Version");
             }
+
+            if (!Enum.TryParse(fileType, out DownloadFileType downloadFileType))
+                return BadRequest("Invalid file type");
+
 
             //check package actually exists!
             bool exists = await _packageContentService.GetPackageVersionExistsAsync(id, version, compiler, thePlatform, cancellationToken);
@@ -121,10 +125,6 @@ namespace DPMGallery.Controllers.Api
             {
                 return NotFound();
             }
-
-            if (!Enum.TryParse(fileType, out DownloadFileType downloadFileType))
-                return NotFound();
-
 
             //if the storage is a cdn (ie aws or google cloud) then redirect to the cdn url for the package file.
             if (_storageService.IsCDN())
