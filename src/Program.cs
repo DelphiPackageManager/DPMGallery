@@ -28,7 +28,7 @@ namespace DPMGallery
             string configFileName = Path.Combine(commonAppDataPath, "dpm","dpmserver", ServerConfig.ConfigFileName + ".config.json");
 
             if (!File.Exists(configFileName))
-                return ServerConfig.CreateDefaultConfig(configFileName);
+                ServerConfig.CreateDefaultConfig(configFileName);
 
             _configuration = new ConfigurationBuilder()
                 .AddJsonFile(configFileName)

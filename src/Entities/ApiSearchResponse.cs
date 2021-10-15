@@ -9,6 +9,6 @@ namespace DPMGallery.Entities
     {
         public long TotalCount { get; set; }
 
-        public IList<SearchResult> searchResults { get; set; }
+        public List<SearchResult> searchResults { get; set; } = new();
     }
 }

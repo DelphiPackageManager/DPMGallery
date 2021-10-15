@@ -33,8 +33,8 @@ namespace DPMGallery.Repositories
 
         public async Task<PackageTargetPlatform> InsertAsync(PackageTargetPlatform packageTargetPlatform, CancellationToken cancellationToken = default)
         {
-            string sql = $@"INSERT INTO {T.PackageTargetPlatform} (package_id, compiler_version, platform, latest_version, latest_stable_version)
-	                          VALUES (@PackageId , @CompilerVersion, @Platform, @LatestVersionId, @LatestStableVersionId) RETURNING id;";
+            string sql = $@"INSERT INTO {T.PackageTargetPlatform} (package_id, compiler_version, platform, latest_version_id, latest_version, latest_stable_version_id, latest_stable_version)
+	                          VALUES (@PackageId , @CompilerVersion, @Platform, @LatestVersionId, @LatestVersion, @LatestStableVersionId, @LatestStableVersion) RETURNING id;";
 
             try
             {
@@ -44,7 +44,9 @@ namespace DPMGallery.Repositories
                     packageTargetPlatform.CompilerVersion,
                     packageTargetPlatform.Platform,
                     packageTargetPlatform.LatestVersionId,
-                    packageTargetPlatform.LatestStableVersionId
+                    packageTargetPlatform.LatestVersion,
+                    packageTargetPlatform.LatestStableVersionId,
+                    packageTargetPlatform.LatestStableVersion
                 }, cancellationToken: cancellationToken);
                 return packageTargetPlatform;
             }
@@ -59,7 +61,13 @@ namespace DPMGallery.Repositories
         {
 
             string sql = $@"UPDATE {T.PackageTargetPlatform} 
-	                        SET package_id=@PackageId, compiler_version=@CompilerVersion, platform=@Platform, latest_version=@LatestVersionId, latest_stable_version=@LatestStableVersionId
+	                        SET package_id=@PackageId, 
+                                compiler_version=@CompilerVersion, 
+                                platform=@Platform, 
+                                latest_version_id=@LatestVersionId, 
+                                latest_version = @LatestVersion,
+                                latest_stable_version_id=@LatestStableVersionId,
+                                latest_stable_version=@LatestStableVersion
 	                        WHERE id = @Id";
 
             try
@@ -71,7 +79,9 @@ namespace DPMGallery.Repositories
                     packageTargetPlatform.CompilerVersion,
                     packageTargetPlatform.Platform,
                     packageTargetPlatform.LatestVersionId,
-                    packageTargetPlatform.LatestStableVersionId
+                    packageTargetPlatform.LatestVersion,
+                    packageTargetPlatform.LatestStableVersionId,
+                    packageTargetPlatform.LatestStableVersion
                 }, cancellationToken: cancellationToken);
                 return packageTargetPlatform;
             }

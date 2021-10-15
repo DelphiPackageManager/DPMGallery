@@ -30,6 +30,7 @@ namespace DPMGallery.Services
                 dto.PackageId = r.PackageId;
                 dto.Compiler = r.Compiler.Sanitise();
                 dto.Platform = r.Platform;
+                dto.Version = r.Version;
                 dto.LatestVersion = r.LatestVersion;
                 dto.LatestStableVersion = r.LatestStableVersion;
                 dto.IsPreRelease = r.IsPreRelease;
@@ -75,7 +76,7 @@ namespace DPMGallery.Services
                 dto.PackageId = r.PackageId;
                 dto.Compiler = r.Compiler.Sanitise();
                 dto.Platform = r.Platform;
-                dto.LatestVersion = r.LatestVersion;
+                dto.Version = r.Version;
             });
 
             Mapping<ApiListResponse, ListResponseDTO>.Configure((r, dto) =>
@@ -88,6 +89,7 @@ namespace DPMGallery.Services
             Mapping<UISearchResult, UISearchResultDTO>.Configure((r, dto) =>
             {
                 dto.PackageId = r.PackageId;
+                dto.Version = r.Version;
                 dto.LatestVersion = r.LatestVersion;
                 dto.LatestStableVersion = r.LatestStableVersion;
                 dto.IsPreRelease = r.IsPreRelease;

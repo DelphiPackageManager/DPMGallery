@@ -97,7 +97,7 @@ namespace DPMGallery.Services
 
         private static async Task<string> ComputePackageHash(Stream stream, CancellationToken cancellationToken)
         {
-            var hashAlgo = new SHA512Managed();
+            var hashAlgo = new SHA256Managed();
             stream.Seek(0, SeekOrigin.Begin);
             var bytes = await hashAlgo.ComputeHashAsync(stream, cancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
@@ -278,7 +278,7 @@ namespace DPMGallery.Services
                     //the packaged version doesn't exist                    
                     packageVersion.TargetPlatformId = theTargetPlatform.Id;
                     packageVersion.Hash = await ComputePackageHash(stream, cancellationToken);
-                    packageVersion.HashAlgorithm = "SHA512";
+                    packageVersion.HashAlgorithm = "SHA256";
 
                     thePackageVersion = await _packageVersionRepository.InsertAsync(packageVersion, cancellationToken);
 
@@ -289,99 +289,7 @@ namespace DPMGallery.Services
                             Message = "Something went wrong writing the package version to the db"
                         };
 
-                    //update the targetplatform with the latest versions
-
-                    NuGetVersion latestVer = null;
-                    NuGetVersion latestStableVer = null;
-                    bool updateVersions = false;
-
-                    if (!NuGetVersion.TryParseStrict(thePackageVersion.Version, out NuGetVersion version))
-                    {
-                        _logger.Error("Package version is not a valid semantic version : {thePackageVersion.Version}", thePackageVersion.Version);
-                        return new PackageIndexingResult()
-                        {
-                            Status = PackageIndexingStatus.InvalidPackage,
-                            Message = $"Package version is not a valid semantic version : {thePackageVersion.Version}"
-                        };
-
-                    }
-
-                    if (!version.IsPrerelease)
-                    {
-                        //test against the lateststable
-                        if (theTargetPlatform.LatestStableVersionId.HasValue)
-                        {
-                            var latestStablePackageVersion = await _packageVersionRepository.GetById(theTargetPlatform.LatestStableVersionId.Value, cancellationToken);
-                            if (latestStablePackageVersion != null)
-                            {
-                                latestStableVer = latestStablePackageVersion.SemVer;
-                            }
-                        }
-                    }
-                    else //it's prerelease
-                    {
-                        //test against the lateststable
-                        if (theTargetPlatform.LatestVersionId.HasValue)
-                        {
-                            var latestPackageVersion = await _packageVersionRepository.GetById(theTargetPlatform.LatestVersionId.Value, cancellationToken);
-                            if (latestPackageVersion != null)
-                            {
-                                latestVer = latestPackageVersion.SemVer;
-                            }
-                        }
-                    }
-                    if (!version.IsPrerelease) //stable
-                    {
-
-                        if (latestStableVer != null)
-                        {
-                            if (version > latestStableVer)
-                            {
-                                theTargetPlatform.LatestStableVersionId = thePackageVersion.Id;
-                                updateVersions = true;
-                            }
-                        }
-                        else 
-                        {
-                            theTargetPlatform.LatestStableVersionId = thePackageVersion.Id;
-                            updateVersions = true;
-                        }
-                    }
                     
-
-                    if (latestVer != null )
-                    {
-                        if (version > latestVer)
-                        {
-                            theTargetPlatform.LatestVersionId = thePackageVersion.Id;
-                            updateVersions = true;
-                        }
-                    }
-                    else 
-                    {
-                        theTargetPlatform.LatestVersionId = thePackageVersion.Id;
-                        updateVersions = true;
-                    }
-
-
-                    if (updateVersions)
-                    {
-                        try
-                        {
-                            await _targetPlatformRepository.UpdateAsync(theTargetPlatform, cancellationToken);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, "[PackageIndexService] Error updating package versions");
-                            return new PackageIndexingResult()
-                            {
-                                Status = PackageIndexingStatus.Error,
-                                Message = $"Something went wrong updating the package target platform"
-                            };
-
-                        }
-
-                    }
                     //don't rely on the filename of the upload - construct from metadata
                     string fileNameBase = $"{thePackage.PackageId}-{theTargetPlatform.FileName}-{thePackageVersion.Version}";
 

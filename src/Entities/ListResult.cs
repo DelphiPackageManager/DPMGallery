@@ -18,11 +18,7 @@ namespace DPMGallery.Entities
         [Column("platform")]
         public Platform Platform { get; set; }
 
-        [Column("latestversion")]
-        public string LatestVersion { get; set; }
-
-
-
-
+        [Column("version")]
+        public string Version { get; set; }
     }
 }

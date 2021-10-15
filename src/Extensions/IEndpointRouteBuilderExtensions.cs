@@ -34,6 +34,12 @@ namespace DPMGallery.Extensions
                 defaults: new { controller = "Search", action = "Search" });
 
             endpoints.MapControllerRoute(
+                name: Constants.RouteNames.SearchIdsRouteName,
+                pattern: Constants.RoutePatterns.PackageSearchIds,
+                defaults: new { controller = "Search", action = "SearchByIds" });
+
+
+            endpoints.MapControllerRoute(
                 name: Constants.RouteNames.ListRouteName,
                 pattern: Constants.RoutePatterns.PackageList,
                 defaults: new { controller = "Search", action = "List" });

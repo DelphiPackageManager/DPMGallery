@@ -15,6 +15,7 @@ namespace DPMGallery.Models
             Mapping<UISearchResultDTO, PackageViewModel>.Configure((dto, model) =>
             {
                 model.PackageId = dto.PackageId;
+                model.Version = dto.Version;
                 model.LatestVersion = dto.LatestVersion;
                 model.LatestStableVersion = dto.LatestStableVersion;
                 model.IsPreRelease = dto.IsPreRelease;

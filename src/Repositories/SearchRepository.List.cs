@@ -11,20 +11,6 @@ namespace DPMGallery.Repositories
 {
     public partial class SearchRepository : RepositoryBase
     {
-
-        private string GetListSelectSql(bool includePrerelease)
-        {
-
-            if (includePrerelease)
-            {
-                return $"select packageid, compiler_version, platform, latestversion, lateststableversion from {V.SearchLatestVersion} \n";
-            }
-            else
-            {
-                return $"select packageid, compiler_version, platform, latestversion, lateststableversion from {V.SearchStableVersion} \n";
-            }
-        }
-
         private string GetListWhereSql(CompilerVersion compilerVersion, List<Platform> platforms, string query, bool exact, bool includePrerelease, bool includeCommercial, bool includeTrial)
         {
             string result = "";
@@ -36,6 +22,10 @@ namespace DPMGallery.Repositories
             if (platforms.Any())
             {
                 result = result + "and platform = ANY (@platforms) \n";
+            }
+            if (!includePrerelease)
+            {
+                result = result + $"and is_prerelease = false" + "\n";
             }
 
             if (!includeCommercial)
@@ -76,7 +66,7 @@ namespace DPMGallery.Repositories
         public async Task<ApiListResponse> ListAsync(CompilerVersion compilerVersion, List<Platform> platforms, string query = null, bool exact = false, int skip = 0, int take = 20,
                                        bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
         {
-            string select = GetListSelectSql(includePrerelease);
+            string select = $"select packageid, compiler_version, platform, version from {V.SearchPackageVersion} \n";
             string searchSql = GetListWhereSql(compilerVersion, platforms, query, exact, includePrerelease, includeCommercial, includeTrial);
 
             string countSql = GetCountSelect(includePrerelease);
@@ -95,7 +85,7 @@ namespace DPMGallery.Repositories
 
             int totalCount = await Context.ExecuteScalarAsync<int>(countSql, countParams, cancellationToken: cancellationToken);
 
-            string orderBy = "order by id, compiler_version, platform\n";
+            string orderBy = "order by packageid, compiler_version, platform, version\n";
             string pagingSql = "offset @skip limit @take";
 
             string sql = $@"{select}

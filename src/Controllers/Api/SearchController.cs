@@ -17,15 +17,17 @@ namespace DPMGallery.Controllers
         {
             _searchService = searchService;
         }
+
+
         [HttpGet]
-        public async Task<ListResponseDTO> ListAsync(CancellationToken cancellationToken,
+        public async Task<ActionResult<ListResponseDTO>> ListAsync(CancellationToken cancellationToken,
             [FromQuery] string compiler,
             [FromQuery] string platforms,
             [FromQuery(Name = "q")] string query = null,
             [FromQuery] bool exact = false,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 40,
-            [FromQuery] bool prerelease = true,
+            [FromQuery(Name ="prerel")] bool includePrerelease = true,
             [FromQuery] bool commercial = true,
             [FromQuery] bool trial = true)
         {
@@ -35,7 +37,7 @@ namespace DPMGallery.Controllers
             {
                 compilerVersion = compiler.ToCompilerVersion();
                 if (compilerVersion == CompilerVersion.UnknownVersion)
-                    NotFound();
+                    return NotFound();
             }
 
             var thePlatformStrings = !string.IsNullOrEmpty(platforms) ? platforms.Split(',') : new string[0] ;
@@ -50,25 +52,47 @@ namespace DPMGallery.Controllers
                 {
                     thePlatform = platformString.ToPlatform();
                     if (thePlatform == Platform.UnknownPlatform)
-                        NotFound();
+                        return NotFound();
                     if (!thePlatforms.Contains(thePlatform))
                         thePlatforms.Add(thePlatform);
                 }
             }
-            return await _searchService.ListAsync(compilerVersion, thePlatforms, query, exact, skip, take, prerelease, commercial, trial, cancellationToken);
+            return await _searchService.ListAsync(compilerVersion, thePlatforms, query, exact, skip, take, includePrerelease, commercial, trial, cancellationToken);
         }
 
+        [HttpPost]
+        public async Task<ActionResult<SearchResponseDTO>> SearchByIdsAsync(CancellationToken cancellationToken, [FromBody] SearchByIdRequestDTO model)
+        {
+            //validate model.
+            CompilerVersion compilerVersion = CompilerVersion.UnknownVersion;
+            if (!string.IsNullOrEmpty(model.Compiler))
+            {
+                compilerVersion = model.Compiler.ToCompilerVersion();
+                if (compilerVersion == CompilerVersion.UnknownVersion)
+                    return NotFound();
+            }
 
+            Platform thePlatform = Platform.UnknownPlatform;
+
+            if (!string.IsNullOrEmpty(model.Platform))
+            {
+                thePlatform = model.Platform.ToPlatform();
+                if (thePlatform == Platform.UnknownPlatform)
+                    return NotFound ();
+            }
+
+            return await _searchService.SearchByIdsAsync( compilerVersion, thePlatform, model.PackageIds, cancellationToken);
+        }
 
         [HttpGet]
-        public async Task<SearchResponseDTO> SearchAsync(CancellationToken cancellationToken,
+        public async Task<ActionResult<SearchResponseDTO>> SearchAsync(CancellationToken cancellationToken,
             [FromQuery] string compiler,
             [FromQuery] string platform,
             [FromQuery(Name = "q")] string query = null,
             [FromQuery] bool exact = false,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 40,
-            [FromQuery] bool prerelease = true,
+            [FromQuery(Name ="prerel")] bool includePrerelease = true,
             [FromQuery] bool commercial = true,
             [FromQuery] bool trial = true)
         {
@@ -77,7 +101,7 @@ namespace DPMGallery.Controllers
             {
                 compilerVersion = compiler.ToCompilerVersion();
                 if (compilerVersion == CompilerVersion.UnknownVersion)
-                    NotFound();
+                    return NotFound();
             }
 
             Platform thePlatform = Platform.UnknownPlatform;
@@ -86,9 +110,9 @@ namespace DPMGallery.Controllers
             {
                 thePlatform = platform.ToPlatform();
                 if (thePlatform == Platform.UnknownPlatform)
-                    NotFound();
+                    return NotFound();
             }
-            return await _searchService.SearchAsync(compilerVersion, thePlatform, query, exact, skip, take, prerelease, commercial, trial, cancellationToken);
+            return await _searchService.SearchAsync(compilerVersion, thePlatform, query, exact, skip, take, includePrerelease, commercial, trial, cancellationToken);
         }
     }
 }

@@ -15,6 +15,7 @@ using DPMGallery.Entities;
 using DPMGallery.Antivirus;
 using System.IO;
 using DPMGallery.PackageExtraction;
+using NuGet.Versioning;
 
 namespace DPMGallery.BackgroundServices
 {
@@ -206,6 +207,86 @@ namespace DPMGallery.BackgroundServices
             return aVScanResult;
         }
 
+        private bool CheckLatestVersions(PackageTargetPlatform targetPlatform, PackageVersion packageVersion)
+        {
+            //update the targetplatform with the latest versions
+
+            NuGetVersion latestVer = null;
+            NuGetVersion latestStableVer = null;
+            bool updateVersions = false;
+
+            if (!NuGetVersion.TryParseStrict(packageVersion.Version, out NuGetVersion version))
+            {
+                _logger.Error("Package version is not a valid semantic version : {thePackageVersion.Version}", packageVersion.Version);
+                return false;
+            }
+
+
+            //This needs to be done after processing! 
+            if (!version.IsPrerelease)
+            {
+                //test against the lateststable
+                if (!string.IsNullOrEmpty(targetPlatform.LatestStableVersion))
+                {
+                    if (!NuGetVersion.TryParseStrict(targetPlatform.LatestStableVersion, out latestStableVer))
+                    {
+                        _logger.Error("Package version is not a valid semantic version : {thePackageVersion.Version}", targetPlatform.LatestStableVersion);
+                        return false;
+                    }
+                }
+            }
+            else //it's prerelease
+            {
+                //test against the lateststable
+                if (!string.IsNullOrEmpty(targetPlatform.LatestVersion))
+                {
+                    if (!NuGetVersion.TryParseStrict(targetPlatform.LatestVersion, out latestVer))
+                    {
+                        _logger.Error("Package version is not a valid semantic version : {packageVersion.Version}", packageVersion.Version);
+                        return false;
+                    }
+                }
+            }
+            if (!version.IsPrerelease) //stable
+            {
+
+                if (latestStableVer != null)
+                {
+                    if (version > latestStableVer)
+                    {
+                        targetPlatform.LatestStableVersionId = packageVersion.Id;
+                        targetPlatform.LatestStableVersion = packageVersion.Version;
+                        updateVersions = true;
+                    }
+                }
+                else
+                {
+                    targetPlatform.LatestStableVersionId = packageVersion.Id;
+                    targetPlatform.LatestStableVersion = packageVersion.Version;
+                    updateVersions = true;
+                }
+            }
+
+
+            if (latestVer != null)
+            {
+                if (version > latestVer)
+                {
+                    targetPlatform.LatestVersionId = packageVersion.Id;
+                    targetPlatform.LatestVersion = packageVersion.Version;
+                    updateVersions = true;
+                }
+            }
+            else
+            {
+                targetPlatform.LatestVersionId = packageVersion.Id;
+                targetPlatform.LatestVersion = packageVersion.Version;
+                updateVersions = true;
+            }
+
+            return updateVersions;
+       }
+
         private async Task DoProcess(IServiceScope scope, PackageVersionProcess item, CancellationToken cancellationToken)
         {
             var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
@@ -295,6 +376,21 @@ namespace DPMGallery.BackgroundServices
                             packageVersion.StatusMessage = "Ok";
                             packageVersion.Listed = true;
                             break;
+                    }
+
+                    if (packageVersion.Status == PackageStatus.Passed)
+                    {
+                        if (CheckLatestVersions(targetPlatform, packageVersion))
+                        {
+                            try
+                            {
+                                await targetPlatformRepository.UpdateAsync(targetPlatform, cancellationToken);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.Error(ex, "[PackageIndexService] Error updating package versions");
+                            }
+                        }
                     }
 
                     await packageVersionRepository.UpdateAsyncStatus(packageVersion, cancellationToken);

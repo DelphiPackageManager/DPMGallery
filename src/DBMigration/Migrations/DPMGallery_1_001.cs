@@ -13,15 +13,16 @@ namespace DPMGallery.DBMigration.Conventions
 	[Migration(1, "Initial Schema creation")]
 	public class DPMGallery_1_001 : Migration
 	{
-
+		//do't hide not listed from this view as it would stop people restoring
 		private const string SearchPackageVersionView = @"create view " + V.SearchPackageVersion + @" as
-													     SELECT p.id,
+															SELECT p.id,
 															pv.id as versionid,
 															p.packageid, 
 															tp.compiler_version, 
 															tp.platform,
-															pv.version as latestversion,
-															pv.version as lateststableversion,
+															pv.version as version,
+															tp.latest_version as latestversion,
+															tp.latest_stable_version as lateststableversion,
 															pv.is_prerelease, 
 															pv.is_commercial, 
 															pv.is_trial, 
@@ -52,6 +53,7 @@ namespace DPMGallery.DBMigration.Conventions
 															FROM package p
 															left join package_targetplatform tp on  tp.package_id = p.id
 															left join package_version pv on pv.targetplatform_id = tp.id
+															where pv.status = 200
 															order by p.id, tp.compiler_version, tp.platform, pv.published_utc";
 
 
@@ -62,8 +64,9 @@ namespace DPMGallery.DBMigration.Conventions
 															p.packageid, 
 															tp.compiler_version, 
 															tp.platform,
-															pv.version as latestversion,
-															pv.version as lateststableversion,
+															pv.version as version,
+															tp.latest_version as latestversion,
+															tp.latest_stable_version as lateststableversion,
 															pv.is_prerelease, 
 															pv.is_commercial, 
 															pv.is_trial, 
@@ -95,7 +98,7 @@ namespace DPMGallery.DBMigration.Conventions
 														left  join package_targetplatform tp on
 														p.id = tp.package_id
 														left join package_version pv
-														on tp.latest_version = pv.id							
+														on tp.latest_stable_version_id = pv.id							
 														where pv.status = 200
 														and pv.listed = true
 														order by p.id, tp.compiler_version, tp.platform";
@@ -107,8 +110,9 @@ namespace DPMGallery.DBMigration.Conventions
 														p.packageid, 
 														tp.compiler_version, 
 														tp.platform,
-														pvl.version as latestversion,
-														pv.version as lateststableversion,
+														pvl.version,
+														tp.latest_version as latestversion,
+														tp.latest_stable_version as lateststableversion,
 														pvl.is_prerelease, 
 														pvl.is_commercial, 
 														pvl.is_trial, 
@@ -134,15 +138,13 @@ namespace DPMGallery.DBMigration.Conventions
 														pvl.alternate_package,
 														pvl.hash,
 														pvl.hash_algorithm,
-														p.downloads as totaldownloads,
-														pvl.downloads as versiondownloads
+														p.downloads as total_downloads,
+														pvl.downloads as version_downloads
 													from package p 
 													left join package_targetplatform tp on
 													p.id = tp.package_id
 													left join package_version pvl
-													on tp.latest_version = pvl.id
-													left join package_version pv
-													on tp.latest_stable_version = pv.id
+													on tp.latest_version_id = pvl.id
 													where pvl.status = 200
 													and pvl.listed = true
 													order by p.id, tp.compiler_version, tp.platform";
@@ -277,8 +279,10 @@ namespace DPMGallery.DBMigration.Conventions
 				.WithColumn("package_id").AsInt32().NotNullable()
 				.WithColumn("compiler_version").AsInt32().NotNullable()
 				.WithColumn("platform").AsInt32().NotNullable()
-				.WithColumn("latest_version").AsInt32().Nullable() //needs to be nullable due to circular ref
-				.WithColumn("latest_stable_version").AsInt32().Nullable(); // ""
+				.WithColumn("latest_version_id").AsInt32().Nullable() //needs to be nullable due to circular ref
+				.WithColumn("latest_version").AsString(FL.Long).Nullable()
+				.WithColumn("latest_stable_version_id").AsInt32().Nullable()
+				.WithColumn("latest_stable_version").AsString(FL.Long).Nullable(); // ""
 
 			Create.Index("ix_targetplatforn_unique")
 							.OnTable(T.PackageTargetPlatform).WithOptions().Unique()

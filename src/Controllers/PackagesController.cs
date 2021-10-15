@@ -40,7 +40,7 @@ namespace DPMGallery.Controllers
             {
                 compilerVersion = compiler.ToCompilerVersion();
                 if (compilerVersion == CompilerVersion.UnknownVersion)
-                    NotFound();
+                    return NotFound();
             }
 
             Platform thePlatform = Platform.UnknownPlatform;
@@ -49,7 +49,7 @@ namespace DPMGallery.Controllers
             {
                 thePlatform = platform.ToPlatform();
                 if (thePlatform == Platform.UnknownPlatform)
-                    NotFound();
+                    return NotFound();
             }
 
 

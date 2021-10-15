@@ -36,6 +36,15 @@ namespace DPMGallery.Services
         }
 
 
+        public async Task<SearchResponseDTO> SearchByIdsAsync(CompilerVersion compilerVersion, Platform platform, List<SearchIdDTO> ids, CancellationToken cancellationToken)
+        {
+            var searchResponse = await _searchRepository.SearchByIdsAsync(compilerVersion, platform, ids, cancellationToken);
+
+            return Mapping<ApiSearchResponse, SearchResponseDTO>.Map(searchResponse);
+           
+        }
+
+
         public async Task<SearchResponseDTO> SearchAsync(CompilerVersion compilerVersion, Platform platform, string query = null, bool exact = false, int skip = 0, int take = 20,
                                                    bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
         {

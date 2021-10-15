@@ -19,6 +19,9 @@ namespace DPMGallery.DTO
         [JsonPropertyName("platform")]
         public Platform Platform { get; set; }
 
+        [JsonPropertyName("version")]
+        public string Version { get; set; }
+
         [JsonPropertyName("latestVersion")]
         public string LatestVersion { get; set; }
 

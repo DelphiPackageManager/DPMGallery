@@ -17,11 +17,11 @@ namespace DPMGallery.Repositories
 
         public async Task<SearchResult> GetPackageInfo(string packageId, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken)
         {
-            var sql = @$"select * from {V.SearchLatestVersion} where 
+            var sql = @$"select * from {V.SearchPackageVersion} where 
                          packageid = @packageId
                          and compiler_version = @compilerVersion
                          and platform = @platform
-                         and latestversion = @version";
+                         and version = @version";
 
             var sqlParams = new
             {
@@ -74,7 +74,7 @@ namespace DPMGallery.Repositories
             {
                 if (NuGetVersion.TryParseStrict(item.LatestVersion, out NuGetVersion version))
                 {
-                    if (range.Satisfies(version))
+                    if (range.Satisfies(version)) //TODO : Need to write our own version of this as Nuget allows all parts of a version to float, we only allow minor!
                         result.Add(item);
                 }
             }

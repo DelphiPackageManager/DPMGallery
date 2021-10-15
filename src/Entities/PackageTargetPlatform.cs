@@ -22,8 +22,14 @@ namespace DPMGallery.Entities
         [Column("latest_version_id")]
         public int? LatestVersionId { get; set; }
 
+        [Column("latest_version")]
+        public string LatestVersion { get; set; }
+
         [Column("latest_stable_version_id")]
         public int? LatestStableVersionId { get; set; }
+
+        [Column("latest_stable_version")]
+        public string LatestStableVersion { get; set; }
 
         public string SantisedCompilerVersion => $"{CompilerVersion}".Replace("RS", "").Replace('_', '.');
 
