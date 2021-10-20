@@ -28,6 +28,8 @@ namespace DPMGallery.DTO
 
         public string Authors { get; set; }
 
+        public string Copyright { get; set; }
+
         public List<string> Owners { get; set; }
 
         public string Icon { get; set; }

@@ -39,7 +39,6 @@ namespace DPMGallery.Services
                 dto.IsReservedPrefix = r.IsReservedPrefix;
                 dto.Description = r.Description;
                 dto.Authors = r.Authors;
-                dto.Owners = r.Owners;
                 dto.Icon = r.Icon;
                 dto.ReadMe = r.ReadMe;
                 dto.ReleaseNotes = r.ReleaseNotes;
@@ -98,6 +97,7 @@ namespace DPMGallery.Services
                 dto.IsReservedPrefix = r.IsReservedPrefix;
                 dto.Description = r.Description;
                 dto.Authors = r.Authors;
+                dto.Copyright = r.Copyright;
                 dto.Owners = r.Owners;
                 dto.Icon = r.Icon;
                 dto.ReadMe = r.ReadMe;

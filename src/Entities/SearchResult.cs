@@ -49,6 +49,9 @@ namespace DPMGallery.Entities
         [Column("authors")]
         public string Authors { get; set; }
 
+        [Column("copyright")]
+        public string Copyright { get; set; }
+
         //not a field, we'll populate manually.
         public List<string> Owners { get; set; }
 
