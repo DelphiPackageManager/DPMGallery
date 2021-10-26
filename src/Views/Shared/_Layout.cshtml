@@ -21,7 +21,7 @@
 </head>
 <body class="flex flex-col m-0 h-screen bg-gray-50">
 	<partial name="_CookieConsentPartial" />
-	<nav class="bg-primary text-gray-100 inset-x-0 top-0 py-2 ">
+	<nav class="bg-primary text-gray-100 inset-x-0 top-0 py-2 z-50 sticky">
 		<div class="px-2 max-w-7xl mx-auto justify-content-center items-center">
 			<div class="flex justify-between items-center">
 				<div class="mr-2 items-center">
@@ -72,7 +72,7 @@
 		</div>
 	</nav>
 	@RenderSection("SearchBar", false)
-	<div class="flex-grow overflow-y-auto">
+	<div class="flex-grow">
 		@RenderBody()
 	</div>
 

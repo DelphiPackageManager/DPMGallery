@@ -1,13 +1,13 @@
 ﻿<div class="flex justify-center items-center py-2">
-	<form action="/packages" method="get" class="w-full flex flex-col">
-		<div class="relative w-full flex justify-center items-center px-3 text-gray-400">
-			<span class="absolute inset-y-0 left-0 flex items-center pl-4">
+	<form action="/packages" method="get" class="w-full flex flex-col md:w-8/12">
+		<div class="relative flex justify-around items-center text-gray-400">
+			<span class="absolute inset-y-0 left-0 flex items-center justify-center">
 				<button type="submit" class="p-2 focus:outline-none">
 					<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" class="w-8 h-8"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
 				</button>
 			</span>
-			<input type="text" name="q" id="search" class="flex-grow focus:outline-none focus:shadow-none focus:ring-primary py-1 text-lg text-gray-100 bg-secondary rounded-full pl-12 border-none" placeholder="Search Packages" autocomplete="off"
-				   value="@ViewBag.Query" autofocus="" onkeydown="clearOnEscape(event, this);">
+			<input type="text" name="q" id="search" class="w-full mx-auto focus:outline-none focus:shadow-none focus:ring-primary py-1 text-lg text-gray-100 bg-secondary rounded-full pl-12 border-none" placeholder="Search Packages" autocomplete="off"
+					value="@ViewBag.Query" autofocus="" onkeydown="clearOnEscape(event, this);">
 		</div>
 	</form>
 </div>
