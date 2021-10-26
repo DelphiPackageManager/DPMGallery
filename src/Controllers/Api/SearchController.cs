@@ -63,6 +63,10 @@ namespace DPMGallery.Controllers
         [HttpPost]
         public async Task<ActionResult<SearchResponseDTO>> SearchByIdsAsync(CancellationToken cancellationToken, [FromBody] SearchByIdRequestDTO model)
         {
+            if (model == null)
+            {
+                return BadRequest();
+            }
             //validate model.
             CompilerVersion compilerVersion = CompilerVersion.UnknownVersion;
             if (!string.IsNullOrEmpty(model.Compiler))
