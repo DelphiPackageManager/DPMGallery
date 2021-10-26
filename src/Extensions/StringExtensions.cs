@@ -12,7 +12,7 @@ namespace DPMGallery.Extensions
         public static string GetHashSha256(this string unhashed)
         {
             StringBuilder hash = new();
-            using (SHA256Managed crypt = new())
+            using (SHA256 crypt = SHA256.Create())
             {
                 byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(unhashed), 0, Encoding.UTF8.GetByteCount(unhashed));
                 foreach (byte theByte in crypto)

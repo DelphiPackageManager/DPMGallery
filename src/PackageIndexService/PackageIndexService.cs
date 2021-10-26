@@ -97,7 +97,7 @@ namespace DPMGallery.Services
 
         private static async Task<string> ComputePackageHash(Stream stream, CancellationToken cancellationToken)
         {
-            var hashAlgo = new SHA256Managed();
+            var hashAlgo = SHA256.Create();
             stream.Seek(0, SeekOrigin.Begin);
             var bytes = await hashAlgo.ComputeHashAsync(stream, cancellationToken);
             stream.Seek(0, SeekOrigin.Begin);
