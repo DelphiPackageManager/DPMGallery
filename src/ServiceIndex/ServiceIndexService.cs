@@ -62,6 +62,12 @@ namespace DPMGallery.Services
 					},
 					new ServiceIndexItemDTO()
 					{
+						ResourceType = Constants.ResourceNames.PackageSearchIds,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageSearchIds),
+						Comment = "Search by id of DPM Search service (POST)"
+					},
+					new ServiceIndexItemDTO()
+					{
 						ResourceType = Constants.ResourceNames.PackageVersionsWithDeps,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageVersionsWithDeps),
 						Comment = $"Get a list of package versions with dependencies in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageVersionsWithDeps} (GET)"
