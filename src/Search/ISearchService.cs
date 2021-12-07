@@ -37,5 +37,8 @@ namespace DPMGallery.Services
         Task<SearchResultDTO> GetPackageInfoAsync(string packageId, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken = default);
 
         Task<PackageVersionsWithDependenciesResponseDTO> GetPackageVersionsWithDependenciesOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, VersionRange range, bool includePrerelease, CancellationToken cancellationToken);
+
+        Task<FindResponseDTO> FindAsync(string id,  CompilerVersion compilerVersion, Platform platform, string version, bool includePrerelease = true, CancellationToken cancellationToken = default);
+
     }
 }

@@ -50,6 +50,7 @@ namespace DPMGallery
                 public const string PackageVersion = "package_version";
                 public const string PackageVersionProcess = "package_version_process";
                 public const string PackageDependency = "package_dependency";
+                public const string Platform = "platform";
                 public const string ReservedPrefix = "reserved_prefix";
                 public const string ReservedPrefixOwner = "reserved_prefix_owner";
                 public static string PrimaryKeyNamer(string tableName, params string[] columns)

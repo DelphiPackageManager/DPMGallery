@@ -221,32 +221,24 @@ namespace DPMGallery.BackgroundServices
                 return false;
             }
 
+            if (!string.IsNullOrEmpty(targetPlatform.LatestStableVersion))
+            {
+                if (!NuGetVersion.TryParseStrict(targetPlatform.LatestStableVersion, out latestStableVer))
+                {
+                    _logger.Error("Package version is not a valid semantic version : {targetPlatform.LatestStableVersion}", targetPlatform.LatestStableVersion);
+                    return false;
+                }
+            }
+            if (!string.IsNullOrEmpty(targetPlatform.LatestVersion))
+            {
+                if (!NuGetVersion.TryParseStrict(targetPlatform.LatestVersion, out latestVer))
+                {
+                    _logger.Error("Package version is not a valid semantic version : {targetPlatform.LatestVersion}", targetPlatform.LatestVersion);
+                    return false;
+                }
+            }
 
-            //This needs to be done after processing! 
-            if (!version.IsPrerelease)
-            {
-                //test against the lateststable
-                if (!string.IsNullOrEmpty(targetPlatform.LatestStableVersion))
-                {
-                    if (!NuGetVersion.TryParseStrict(targetPlatform.LatestStableVersion, out latestStableVer))
-                    {
-                        _logger.Error("Package version is not a valid semantic version : {thePackageVersion.Version}", targetPlatform.LatestStableVersion);
-                        return false;
-                    }
-                }
-            }
-            else //it's prerelease
-            {
-                //test against the lateststable
-                if (!string.IsNullOrEmpty(targetPlatform.LatestVersion))
-                {
-                    if (!NuGetVersion.TryParseStrict(targetPlatform.LatestVersion, out latestVer))
-                    {
-                        _logger.Error("Package version is not a valid semantic version : {packageVersion.Version}", packageVersion.Version);
-                        return false;
-                    }
-                }
-            }
+
             if (!version.IsPrerelease) //stable
             {
 
@@ -268,7 +260,7 @@ namespace DPMGallery.BackgroundServices
             }
 
 
-            if (latestVer != null)
+            if (latestVer != null) 
             {
                 if (version > latestVer)
                 {

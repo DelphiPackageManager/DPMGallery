@@ -53,7 +53,6 @@ namespace DPMGallery.Services
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageList),
 						Comment = "List endpoint of DPM Search service (GET)"
 					},
-
 					new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageSearch,
@@ -65,6 +64,12 @@ namespace DPMGallery.Services
 						ResourceType = Constants.ResourceNames.PackageSearchIds,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageSearchIds),
 						Comment = "Search by id of DPM Search service (POST)"
+					},
+					new ServiceIndexItemDTO()
+					{
+						ResourceType = Constants.ResourceNames.PackageFind,
+						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageFind),
+						Comment = "Find endpoint of DPM Search service (GET)"
 					},
 					new ServiceIndexItemDTO()
 					{

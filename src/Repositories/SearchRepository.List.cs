@@ -25,16 +25,16 @@ namespace DPMGallery.Repositories
             }
             if (!includePrerelease)
             {
-                result = result + $"and is_prerelease = false" + "\n";
+                result = result + "and is_prerelease = false \n";
             }
 
             if (!includeCommercial)
             {
-                result = result + $"and is_commercial = false" + "\n";
+                result = result + "and is_commercial = false \n";
             }
             if (!includeTrial)
             {
-                result = result + $"and is_trial = false" + "\n";
+                result = result + "and is_trial = false \n";
             };
 
             if (!string.IsNullOrEmpty(query))
@@ -66,13 +66,25 @@ namespace DPMGallery.Repositories
         public async Task<ApiListResponse> ListAsync(CompilerVersion compilerVersion, List<Platform> platforms, string query = null, bool exact = false, int skip = 0, int take = 20,
                                        bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
         {
-            string select = $"select packageid, compiler_version, platform, version from {V.SearchPackageVersion} \n";
+
+            string view = includePrerelease ? V.SearchLatestVersion : V.SearchStableVersion;
+
+            string selectSql = $@"SELECT compiler_version,  packageid, version, string_agg(platform_name, ','  order by platform) as platforms
+	                             FROM {view}";
+
+
+            
             string searchSql = GetListWhereSql(compilerVersion, platforms, query, exact, includePrerelease, includeCommercial, includeTrial);
 
-            string countSql = GetCountSelect(includePrerelease);
+            string groupOrderSql = @"group by compiler_version, packageid, version
+                                     order by compiler_version, packageid, version";
 
-            countSql = @$"{countSql}
-                          {searchSql}";
+
+            string countSql = $@"select count(*) from (
+                        select string_agg(platform_name, ','  order by platform) as platforms
+                        FROM {view}
+                        {searchSql}
+                        {groupOrderSql} ) as count";
 
             var platformsArray = platforms.Select(x => (int)x).ToArray();
 
@@ -85,12 +97,12 @@ namespace DPMGallery.Repositories
 
             int totalCount = await Context.ExecuteScalarAsync<int>(countSql, countParams, cancellationToken: cancellationToken);
 
-            string orderBy = "order by packageid, compiler_version, platform, version\n";
+            
             string pagingSql = "offset @skip limit @take";
 
-            string sql = $@"{select}
+            string sql = $@"{selectSql}
                             {searchSql}
-                            {orderBy}
+                            {groupOrderSql}
                             {pagingSql}";
 
             var sqlParams = new

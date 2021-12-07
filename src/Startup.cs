@@ -16,6 +16,8 @@ using DPMGallery.Services;
 using Serilog;
 using DPMGallery.Models;
 using AspNetCoreRateLimit;
+using Microsoft.AspNetCore.HttpLogging;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace DPMGallery
 {
@@ -130,6 +132,16 @@ namespace DPMGallery
             });
             services.AddCors();
 
+            //services.AddHttpLogging(logging =>
+            //{
+            //    // Customize HTTP logging here.
+            //    logging.LoggingFields = HttpLoggingFields.All;
+            //    //logging.ResponseHeaders.Add("My-Response-Header");
+            //    //logging.MediaTypeOptions.AddText("application/javascript");
+            //    logging.RequestBodyLogLimit = 4096;
+            //    logging.ResponseBodyLogLimit = 4096;
+            //});
+
             services.ConfigureApplicationCookie(options =>
             {
                 options.LoginPath = new PathString("/identity/account/login");
@@ -167,10 +179,17 @@ namespace DPMGallery
             {
                 app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+                //app.UseHsts();
             }
+            var forwardOpts = new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor
+            };
+            forwardOpts.KnownNetworks.Clear();
+            forwardOpts.KnownProxies.Clear();
+            app.UseForwardedHeaders(forwardOpts);
             app.UseIpRateLimiting();
-            app.UseHttpsRedirection();
+           // app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSerilogRequestLogging();
@@ -179,6 +198,7 @@ namespace DPMGallery
             app.UseAuthentication();
             app.UseAuthorization();
             app.UseOperationCancelledMiddleware();
+            //app.UseHttpLogging();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapApiRoutes();

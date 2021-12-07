@@ -27,7 +27,7 @@ namespace DPMGallery.Controllers
             [FromQuery] bool exact = false,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 40,
-            [FromQuery(Name ="prerel")] bool includePrerelease = true,
+            [FromQuery(Name ="prerel")] bool includePrerelease = false,
             [FromQuery] bool commercial = true,
             [FromQuery] bool trial = true)
         {
@@ -96,7 +96,7 @@ namespace DPMGallery.Controllers
             [FromQuery] bool exact = false,
             [FromQuery] int skip = 0,
             [FromQuery] int take = 40,
-            [FromQuery(Name ="prerel")] bool includePrerelease = true,
+            [FromQuery(Name ="prerel")] bool includePrerelease = false,
             [FromQuery] bool commercial = true,
             [FromQuery] bool trial = true)
         {
@@ -118,5 +118,41 @@ namespace DPMGallery.Controllers
             }
             return await _searchService.SearchAsync(compilerVersion, thePlatform, query, exact, skip, take, includePrerelease, commercial, trial, cancellationToken);
         }
+
+        [HttpGet]
+        public async Task<ActionResult<FindResponseDTO>> FindAsync(CancellationToken cancellationToken,
+            [FromQuery] string id,
+            [FromQuery] string compiler,
+            [FromQuery] string platform,
+            [FromQuery] string version = null,
+            [FromQuery(Name = "prerel")] bool includePrerelease = false)
+        {
+            CompilerVersion compilerVersion = CompilerVersion.UnknownVersion;
+            if (!string.IsNullOrEmpty(compiler))
+            {
+                compilerVersion = compiler.ToCompilerVersion();
+                if (compilerVersion == CompilerVersion.UnknownVersion)
+                    return NotFound();
+            }
+
+            Platform thePlatform = Platform.UnknownPlatform;
+
+            if (!string.IsNullOrEmpty(platform))
+            {
+                thePlatform = platform.ToPlatform();
+                if (thePlatform == Platform.UnknownPlatform)
+                    return NotFound();
+            }
+
+
+
+            var result = await _searchService.FindAsync(id, compilerVersion, thePlatform, version, includePrerelease, cancellationToken);
+
+            if (result == null)
+                return NotFound();
+            return result;
+
+        }
+
     }
 }

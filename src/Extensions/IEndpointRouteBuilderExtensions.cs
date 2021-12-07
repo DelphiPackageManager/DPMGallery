@@ -38,6 +38,11 @@ namespace DPMGallery.Extensions
                 pattern: Constants.RoutePatterns.PackageSearchIds,
                 defaults: new { controller = "Search", action = "SearchByIds" });
 
+            endpoints.MapControllerRoute(
+                name: Constants.RouteNames.SearchIdsRouteName,
+                pattern: Constants.RoutePatterns.PackageFind,
+                defaults: new { controller = "Search", action = "Find" });
+
 
             endpoints.MapControllerRoute(
                 name: Constants.RouteNames.ListRouteName,

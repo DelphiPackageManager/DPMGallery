@@ -32,7 +32,7 @@ namespace DPMGallery.Controllers.Api
             _storageService = storageService;
         }
 
-        public async Task<ActionResult<PackageVersionsWithDependenciesResponseDTO>> GetPackageVersionsWithDependenciesAsync(string id, string compilerVersion, string platform, string versionRange, [FromQuery] bool includePrerelease, CancellationToken cancellationToken)
+        public async Task<ActionResult<PackageVersionsWithDependenciesResponseDTO>> GetPackageVersionsWithDependenciesAsync([FromRoute] string id, [FromRoute] string compilerVersion, [FromRoute] string platform, [FromQuery] string versionRange, [FromQuery(Name = "prerel")] bool includePrerelease, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
             if (compiler == CompilerVersion.UnknownVersion)

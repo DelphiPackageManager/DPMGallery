@@ -4,6 +4,7 @@ using System.Linq;
 namespace DPMGallery.Types
 {
 
+    //Note : must mirror the delphi definition
     public enum Platform
     {
         UnknownPlatform = 0,

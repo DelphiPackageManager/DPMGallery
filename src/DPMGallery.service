@@ -6,7 +6,7 @@ Type=notify
 # will set the Current Working Directory (CWD). Worker service will have issues without this setting
 WorkingDirectory=/srv/dpmgallery
 # systemd will run this executable to start the service
-ExecStart=/usr/bin/dotnet /srv/dpmgallery/DPMGallery.dll --urls http://172.24.91.40:5000
+ExecStart=/usr/bin/dotnet /srv/dpmgallery/DPMGallery.dll --urls http://172.31.7.195:5000
 # to query logs using journalctl, set a logical name here  
 SyslogIdentifier=DPMGallery
 KillSignal=SIGINT

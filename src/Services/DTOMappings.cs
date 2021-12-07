@@ -74,7 +74,7 @@ namespace DPMGallery.Services
             {
                 dto.PackageId = r.PackageId;
                 dto.Compiler = r.Compiler.Sanitise();
-                dto.Platform = r.Platform;
+                dto.Platforms = r.Platforms;
                 dto.Version = r.Version;
             });
 
@@ -128,6 +128,15 @@ namespace DPMGallery.Services
                 dto.TotalHits = r.TotalCount;
 
                 dto.Results = Mapping<UISearchResult, UISearchResultDTO>.Map(r.searchResults);
+            });
+
+            Mapping<ApiFindResponse, FindResponseDTO>.Configure((r, dto) =>  
+            {
+                dto.PackageId = r.PackageId;
+                dto.Compiler = r.Compiler;
+                dto.Platform = r.Platform;
+                dto.Version = r.Version;    
+
             });
         }
     }

@@ -34,6 +34,7 @@ namespace DPMGallery
 			public const string PackagePublish	= "PackagePublish";
 			public const string PackageList		= "PackageList";
 			public const string PackageSearch	= "PackageSearch";
+			public const string PackageFind		= "PackageFind";
 			public const string PackageSearchIds = "PackageSearchIds";
 			public const string PackageVersions = "PackageVersions";
 			public const string PackageDownload = "PackageDownload";
@@ -52,6 +53,7 @@ namespace DPMGallery
 			public const string PackageList		= "api/v1/list";
 			public const string PackageSearch	= "api/v1/search";
 			public const string PackageSearchIds = "api/v1/searchbyids";
+			public const string PackageFind		= "api/v1/find";
 			public const string PackageVersions = "api/v1/package";
 			public const string PackageMetadata = "api/v1/package";
 			public const string PackageIcon		= "api/v1/package";
@@ -67,7 +69,7 @@ namespace DPMGallery
 			public const string PackageDetails			= "packages/{id}/{compilerVersion}/{platform}/{version}";
 			public const string PackageDelist			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/delist";
 			public const string PackageVersions			= "api/v1/package/{id}/{compilerVersion}/{platform}/versions";
-			public const string PackageVersionsWithDeps = "api/v1/package/{id}/{compilerVersion}/{platform}/{versionRange}/versionswithdependencies";
+			public const string PackageVersionsWithDeps = "api/v1/package/{id}/{compilerVersion}/{platform}/versionswithdependencies";
 			public const string PackageDownload			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/dpkg";
 			public const string PackageMetadata			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/dspec";
 			public const string PackageReadme			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/readme";
@@ -91,6 +93,7 @@ namespace DPMGallery
 			public const string PackageList				= ResourceUri.PackageList;
 			public const string PackageSearch			= ResourceUri.PackageSearch;
 			public const string PackageSearchIds		= ResourceUri.PackageSearchIds;
+			public const string PackageFind				= ResourceUri.PackageFind;
 		}
 	}
 }

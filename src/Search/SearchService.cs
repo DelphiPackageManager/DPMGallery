@@ -90,6 +90,16 @@ namespace DPMGallery.Services
             return result;
         }
 
+        public async Task<FindResponseDTO> FindAsync(string id, CompilerVersion compilerVersion, Platform platform, string version, bool includePrerelease = true, CancellationToken cancellationToken = default)
+        {
+            var findResult = await _searchRepository.FindAsync(id, compilerVersion, platform, version, includePrerelease, cancellationToken);
+
+            if (findResult == null)
+                return null;
+
+            return Mapping<ApiFindResponse, FindResponseDTO>.Map(findResult);
+        }
+
 
     }
 }

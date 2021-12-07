@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5",
+    "allowJs": true,
+    "outDir": "wwwroot/js"
+
+  },
+  "exclude": [
+    "node_modules",
+    "wwwroot",
+    "src/obj"
+  ],
+  "include": [
+    "./scripts/**/*.ts"
+  ]
+}

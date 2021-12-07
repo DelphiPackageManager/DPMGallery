@@ -20,6 +20,7 @@ namespace DPMGallery.DBMigration.Conventions
 															p.packageid, 
 															tp.compiler_version, 
 															tp.platform,
+															pl.name as platform_name,
 															pv.version as version,
 															tp.latest_version as latestversion,
 															tp.latest_stable_version as lateststableversion,
@@ -54,6 +55,7 @@ namespace DPMGallery.DBMigration.Conventions
 															FROM package p
 															left join package_targetplatform tp on  tp.package_id = p.id
 															left join package_version pv on pv.targetplatform_id = tp.id
+															left join platform pl on tp.platform = pl.id
 															where pv.status = 200
 															order by p.id, tp.compiler_version, tp.platform, pv.published_utc";
 
@@ -65,6 +67,7 @@ namespace DPMGallery.DBMigration.Conventions
 															p.packageid, 
 															tp.compiler_version, 
 															tp.platform,
+															pl.name as platform_name,
 															pv.version as version,
 															tp.latest_version as latestversion,
 															tp.latest_stable_version as lateststableversion,
@@ -99,8 +102,8 @@ namespace DPMGallery.DBMigration.Conventions
 														from package p 
 														left  join package_targetplatform tp on
 														p.id = tp.package_id
-														left join package_version pv
-														on tp.latest_stable_version_id = pv.id							
+														left join package_version pv on tp.latest_stable_version_id = pv.id							
+														left join platform pl on tp.platform = pl.id
 														where pv.status = 200
 														and pv.listed = true
 														order by p.id, tp.compiler_version, tp.platform";
@@ -112,6 +115,7 @@ namespace DPMGallery.DBMigration.Conventions
 														p.packageid, 
 														tp.compiler_version, 
 														tp.platform,
+														pl.name as platform_name,
 														pvl.version,
 														tp.latest_version as latestversion,
 														tp.latest_stable_version as lateststableversion,
@@ -146,8 +150,8 @@ namespace DPMGallery.DBMigration.Conventions
 													from package p 
 													left join package_targetplatform tp on
 													p.id = tp.package_id
-													left join package_version pvl
-													on tp.latest_version_id = pvl.id
+													left join package_version pvl on tp.latest_version_id = pvl.id
+													left join platform pl on tp.platform = pl.id
 													where pvl.status = 200
 													and pvl.listed = true
 													order by p.id, tp.compiler_version, tp.platform";
@@ -265,6 +269,11 @@ namespace DPMGallery.DBMigration.Conventions
 			Create.ForeignKey($"fk_{T.ApiKey}_{T.Users}_user_id").FromTable(T.ApiKey).ForeignColumn("user_id").ToTable(T.Users).PrimaryColumn("id");
 			Create.Index("ix_apikeys_user_id_name").OnTable(T.ApiKey).OnColumn("user_id").Ascending().OnColumn("name").Unique();
 
+			Create.Table(T.Platform)
+				.WithIntPrimaryKeyColumn()
+				.WithColumn("name").AsString(FL.Short).NotNullable().Unique();
+
+
 			Create.Table(T.Package)
 				.WithIntPrimaryKeyColumn().Identity()
 				.WithColumn("packageid").AsString(FL.Medium, DB.Collation).NotNullable().Unique()
@@ -370,6 +379,26 @@ namespace DPMGallery.DBMigration.Conventions
 			Execute.Sql(LatestStableVersionView);
 			Execute.Sql(LatestVersionView);
 			Execute.Sql(SearchPackageVersionView);
+
+			Insert.IntoTable(T.Platform).Row(new { id = 0, name = "Unknown" });
+			Insert.IntoTable(T.Platform).Row(new { id = 1, name = "Win32" });
+			Insert.IntoTable(T.Platform).Row(new { id = 2, name = "Win64" });
+			Insert.IntoTable(T.Platform).Row(new { id = 3, name = "WinArm32" });
+			Insert.IntoTable(T.Platform).Row(new { id = 4, name = "WinArm64" });
+			Insert.IntoTable(T.Platform).Row(new { id = 5, name = "OSX32" });
+			Insert.IntoTable(T.Platform).Row(new { id = 6, name = "OSX64" });
+			Insert.IntoTable(T.Platform).Row(new { id = 7, name = "OSXARM64" });
+			Insert.IntoTable(T.Platform).Row(new { id = 8, name = "AndroidArm32" });
+			Insert.IntoTable(T.Platform).Row(new { id = 9, name = "AndroidArm64" });
+			Insert.IntoTable(T.Platform).Row(new { id = 10, name = "AndroidIntel32" });
+			Insert.IntoTable(T.Platform).Row(new { id = 11, name = "AndroidIntel64" });
+			Insert.IntoTable(T.Platform).Row(new { id = 12, name = "iOS32" });
+			Insert.IntoTable(T.Platform).Row(new { id = 13, name = "iOS64" });
+			Insert.IntoTable(T.Platform).Row(new { id = 14, name = "LinuxIntel32" });
+			Insert.IntoTable(T.Platform).Row(new { id = 15, name = "LinuxIntel64" });
+			Insert.IntoTable(T.Platform).Row(new { id = 16, name = "LinuxArm32" });
+			Insert.IntoTable(T.Platform).Row(new { id = 17, name = "LinuxArm64" });
+
 
 			//TODO : Add tables for statistics - downloads per week, month
 
