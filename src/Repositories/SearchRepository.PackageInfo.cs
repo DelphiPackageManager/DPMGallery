@@ -72,7 +72,7 @@ namespace DPMGallery.Repositories
 
             foreach (var item in items)
             {
-                if (NuGetVersion.TryParseStrict(item.LatestVersion, out NuGetVersion version))
+                if (NuGetVersion.TryParseStrict(item.Version, out NuGetVersion version))
                 {
                     if (range.Satisfies(version)) //TODO : Need to write our own version of this as Nuget allows all parts of a version to float, we only allow minor!
                         result.Add(item);
