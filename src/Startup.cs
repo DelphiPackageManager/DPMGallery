@@ -58,7 +58,13 @@ namespace DPMGallery
 
             //_configuration.Bind("ipRateLimitPolicies", serverConfig.IpRateLimitPolicies);
 
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
 
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
 
             // inject counter and rules stores
             services.AddInMemoryRateLimiting();
@@ -181,15 +187,9 @@ namespace DPMGallery
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 //app.UseHsts();
             }
-            var forwardOpts = new ForwardedHeadersOptions
-            {
-                ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor
-            };
-            forwardOpts.KnownNetworks.Clear();
-            forwardOpts.KnownProxies.Clear();
-            app.UseForwardedHeaders(forwardOpts);
+            app.UseForwardedHeaders();
             app.UseIpRateLimiting();
-           // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
             app.UseSerilogRequestLogging();

@@ -50,7 +50,7 @@ namespace DPMGallery
             //TODO : Granular Serilog config and logging to file.
 
             Log.Logger = new LoggerConfiguration()
-               //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+               .MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
                .Enrich.FromLogContext()
                .WriteTo.Console()
                .CreateLogger();
