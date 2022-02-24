@@ -12,10 +12,10 @@
 		<IsPublishable>True</IsPublishable>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.3" />
+		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.4" />
 		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.1" />
-		<PackageReference Include="AWSSDK.S3" Version="3.7.7.17" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.110" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.7.26" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.119" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
@@ -39,10 +39,10 @@
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.1" />
-		<PackageReference Include="nClam" Version="6.0.1" />
+		<PackageReference Include="nClam" Version="7.0.0" />
 		<PackageReference Include="Npgsql" Version="6.0.3" />
-		<PackageReference Include="NuGet.Versioning" Version="6.0.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="4.1.1-dev-00250" />
+		<PackageReference Include="NuGet.Versioning" Version="6.1.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="5.0.1-dev-00262" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.1-dev-00944" />
 	</ItemGroup>
 	<ItemGroup>
