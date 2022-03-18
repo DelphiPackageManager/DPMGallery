@@ -13,7 +13,7 @@ namespace DPMGallery.Repositories
 {
     public partial class SearchRepository : RepositoryBase
     {
-        private string GetSearchSelectSql(bool includePrerelease)
+        private static string GetSearchSelectSql(bool includePrerelease)
         {
             if (includePrerelease)
             {
@@ -26,7 +26,7 @@ namespace DPMGallery.Repositories
         }
 
 
-        private string GetSearchWhereSql(CompilerVersion compilerVersion, Platform platform, string query, bool exact, bool includePrerelease, bool includeCommercial, bool includeTrial)
+        private static string GetSearchWhereSql(CompilerVersion compilerVersion, Platform platform, string query, bool exact, bool includePrerelease, bool includeCommercial, bool includeTrial)
         {
             string result = "";
 

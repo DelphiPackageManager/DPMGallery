@@ -13,9 +13,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.4" />
-		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.1" />
-		<PackageReference Include="AWSSDK.S3" Version="3.7.7.26" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.119" />
+		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.2" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.8.10" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.130" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
@@ -23,9 +23,9 @@
 		<PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
 		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="3.3.2" />
 		<PackageReference Include="Google.Cloud.Storage.V1" Version="3.7.0" />
-		<PackageReference Include="HtmlSanitizer" Version="7.1.475" />
+		<PackageReference Include="HtmlSanitizer" Version="7.1.488" />
 		<PackageReference Include="MailKit" Version="3.1.1" />
-		<PackageReference Include="Markdig" Version="0.27.0" />
+		<PackageReference Include="Markdig" Version="0.28.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.1" />
@@ -34,7 +34,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.2-mauipre.1.22054.8" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.2-mauipre.1.22054.8" />
-		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.5.2">
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.6.2">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -42,7 +42,7 @@
 		<PackageReference Include="nClam" Version="7.0.0" />
 		<PackageReference Include="Npgsql" Version="6.0.3" />
 		<PackageReference Include="NuGet.Versioning" Version="6.1.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="5.0.1-dev-00262" />
+		<PackageReference Include="Serilog.AspNetCore" Version="6.0.0-dev-00265" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.1-dev-00944" />
 	</ItemGroup>
 	<ItemGroup>
