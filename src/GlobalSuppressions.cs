@@ -7,3 +7,4 @@ using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "<Pending>")]
 [assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+[assembly: SuppressMessage("Spellchecker", "CRRSP08:A misspelled word has been found", Justification = "<Pending>", Scope = "member", Target = "~F:DPMGallery.Constants.RouteTemplates.PackageVersionsWithDeps")]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace DPMGallery.Extensions
@@ -23,5 +24,14 @@ namespace DPMGallery.Extensions
             return hash.ToString();
         }
 
+        public static string ToSentenceCase(this string value)
+        {
+            // start by converting entire string to lower case
+            var lowerCase = value.ToLower();
+            // matches the first sentence of a string, as well as subsequent sentences
+            var r = new Regex(@"(^[a-z])|\.(.)", RegexOptions.ExplicitCapture); //todo make static
+                                                                                   // MatchEvaluator delegate defines replacement of setence starts to uppercase
+            return r.Replace(lowerCase, s => s.Value.ToUpper());
+        }
     }
 }

@@ -76,6 +76,11 @@ namespace DPMGallery.Extensions
                 pattern: Constants.RoutePatterns.PackageDetails,
                 defaults: new { controller = "Packages", action = "Details" });
 
+            endpoints.MapControllerRoute(
+                name: Constants.RouteNames.PackageReportRouteName,
+                pattern: Constants.RoutePatterns.PackageReport,
+                defaults: new { controller = "Packages", action = "Report" });
+
         }
 
     }

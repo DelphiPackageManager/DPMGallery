@@ -3,6 +3,7 @@ using DPMGallery.Models;
 using DPMGallery.Services;
 using DPMGallery.Types;
 using DPMGallery.Utils;
+using DPMGallery.Extensions;
 using Ganss.XSS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -104,9 +105,52 @@ namespace DPMGallery.Controllers
             return View();
         }
 
-        public IActionResult Details(string id, string compilerVersion, string platform, string version)
+        public IActionResult Details(string id, string version)
         {
-            return Content("package details here");
+            _logger.Debug($"getting package details  for : {id} {version}");
+
+            //dummy for ui testing. 
+            PackageDetailsViewModel model = new PackageDetailsViewModel()
+            {
+                PackageId = id,
+                PackageName = id.ToSentenceCase(),
+                PackageVersion = version,
+                PublishedUtc = DateTime.UtcNow,
+                Licenses = new List<string>()
+                {
+                    "MIT",
+                    "Apache-2.0"
+                },
+                RepositoryUrl = "https://github.com/DelphiPackageManager/DPM",
+                ProjectUrl = "https://github.com/DelphiPackageManager/DPM",
+                CompilerVersions = new List<CompilerVersion>() { 
+                    CompilerVersion.RS10_2, 
+                    CompilerVersion.RS10_3, 
+                    CompilerVersion.RS10_4, 
+                    CompilerVersion.RS11_0},
+                CompilerPlatforms = new Dictionary<CompilerVersion, List<Platform>>(),
+                Platforms = new List<Platform>() { 
+                    Platform.Win32, 
+                    Platform.Win64},
+                Owners = new List<string>()
+                {
+                    "vincent",
+                    "vsoft"
+                },
+                Tags = new List<string>()
+                {
+                    "http",
+                    "async"
+                },
+                IsPrerelease = true
+            };
+            
+            return View(model);
+        }
+
+        public IActionResult Report(string id, string version)
+        {
+            return Content($"Reported {id} {version}");
+        }
         }
     }
-}

@@ -17,6 +17,7 @@ namespace DPMGallery
 			public const string DelistRouteName = "delistpackage";
 
 			public const string PackageDetailsRouteName = "package-details";
+			public const string PackageReportRouteName = "package-report";
 			public const string PackageVersionsRouteName = "package-versions";
 			public const string PackageVersionsWithDepsRouteName = "package-versions-deps";
 			public const string PackageDownloadRouteName = "package-download";
@@ -66,7 +67,8 @@ namespace DPMGallery
 		//used by the serviceindex in comment
 		public static class RouteTemplates
         {
-			public const string PackageDetails			= "packages/{id}/{compilerVersion}/{platform}/{version}";
+			public const string PackageDetails			= "packages/{id}/{version}";
+			public const string PackageReport		= "packages/{id}/{version}/report";
 			public const string PackageDelist			= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/delist";
 			public const string PackageVersions			= "api/v1/package/{id}/{compilerVersion}/{platform}/versions";
 			public const string PackageVersionsWithDeps = "api/v1/package/{id}/{compilerVersion}/{platform}/versionswithdependencies";
@@ -88,6 +90,7 @@ namespace DPMGallery
 			public const string PackageDownloadFile		= "api/v1/package/{id}/{compilerVersion}/{platform}/{version}/{fileType}";
             public const string PackageDetails			= RouteTemplates.PackageDetails;
 			public const string PackageVersions			= RouteTemplates.PackageVersions;
+			public const string PackageReport		    = RouteTemplates.PackageReport;
 			public const string PackageVersionsWithDeps = RouteTemplates.PackageVersionsWithDeps;
 
 			public const string PackageList				= ResourceUri.PackageList;
