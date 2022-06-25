@@ -1200,24 +1200,24 @@ select {
   fill: rgb(56 189 248 / 0.2);
 }
 
-.fill-slate-400 {
-  fill: #94a3b8;
-}
-
 .fill-sky-500 {
   fill: #0ea5e9;
+}
+
+.fill-slate-400 {
+  fill: #94a3b8;
 }
 
 .fill-current {
   fill: currentColor;
 }
 
-.stroke-slate-400 {
-  stroke: #94a3b8;
-}
-
 .stroke-sky-400 {
   stroke: #38bdf8;
+}
+
+.stroke-slate-400 {
+  stroke: #94a3b8;
 }
 
 .stroke-sky-500 {

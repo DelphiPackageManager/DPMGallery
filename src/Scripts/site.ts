@@ -1,4 +1,5 @@
-﻿
+﻿//todo : can we replace this with alpine js in the views?
+
 const btn = document.querySelector("button.mobile-menu-button");
 const menu = document.querySelector(".mobile-menu");
 

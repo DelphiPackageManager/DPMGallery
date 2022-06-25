@@ -1,3 +1,4 @@
+//todo : can we replace this with alpine js in the views?
 var btn = document.querySelector("button.mobile-menu-button");
 var menu = document.querySelector(".mobile-menu");
 // add event listeners
