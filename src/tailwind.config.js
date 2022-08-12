@@ -12,8 +12,8 @@ module.exports = {
     ],
     theme: {
         colors: {
-            primary: 'var(--color-primary)',
-            secondary : 'var(--color-secondary)',
+            primary: '#12202F',
+            secondary: '#35404d',
             current : colors.current,
             black: colors.black,
             white: colors.white,
@@ -38,7 +38,8 @@ module.exports = {
             purple: colors.purple,
             fuchsia: colors.fuchsia,
             pink: colors.pink,
-            rose: colors.rose,
+            rose: colors.rose
+            /*,
             dark: {
                 '100': '#121212',
                 '200': '#1d1d1d',
@@ -51,7 +52,7 @@ module.exports = {
                 '900': '#353535',
                 '999': '#373737',
             }
-
+            */
         },
         minWidth: {
             '0': '0',

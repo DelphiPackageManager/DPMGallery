@@ -1,9 +1,3 @@
-:root {
-    --color-primary: #12202F; /*/ #1b6ec2;*/
-    --color-secondary: #35404d;
-    /* ... */
-}
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

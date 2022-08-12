@@ -14,35 +14,35 @@
 	<ItemGroup>
 		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />
 		<PackageReference Include="AspNetCoreRateLimit" Version="4.0.2" />
-		<PackageReference Include="AWSSDK.S3" Version="3.7.9.18" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.167" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.9.38" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.1.184" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Dapper" Version="2.0.123" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
 		<PackageReference Include="FluentMigrator" Version="3.3.2" />
 		<PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
 		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="3.3.2" />
-		<PackageReference Include="Google.Cloud.Storage.V1" Version="3.7.0" />
-		<PackageReference Include="HtmlSanitizer" Version="7.1.512" />
+		<PackageReference Include="Google.Cloud.Storage.V1" Version="4.1.0" />
+		<PackageReference Include="HtmlSanitizer" Version="7.1.542" />
 		<PackageReference Include="MailKit" Version="3.3.0" />
-		<PackageReference Include="Markdig" Version="0.30.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.1" />
+		<PackageReference Include="Markdig" Version="0.30.3" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.8" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.2-mauipre.1.22054.8" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.2-mauipre.1.22054.8" />
-		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.6.2">
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.7.4">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.6" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.8" />
 		<PackageReference Include="nClam" Version="7.0.0" />
-		<PackageReference Include="Npgsql" Version="6.0.3" />
-		<PackageReference Include="NuGet.Versioning" Version="6.2.1" />
-		<PackageReference Include="Serilog.AspNetCore" Version="6.0.0-dev-00265" />
+		<PackageReference Include="Npgsql" Version="6.0.6" />
+		<PackageReference Include="NuGet.Versioning" Version="6.3.0" />
+		<PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.1-dev-00944" />
 	</ItemGroup>
 	<ItemGroup>
