@@ -86,5 +86,11 @@ namespace DPMGallery.Controllers
             return File(_cache, "application/opensearchdescription+xml");
         }
 
+        [Route("/downloads")]
+        public IActionResult Downloads()
+        {
+            return View();
+        }
+
     }
 }
