@@ -1,34 +1,40 @@
-import { createContext, useState } from "react";
+import React, { createContext, useState } from "react";
 
-export interface IUser {
+export type User = {
     userName: string;
     password: string;
 };
 
 
 export type AuthContextType = {
-    user: IUser;
-    setUser: (newUser: IUser) => void;
+    user: User | null;
+    setUser: (user : User) => void;
+    roles : string[];
+    setRoles : (newroles : string[]) => void;
 }
 
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | null>({
+    user : null,
+    setUser : (user : User) => {},
+    roles : [],
+    setRoles: (newRoles : string[]) => {}
+});
 
-
-export interface AuthProviderProps{
+type AuthProviderProps = {
     children: React.ReactNode
 }
- 
 
 
-const AuthProvider  = ({ children } :  AuthProviderProps) => {
+export const AuthProvider  = ({ children } :  AuthProviderProps) => {
 
-    const [user, setUser] = useState<IUser>();
+    const [user, setUser] = useState<User | null>(null);
+    const [roles, setRoles] = useState<string[]>([]);
 
     return (
-        <AuthContext.Provider  value={user ? {user, setUser} : undefined}>
+        <AuthContext.Provider  value={{user, setUser, roles, setRoles}}>
             {children}
         </AuthContext.Provider>
     )
 }
 
-export default AuthProvider;
+export default AuthContext;

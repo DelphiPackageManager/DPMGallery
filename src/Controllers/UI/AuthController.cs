@@ -46,7 +46,7 @@ namespace DPMGallery.Controllers.UI
         public string RefreshToken { get; set; }
     }
 
-    [Route("api/[controller]")]
+    [Route("ui/auth")]
     [ApiController]
     public class AuthController : Controller
     {
