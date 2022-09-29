@@ -184,7 +184,9 @@ namespace DPMGallery.DBMigration.Conventions
 				.WithColumn("lockout_enabled").AsBoolean().NotNullable()
 				.WithColumn("access_failed_count").AsInt32().WithDefaultValue(0).NotNullable()
 				.WithColumn("is_organisation").AsBoolean().NotNullable()
-				.WithColumn("account_suspended").AsBoolean().NotNullable();
+				.WithColumn("account_suspended").AsBoolean().NotNullable()
+				.WithColumn("refresh_token").AsString(FL.Long).Nullable()
+				.WithColumn("refresh_token_expiry").AsDateTimeOffset();
 
 			Create.Index("ix_users_user_name").OnTable(T.Users).OnColumn("user_name").Ascending().WithOptions().Unique();
 			Create.Index("ix_users_email").OnTable(T.Users).OnColumn("email").Ascending().WithOptions().Unique().WithOptions().NonClustered();

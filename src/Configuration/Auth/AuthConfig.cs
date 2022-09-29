@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DPMGallery.Configuration.Auth;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json.Serialization;
@@ -14,5 +15,8 @@ namespace DPMGallery.Configuration
 		public MicrosoftAuthConfig Microsoft { get; set; } = new MicrosoftAuthConfig();
 
 		public GitHubAuthConfig GitHub { get; set; } = new GitHubAuthConfig();
+
+		public JwtConfig JwtConfig { get; set; } = new JwtConfig();
+
 	}
 }

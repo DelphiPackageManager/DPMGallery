@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 namespace DPMGallery.Controllers
 {
+    [ApiController]
     public class SearchController : Controller
     {
 
@@ -20,6 +21,7 @@ namespace DPMGallery.Controllers
 
 
         [HttpGet]
+        [Route(Constants.RoutePatterns.PackageList)]
         public async Task<ActionResult<ListResponseDTO>> ListAsync(CancellationToken cancellationToken,
             [FromQuery] string compiler,
             [FromQuery] string platforms,
@@ -61,6 +63,7 @@ namespace DPMGallery.Controllers
         }
 
         [HttpPost]
+        [Route(Constants.RoutePatterns.PackageSearchIds)]
         public async Task<ActionResult<SearchResponseDTO>> SearchByIdsAsync(CancellationToken cancellationToken, [FromBody] SearchByIdRequestDTO model)
         {
             if (model == null)
@@ -89,6 +92,7 @@ namespace DPMGallery.Controllers
         }
 
         [HttpGet]
+        [Route(Constants.RoutePatterns.PackageSearch)]
         public async Task<ActionResult<SearchResponseDTO>> SearchAsync(CancellationToken cancellationToken,
             [FromQuery] string compiler,
             [FromQuery] string platform,
@@ -120,6 +124,7 @@ namespace DPMGallery.Controllers
         }
 
         [HttpGet]
+        [Route(Constants.RoutePatterns.PackageFind)]
         public async Task<ActionResult<FindResponseDTO>> FindAsync(CancellationToken cancellationToken,
             [FromQuery] string id,
             [FromQuery] string compiler,

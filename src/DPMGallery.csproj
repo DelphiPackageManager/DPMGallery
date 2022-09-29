@@ -6,11 +6,26 @@
 		<StartupObject>DPMGallery.Program</StartupObject>
 		<ApplicationIcon />
 		<OutputType>Exe</OutputType>
+		<SpaRoot>ClientApp</SpaRoot>
+		<SpaProxyServerUrl>http://localhost:3175</SpaProxyServerUrl>
+		<SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
 	</PropertyGroup>
 	<PropertyGroup>
 		<RuntimeIdentifiers>win10-x64;linux-x64</RuntimeIdentifiers>
 		<IsPublishable>True</IsPublishable>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="Areas\**" />
+	  <Compile Remove="ClientApp\**" />
+	  <Content Remove="Areas\**" />
+	  <Content Remove="ClientApp\**" />
+	  <EmbeddedResource Remove="Areas\**" />
+	  <EmbeddedResource Remove="ClientApp\**" />
+	  <None Remove="Areas\**" />
+	  <None Remove="ClientApp\**" />
+	  <TypeScriptCompile Remove="Areas\**" />
+	  <TypeScriptCompile Remove="ClientApp\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="6.0.6" />
@@ -29,10 +44,12 @@
 		<PackageReference Include="Markdig" Version="0.30.3" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="6.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="6.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="6.0.9" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="6.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.9" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.2-mauipre.1.22054.8" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.2-mauipre.1.22054.8" />
 		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.7.4">
@@ -46,17 +63,23 @@
 		<PackageReference Include="Serilog.AspNetCore" Version="6.0.1" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.1-dev-00944" />
 	</ItemGroup>
+
+
 	<ItemGroup>
 		<Folder Include="Configuration\RateLimiting\" />
 		<Folder Include="Statistics\" />
 		<Folder Include="Serialization\" />
-		<Folder Include="Pages\" />
+		<Folder Include="wwwroot\" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Compile Remove="Controllers\AdminController.cs" />
+	  <Compile Remove="Controllers\AuthController.cs" />
+	  <Compile Remove="Controllers\DPMController.cs" />
+	  <Compile Remove="Controllers\HomeController.cs" />
+	  <Compile Remove="Controllers\PackagesController.cs" />
+	  <Compile Remove="Controllers\PoliciesController.cs" />
+	  <Compile Remove="Controllers\ProfilesController.cs" />
 	  <Compile Remove="Repositories\SearchRepository1.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Remove="wwwroot\css\tailwind.css" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="postcss.config.js" />
@@ -66,26 +89,25 @@
 	  <Compile Include="obj\PackageContentService\PackageContentService.cs" />
 	</ItemGroup>
 	<ItemGroup>
-	  <None Include="wwwroot\css\tailwind.css" />
-	</ItemGroup>
-	<ItemGroup>
-		<UpToDateCheckBuilt Include="wwwroot/css/tailwind.css" Set="Css" />
-		<UpToDateCheckBuilt Include="postcss.config.js" Set="Css" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Update="tsconfig.json">
-	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-	  </Content>
-	</ItemGroup>
-	<ItemGroup>
 	  <None Update="DPMGallery.service">
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </None>
 	</ItemGroup>
 
-	<Target Name="Tailwind" BeforeTargets="Build">
-		<Exec Command="npm run css:build" />
-	</Target>
+	<Target Name="PublishRunVite" BeforeTargets="ComputeFilesToPublish">
+		<!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm install" />
+		<Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
 
-	<ProjectExtensions><VisualStudio><UserProperties NpmRestoreOnProjectOpen="True" /></VisualStudio></ProjectExtensions>
+		<!-- Include the newly-built files in the publish output -->
+		<ItemGroup>
+			<DistFiles Include="$(SpaRoot)\dist\**" />
+			<ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+				<RelativePath>wwwroot\%(RecursiveDir)%(FileName)%(Extension)</RelativePath>
+				<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+				<ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+			</ResolvedFileToPublish>
+		</ItemGroup>
+	</Target>
+	
 </Project>

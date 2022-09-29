@@ -32,6 +32,8 @@ namespace DPMGallery.Controllers.Api
             _storageService = storageService;
         }
 
+        [HttpGet]
+        [Route(Constants.RoutePatterns.PackageVersionsWithDeps)]
         public async Task<ActionResult<PackageVersionsWithDependenciesResponseDTO>> GetPackageVersionsWithDependenciesAsync([FromRoute] string id, [FromRoute] string compilerVersion, [FromRoute] string platform, [FromQuery] string versionRange, [FromQuery(Name = "prerel")] bool includePrerelease, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
@@ -53,8 +55,8 @@ namespace DPMGallery.Controllers.Api
                
         }
 
-
-
+        [HttpGet]
+        [Route(Constants.RoutePatterns.PackageVersions)]
         public async Task<ActionResult<PackageVersionsResponseDTO>> GetPackageVersionsAsync(string id, string compilerVersion, string platform, [FromQuery] bool includePrerelease = true, CancellationToken cancellationToken = default)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
@@ -74,6 +76,8 @@ namespace DPMGallery.Controllers.Api
             return versions;
         }
 
+        [HttpGet]
+        [Route(Constants.RoutePatterns.PackageInfo)]
         public async Task<ActionResult<SearchResultDTO>> GetPackageInfo(string id, string compilerVersion, string platform, string version, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
@@ -100,6 +104,8 @@ namespace DPMGallery.Controllers.Api
 
         }
 
+        [HttpGet]
+        [Route(Constants.RoutePatterns.PackageDownloadFile)]
         public async Task<IActionResult> DownloadFileAsync(string id, string compilerVersion, string platform, string version, string fileType, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();

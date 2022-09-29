@@ -111,6 +111,14 @@ namespace DPMGallery.Entities
         [Column("account_suspended")]
         public bool AccountSuspended { get; set; }
 
+        //jwt
+        [Column("refresh_token")]
+        public string RefreshToken { get; set; }
+
+        //jwt
+        [Column("refresh_token_expiry")]
+        public DateTimeOffset? RefreshTokenExpiryTime { get; set; }
+
         //used by the identity stores
         internal List<Claim> Claims { get; set; }
 
@@ -119,6 +127,8 @@ namespace DPMGallery.Entities
         internal List<UserLoginInfo> Logins { get; set; }
 
         internal List<UserToken> Tokens { get; set; }
+
+
 
     }
 }

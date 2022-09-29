@@ -68,13 +68,12 @@ namespace DPMGallery.Controllers
                         new XElement(nsOs + "Image",
                             new XAttribute("width", 64),
                             new XAttribute("height", 64),
-                            new XAttribute("type", "image/x-icon"),
-                            $"{Url.Content("~/favicon.ico")}"
+                            new XAttribute("type", "image/x-icon"), $"{Url.Content("~/favicon.ico")}"
                         ),
                         new XElement(nsOs + "Url",
                             new XAttribute("type", "text/html"),
                             new XAttribute("method", "get"),
-                            new XAttribute("template", "/packages?query={searchTerms}")
+                            new XAttribute("template", "https://delphi.dev/packages?query={searchTerms}")
                         )                       
                     )
                 );

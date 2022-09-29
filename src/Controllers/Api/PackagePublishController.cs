@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 namespace DPMGallery.Controllers
 {
     [Authorize]
+    [ApiController]
     public class PackagePublishController : Controller
     {
         private readonly IPackageIndexService _packageIndexService;
@@ -66,6 +67,8 @@ namespace DPMGallery.Controllers
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        [HttpPut]
+        [Route(Constants.RoutePatterns.PackagePublish)]
         public async Task<IActionResult> PushPackage(CancellationToken cancellationToken)
         {
             ClaimsPrincipal claimsPrincipal = HttpContext.User;
@@ -122,7 +125,9 @@ namespace DPMGallery.Controllers
             }
         }
 
-        public async Task DelistPackage(string id, string version, CancellationToken cancellationToken)
+        [HttpDelete]
+        [Route(Constants.RoutePatterns.PackageDelist)]
+        public async Task DelistPackage([FromRoute] string id, [FromRoute] string compilerVersion, [FromRoute] string platform, [FromRoute] string version, CancellationToken cancellationToken)
         {
 
             //just for now.

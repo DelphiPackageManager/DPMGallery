@@ -2,6 +2,7 @@ using DPMGallery.Entities;
 using DPMGallery.Extensions;
 using DPMGallery.Identity;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -18,6 +19,9 @@ using DPMGallery.Models;
 using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System;
 
 namespace DPMGallery
 {
@@ -37,34 +41,27 @@ namespace DPMGallery
         {
             var serverConfig = ServerConfig.Current;
             services.AddSingleton(serverConfig);
-            //_configuration.Bind(serverConfig);
+            _configuration.Bind(serverConfig);
 
-            services.AddSingleton<Serilog.ILogger>(provider =>
+            services.AddSingleton<ILogger>(provider =>
             {
                 return Serilog.Log.Logger;
             });
 
-
-            // needed to store rate limit counters and ip rules
-            services.AddMemoryCache();
-
-            ////load general configuration from appsettings.json
-            services.Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimitOptions"));
-
-            ////load ip rules from appsettings.json
-            services.Configure<IpRateLimitPolicies>(_configuration.GetSection("IpRateLimitPolicies"));
-
-            //_configuration.Bind("IpRateLimitOptions", serverConfig.IpRateLimitOptions);
-
-            //_configuration.Bind("ipRateLimitPolicies", serverConfig.IpRateLimitPolicies);
-
+            //allows running behind nginx
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
-
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });
+
+            // needed to store rate limit counters and ip rules
+            services.AddMemoryCache();
+            ////load general configuration from appsettings.json
+            services.Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimitOptions"));
+            ////load ip rules from appsettings.json
+            services.Configure<IpRateLimitPolicies>(_configuration.GetSection("IpRateLimitPolicies"));
 
             // inject counter and rules stores
             services.AddInMemoryRateLimiting();
@@ -88,30 +85,40 @@ namespace DPMGallery
             .AddDefaultTokenProviders()
             .AddDapperStores();
 
-            services.Configure<CookiePolicyOptions>(options =>
+            //services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    // This lambda determines whether user consent for non-essential 
+            //    // cookies is needed for a given request.
+            //    options.CheckConsentNeeded = context => true;
+            //    // requires using Microsoft.AspNetCore.Http;
+            //    options.MinimumSameSitePolicy = SameSiteMode.Strict;
+            //});
+
+            services.AddAuthentication(options =>
             {
-                // This lambda determines whether user consent for non-essential 
-                // cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                // requires using Microsoft.AspNetCore.Http;
-                options.MinimumSameSitePolicy = SameSiteMode.Strict;
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+                options.SaveToken = true;
+                options.RequireHttpsMetadata = false;
+                options.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ClockSkew = TimeSpan.Zero,
+
+                    ValidAudience = serverConfig.Authentication.JwtConfig.ValidAudience,
+                    ValidIssuer = serverConfig.Authentication.JwtConfig.ValidIssuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(serverConfig.Authentication.JwtConfig.Secret))
+                };
             });
 
-            services.AddControllersWithViews()
-                .AddJsonOptions(options =>
-                {
-                    options.JsonSerializerOptions.WriteIndented = _env.IsDevelopment();
-                    options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-                }); ;
-
-            var mvcBuilder = services.AddRazorPages();
-            if (_env.IsDevelopment())
-            {
-                mvcBuilder.AddRazorRuntimeCompilation();
-            }
-
-            services.AddAuthentication()
+            //need to figure out how to use these with react
+            /*
             .AddMicrosoftAccount(microsoftOptions =>
             {
                 microsoftOptions.ClientId = serverConfig.Authentication.Microsoft.ClientId;// Configuration["Authentication:Microsoft:ClientId"];
@@ -135,8 +142,18 @@ namespace DPMGallery
                 options.ClaimActions.MapJsonKey("urn:github:login", "email");
                 options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
                 options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
+            }); */
+
+
+            services.AddControllers();
+
+            services.AddSpaStaticFiles(configuration =>
+            {
+                configuration.RootPath = "wwwroot";
             });
+
             services.AddCors();
+
 
             //services.AddHttpLogging(logging =>
             //{
@@ -147,26 +164,7 @@ namespace DPMGallery
             //    logging.RequestBodyLogLimit = 4096;
             //    logging.ResponseBodyLogLimit = 4096;
             //});
-
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.LoginPath = new PathString("/identity/account/login");
-                options.LogoutPath = new PathString("/identity/account/logout");
-
-                //stop redirecting to login for api routes.
-                options.Events.OnRedirectToLogin = context =>
-                {
-                    if (context.Request.Path.StartsWithSegments("/api") && context.Response.StatusCode == StatusCodes.Status200OK)
-                    {
-                        context.Response.Clear();
-                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                        return Task.CompletedTask;
-                    }
-                    context.Response.Redirect(context.RedirectUri);
-                    return Task.CompletedTask;
-                };
-
-            });
+            
             DTOMappings.Configure();
             ModelMappings.Configure();
             // configuration (resolvers, counter key builders)
@@ -179,34 +177,51 @@ namespace DPMGallery
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseCors(config =>
+                {
+                    config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                }) ;
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                //app.UseHsts();
+                app.UseHsts();
             }
+            
             app.UseForwardedHeaders();
             app.UseIpRateLimiting();
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+
+            app.MapWhen(x => !(x.Request.Path.Value.StartsWith("/api") | x.Request.Path.Value.StartsWith("/ui")), builder =>
+            {
+                builder.UseSpa(spa =>
+                {
+                    if (env.IsDevelopment())
+                    {
+                        // Make sure you have started the frontend with npm run dev on port 4000
+                        spa.UseProxyToSpaDevelopmentServer("http://localhost:3175");
+                    }
+                });
+            });
+
+
+
+
+            //app.UseCookiePolicy();
             app.UseSerilogRequestLogging();
             app.UseRouting();
-            app.UseApiKeyAuthMiddleware();
-            app.UseAuthentication();
-            app.UseAuthorization();
-            app.UseOperationCancelledMiddleware();
+//            app.UseApiKeyAuthMiddleware();
+            //app.UseAuthentication();
+            //app.UseAuthorization();
+//            app.UseOperationCancelledMiddleware();
             //app.UseHttpLogging();
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapApiRoutes();
                 endpoints.MapControllers();
-                endpoints.MapRazorPages();
-                endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapApiRoutes();
+                endpoints.MapFallbackToFile("/index.html");
+                
             });
 
         }
