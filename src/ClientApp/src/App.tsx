@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom"
+import ConfirmEmailPage from "./components/confirmEmailPage"
 import DownloadsPage from "./components/downloadsPage"
 import HomePage from "./components/homePage"
 
@@ -22,6 +23,7 @@ function App() {
           <Route path="/downloads" element={<DownloadsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/confirmemail" element={<ConfirmEmailPage />} />
 
           <Route path="/policies/terms" element={<TermsPage/>} />
           <Route path="/policies/privacy" element={<PrivacyPage/>} />

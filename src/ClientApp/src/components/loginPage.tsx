@@ -1,13 +1,14 @@
 import * as React from 'react';
+import PageContainer from './pageContainer';
 
 export interface ILoginPageProps {
 }
 
 const  LoginPage = (props: ILoginPageProps) => {
   return (
-    <div>
-      <h1>Login</h1>
-    </div>
+    <PageContainer className='text-center'>
+        <h1>Login</h1>
+    </PageContainer>
   );
 }
 
