@@ -56,6 +56,8 @@ namespace DPMGallery
                 options.KnownProxies.Clear();
             });
 
+
+            //TODO: Replace with built in rate limiting when we upgrade to netcore 7.0
             // needed to store rate limit counters and ip rules
             services.AddMemoryCache();
             ////load general configuration from appsettings.json
@@ -219,7 +221,7 @@ namespace DPMGallery
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                endpoints.MapApiRoutes();
+                //endpoints.MapApiRoutes();
                 endpoints.MapFallbackToFile("/index.html");
                 
             });

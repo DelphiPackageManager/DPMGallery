@@ -1,8 +1,9 @@
 import { NavLink } from "react-router-dom";
-
+import DarkModeToggle from "./darkModeToggle";
+// import useAuth so we can tell if logged in
 export default function NavBar() {
     return (
-        <nav className="bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-200  inset-x-0 top-0 py-2 z-10 border-b border-gray-300 shadow dark:shadow-none dark:border-none sticky">
+        <nav className="bg-gray-200 dark:bg-gray-900 text-gray-900 dark:text-gray-200  top-0 py-2 z-10 border-b border-gray-300 shadow dark:shadow-none dark:border-none sticky">
             <div className="px-2 max-w-7xl mx-auto justify-content-center items-center" >
                 <div className="flex justify-between items-center">
                     <div className="mr-2 items-center">
@@ -16,8 +17,10 @@ export default function NavBar() {
                         <NavLink className="hidden lg:flex py-2 px-3 hover:text-gray-800 dark:hover:text-white" to="/downloads" >Downloads</NavLink>
                         <a className="hidden lg:flex py-2 px-3 hover:text-gray-800 dark:hover:text-white" href="https://www.finalbuilder.com/resources/blogs/tag/dpm" target="_blank">Blog</a>
 				    </div>
-                    <div>
-                        
+
+                    <div className="flex flex-row items-center">
+                       <DarkModeToggle />
+                       <NavLink to="/login">Login</NavLink> 
                     </div>
                 </div>
             </div>

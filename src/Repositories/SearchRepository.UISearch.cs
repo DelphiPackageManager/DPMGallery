@@ -70,7 +70,8 @@ namespace DPMGallery.Repositories
                 return new List<int>();
             }
 
-            string packageIdSql = $"select package_id from {T.PackageOwner} where owner_id = @ownerId";
+            string packageIdSql = @$"select package_id from {T.PackageOwner} where owner_id = @ownerId
+                                     offset @skip limit @take";
 
             var idSqlParams = new
             {
@@ -84,8 +85,8 @@ namespace DPMGallery.Repositories
             return ids.ToList();
         }
 
-        public async Task<UISearchResponse> UISearchAsync(string query = null, int skip = 0, int take = 20,
-                                     bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default)
+        public async Task<UISearchResponse> UISearchAsync(string query = null, int skip = 0, int take = 20, bool includePrerelease = true, bool includeCommercial = true, 
+                                                          bool includeTrial = true, CancellationToken cancellationToken = default)
         {
             var result = new UISearchResponse()
             {
@@ -246,6 +247,10 @@ namespace DPMGallery.Repositories
                             continue;
                         }
                         //not newer, so we just add the compiler
+                        compilers.Add(item.Compiler);
+                        platforms.Add(item.Platform);
+                    } else
+                    {
                         compilers.Add(item.Compiler);
                         platforms.Add(item.Platform);
                     }

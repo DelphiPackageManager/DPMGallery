@@ -5,6 +5,14 @@
 <!--    <link rel="icon" type="image/svg+xml" href="/vite.svg" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>DPM Gallery</title>
+    <script>
+      //needs to run before react loads
+      if (localStorage.getItem('darkMode') === 'true' || (!('darkMode' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+          document.documentElement.classList.add('dark')
+      } else {
+          document.documentElement.classList.remove('dark')
+      }
+    </script>
   </head>
   <body>
     <main class="flex flex-col m-0 h-screen bg-gray-50 dark:bg-slate-800 text-gray-600 dark:text-gray-300" id="root"></main>

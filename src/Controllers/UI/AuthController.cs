@@ -132,8 +132,8 @@ namespace DPMGallery.Controllers.UI
                 return BadRequest("Invalid client request");
             }
 
-            string? accessToken = tokenModel.AccessToken;
-            string? refreshToken = tokenModel.RefreshToken;
+            string accessToken = tokenModel.AccessToken;
+            string refreshToken = tokenModel.RefreshToken;
 
             var principal = GetPrincipalFromExpiredToken(accessToken);
             if (principal == null)

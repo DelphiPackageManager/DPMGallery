@@ -8,7 +8,7 @@ using DPMGallery.Extensions;
 
 namespace DPMGallery.Models
 {
-    public class PackagesViewModel
+    public class PackagesListModel
     {
         public long TotalPackages { get; set; }
         public string Query { get; set; }
@@ -17,6 +17,6 @@ namespace DPMGallery.Models
 
         public int PrevPage { get; set; }
 
-        public IList<PackageViewModel> Packages { get; set; } = new List<PackageViewModel>();
+        public IList<PackageListItemModel> Packages { get; set; } = new List<PackageListItemModel>();
     }
 }

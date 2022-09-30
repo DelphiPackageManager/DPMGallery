@@ -13,6 +13,7 @@ using Serilog;
 namespace DPMGallery.Controllers.UI
 {
     [ApiController]
+    [Route("api/ui")]
     public class UIPackagesController : Controller
     {
         private readonly ILogger _logger;
@@ -25,8 +26,9 @@ namespace DPMGallery.Controllers.UI
 
 
         [HttpGet]
-        [Route("ui/packages")]
-        public async Task<IActionResult> Index([FromQuery] string compiler,
+        [Route("packages")]
+        public async Task<IActionResult> Index(
+            [FromQuery] string compiler,
             [FromQuery] string platform,
             [FromQuery] string q,
             [FromQuery] int page = 1,
@@ -71,7 +73,7 @@ namespace DPMGallery.Controllers.UI
             var seachResults = await _searchService.UISearchAsync(query, skip, take, prerelease, commercial, trial, cancellationToken);
 
             //TODO : mapping from entity to dto to model is wasteful - have the service just return the model? 
-            PackagesViewModel model = Mapping<UISearchResponseDTO, PackagesViewModel>.Map(seachResults);
+            PackagesListModel model = Mapping<UISearchResponseDTO, PackagesListModel>.Map(seachResults);
 
             var sanitizer = new HtmlSanitizer();
             //Sanitise any text fields - description etc. 
@@ -80,7 +82,6 @@ namespace DPMGallery.Controllers.UI
                 package.Description = sanitizer.Sanitize(package.Description);
 
             }
-
 
             model.Query = query;
 
@@ -94,8 +95,7 @@ namespace DPMGallery.Controllers.UI
                 model.PrevPage = Math.Max(1, page - 1);
             }
 
-
-            return View(model);
+            return Json(model);
         }
     }
 }

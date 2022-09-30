@@ -69,6 +69,7 @@
 		<Folder Include="Configuration\RateLimiting\" />
 		<Folder Include="Statistics\" />
 		<Folder Include="Serialization\" />
+		<Folder Include="Views\Packages\" />
 		<Folder Include="wwwroot\" />
 	</ItemGroup>
 	<ItemGroup>
@@ -80,6 +81,11 @@
 	  <Compile Remove="Controllers\PoliciesController.cs" />
 	  <Compile Remove="Controllers\ProfilesController.cs" />
 	  <Compile Remove="Repositories\SearchRepository1.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Content Remove="Views\Packages\Details.cshtml" />
+	  <Content Remove="Views\Packages\Index.cshtml" />
+	  <Content Remove="Views\Packages\Upload.cshtml" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="postcss.config.js" />
