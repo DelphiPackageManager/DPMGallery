@@ -24,15 +24,15 @@ const PackageSearchBar: React.FunctionComponent<IPackageSearchBarProps> = ({ doN
     }
 
     return (
-        <div className="flex justify-center items-center py-2 w-full md:max-w-3xl">
+        <div className="flex justify-center items-center py-2 w-full max-w-sm md:max-w-xl">
             <div className="w-full flex flex-col">
-                <div className="relative flex justify-around items-center text-gray-900">
+                <div className="relative flex justify-around items-center ">
                     <span className="absolute inset-y-0 left-0 flex items-center justify-center">
-                        <button type="submit" className="p-2 focus:outline-none">
-                            <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-8 h-8"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <button type="submit" className="p-2 focus:outline-none text-gray-400">
+                            <svg fill="none" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" className="w-6 h-6"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                         </button>
                     </span>
-                    <input autoFocus type="text" name="q" id="search" className="w-full focus:outline-none focus:shadow-none focus:ring-primary py-1 text-lg  text-gray-900 dark:bg-gray-100 bg-white rounded-full pl-12 border-none"
+                    <input autoFocus type="text" name="q" id="search" className="w-full focus:outline-none focus:shadow-none focus:ring-primary py-1 text-base text-gray-700  bg-gray-100 rounded-full pl-12 border-none"
                         placeholder="Search Packages" autoComplete="off" onKeyDown={_handleKeyDown} defaultValue={value } />
                 </div>
             </div>

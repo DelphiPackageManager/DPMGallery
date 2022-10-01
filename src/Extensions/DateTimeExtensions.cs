@@ -31,10 +31,10 @@ namespace DPMGallery.Extensions
 
             // 4.
             // Don't allow out of range values.
-            if (dayDiff < 0 || dayDiff >= 31)
-            {
-                return null;
-            }
+            //if (dayDiff < 0 || dayDiff >= 31)
+            //{
+            //    return null;
+            //}
 
             // 5.
             // Handle same-day times.

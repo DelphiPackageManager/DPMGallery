@@ -95,9 +95,9 @@ namespace DPMGallery.Repositories
 
             IEnumerable<int> ids;
 
-            if (!string.IsNullOrEmpty(query) && query.StartsWith("Tags:", StringComparison.InvariantCultureIgnoreCase))
+            if (!string.IsNullOrEmpty(query) && query.StartsWith("tag:", StringComparison.InvariantCultureIgnoreCase))
             {
-                string tagName = query.Substring(5).Trim('"').Replace(',', ' ').Trim();
+                string tagName = query.Substring(4).Trim('"').Replace(',', ' ').Trim();
 
 
                 var packageIds = await GetTagSearchIds(tagName, skip, take, includePrerelease, cancellationToken);

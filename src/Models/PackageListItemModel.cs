@@ -41,6 +41,6 @@ namespace DPMGallery.Models
         public List<Platform> Platforms { get; set; }
 
         [JsonPropertyName("published")]
-        public string Published { get; set; }
+        public string Published { get; set; } //pretty
     }
 }

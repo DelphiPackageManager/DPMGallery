@@ -24,6 +24,20 @@ namespace DPMGallery.Extensions
             return hash.ToString();
         }
 
+        public static string ToMd5(this string unhashed)
+        {
+            StringBuilder hash = new();
+            using (MD5 crypt = MD5.Create())
+            {
+                byte[] crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(unhashed), 0, Encoding.UTF8.GetByteCount(unhashed));
+                foreach (byte theByte in crypto)
+                {
+                    hash.Append(theByte.ToString("x2"));
+                }
+            }
+            return hash.ToString();
+        }
+
         public static string ToSentenceCase(this string value)
         {
             // start by converting entire string to lower case

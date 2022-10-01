@@ -1,4 +1,5 @@
 ﻿using DPMGallery.DTO;
+using DPMGallery.Extensions;
 using DPMGallery.Utils;
 using System;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace DPMGallery.Models
                 model.Owners = dto.Owners;
                 model.Icon = dto.Icon;
                 model.PublishedUtc = dto.PublishedUtc;
+                model.Published = dto.PublishedUtc.ToPrettyDate();
                 model.Tags = dto.Tags;
                 model.TotalDownloads = dto.TotalDownloads;
                 model.CompilerVersions = dto.CompilerVersions;
