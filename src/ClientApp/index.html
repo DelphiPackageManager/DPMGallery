@@ -14,10 +14,34 @@
       }
     </script>
     <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+    <style>
+      .svgLoader {
+        animation: spin 0.5s linear infinite;
+        margin: auto;
+      }
+      .divLoader {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    </style>    
   </head>
 
   <body>
-    <main class="flex flex-col m-0 h-screen bg-gray-800 text-gray-300" id="root"></main>
+    <main class="flex flex-col m-0 h-screen bg-gray-800 text-gray-300" id="root">
+      <div class="divLoader">
+        <svg class="svgLoader" viewBox="0 0 100 100" width="6em" height="6em">
+          <path ng-attr-d="{{config.pathCmd}}" ng-attr-fill="{{config.color}}" stroke="none" d="M10 50A40 40 0 0 0 90 50A40 42 0 0 1 10 50" fill="#51CACC" transform="rotate(179.719 50 51)"><animateTransform attributeName="transform" type="rotate" calcMode="linear" values="0 50 51;360 50 51" keyTimes="0;1" dur="1.5s" begin="0s" repeatCount="indefinite"></animateTransform></path>
+        </svg>
+      </div>
+    </main>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
