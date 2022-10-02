@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { NavLink } from 'react-router-dom'
-import PackageItemRow from './packages/packageItemRow'
+import PackageItemRow from './packagesPage/packageItemRow'
 import usePackages, { SearchParams } from "../hooks/usePackages";
 
 

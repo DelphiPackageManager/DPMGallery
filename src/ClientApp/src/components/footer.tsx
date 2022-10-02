@@ -25,7 +25,7 @@ const Footer = () => {
                         </ul>
                     </div>
                     <div>
-                        <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase text-white">Resources</h2>
+                        <h2 className="mb-6 text-sm font-semibold text-gray-900 uppercase">Resources</h2>
                         <ul className="text-gray-400">
                             <li className="mb-4">
                                 <a href="https://docs.delphi.dev/dpm" target="_blank" className="hover:underline ">Documentation</a>
