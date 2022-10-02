@@ -24,7 +24,7 @@ export default function NavBar() {
     
     return (
         <nav className="bg-gray-900 text-gray-300  min-h-[3.5rem] py-2 z-10 px-4 md:px-6 fixed top-0 w-full ">
-            <div className="flex flex-wrap justify-between items-center mx-auto bg-gray-900">
+            <div className="flex flex-wrap justify-between items-center mx-auto bg-gray-900 max-w-6xl">
                 <div className='flex items-center'>
                     <NavLink className="self-center text-xl whitespace-nowrap text-white mr-3" to="/" >DPM</NavLink>
                 </div>

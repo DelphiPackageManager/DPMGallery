@@ -96,7 +96,7 @@ const PackagesPage = () => {
                <div className="container mx-auto flex flex-row justify-center text-xl py-4 max-w-6xl ">
                     <div className="mr-3">
                         {packages.prevPage > 0 ? 
-                                <div><NavLink to={getPageLink(query, packages.prevPage)} className="text-sky-500">Previous</NavLink></div>
+                                <div><NavLink to={getPageLink(query, packages.prevPage)} className="text-sky-600">Previous</NavLink></div>
                             :
                                 <div><span className="dark:text-gray-600 text-gray-300">Previous</span></div>
                         }
@@ -104,7 +104,7 @@ const PackagesPage = () => {
                     <div><span className="px-1 text-gray-400"  >|</span></div>
                     <div className="ml-3">
                         {packages.nextPage > 0 ? 
-                                <div><NavLink to={getPageLink(query, packages.nextPage)} className="text-sky-500">Next</NavLink></div>
+                                <div><NavLink to={getPageLink(query, packages.nextPage)} className="text-sky-600">Next</NavLink></div>
                                 :
                                 <div><span className="dark:text-gray-600 text-gray-300">Next</span></div>
                         }
