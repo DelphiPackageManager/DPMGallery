@@ -38,7 +38,7 @@ namespace DPMGallery.Controllers.UI
 
             var hash = user.Email.ToLower().ToMd5();
 
-            var model = new UIProfileModel()
+            var model = new ProfileModel()
             {
                 UserName = userName,
                 AvatarUrl = $"https://www.gravatar.com/avatar/{hash}"

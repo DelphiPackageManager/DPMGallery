@@ -1,4 +1,5 @@
 ﻿using DPMGallery.DTO;
+using DPMGallery.Entities;
 using DPMGallery.Types;
 using NuGet.Versioning;
 using System;
@@ -28,10 +29,6 @@ namespace DPMGallery.Services
         Task<SearchResponseDTO> SearchByIdsAsync(CompilerVersion compilerVersion, Platform platform, List<SearchIdDTO> ids, CancellationToken cancellationToken);
 
         Task<ListResponseDTO> ListAsync(CompilerVersion compilerVersion, List<Platform> platforms, string query = null, bool exact = false, int skip = 0, int take = 20,
-                                            bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default);
-
-
-        Task<UISearchResponseDTO> UISearchAsync(string query = null, int skip = 0, int take = 20,
                                             bool includePrerelease = true, bool includeCommercial = true, bool includeTrial = true, CancellationToken cancellationToken = default);
 
         Task<SearchResultDTO> GetPackageInfoAsync(string packageId, CompilerVersion compilerVersion, Platform platform, string version, CancellationToken cancellationToken = default);

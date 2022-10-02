@@ -50,6 +50,7 @@
 		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="6.0.8" />
 		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="6.0.9" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.2-mauipre.1.22054.8" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="6.0.2-mauipre.1.22054.8" />
 		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="4.7.4">
@@ -67,6 +68,7 @@
 
 	<ItemGroup>
 		<Folder Include="Configuration\RateLimiting\" />
+		<Folder Include="Search\" />
 		<Folder Include="Statistics\" />
 		<Folder Include="Serialization\" />
 		<Folder Include="Views\Packages\" />

@@ -1,6 +1,6 @@
 ﻿namespace DPMGallery.Models
 {
-    public class UIProfileModel
+    public class ProfileModel
     {
         public string UserName { get; set; }
 

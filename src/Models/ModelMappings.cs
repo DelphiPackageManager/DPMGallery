@@ -1,4 +1,5 @@
 ﻿using DPMGallery.DTO;
+using DPMGallery.Entities;
 using DPMGallery.Extensions;
 using DPMGallery.Utils;
 using System;
@@ -13,30 +14,38 @@ namespace DPMGallery.Models
         public static void Configure()
         {
 
-            Mapping<UISearchResultDTO, PackageListItemModel>.Configure((dto, model) =>
+            Mapping<UISearchResult, PackageListItemModel>.Configure((r, model) =>
             {
-                model.PackageId = dto.PackageId;
-                model.LatestVersion = dto.LatestVersion;
-                model.IsPrerelease = dto.IsPreRelease;
-                model.IsCommercial = dto.IsCommercial;
-                model.IsTrial = dto.IsTrial;
-                model.IsReservedPrefix = dto.IsReservedPrefix;
-                model.Description = dto.Description;
-                model.Owners = dto.Owners;
-                model.Icon = dto.Icon;
-                model.PublishedUtc = dto.PublishedUtc;
-                model.Published = dto.PublishedUtc.ToPrettyDate();
-                model.Tags = dto.Tags;
-                model.TotalDownloads = dto.TotalDownloads;
-                model.CompilerVersions = dto.CompilerVersions;
-                model.Platforms = dto.Platforms;
+                model.PackageId = r.PackageId;
+                model.Version = r.Version;
+                model.LatestVersion = r.LatestVersion;
+                model.IsPrerelease = r.IsPreRelease;
+                model.IsCommercial = r.IsCommercial;
+                model.IsTrial = r.IsTrial;
+                model.IsReservedPrefix = r.IsReservedPrefix;
+                model.Description = r.Description;
+                model.Owners = r.Owners;
+                model.Icon = r.Icon;
+                model.PublishedUtc = r.PublishedUtc;
+                model.Published = r.PublishedUtc.ToPrettyDate();
+                //some older packages have comma separated tags
+                model.Tags = string.IsNullOrEmpty(r.Tags) ? null : r.Tags.Replace(',', ' ').Split(' ').Select(x => x.Trim().ToLower()).ToList();
+                model.TotalDownloads = r.TotalDownloads;
+                model.CompilerVersions = r.CompilerVersions;
+                model.Platforms = r.Platforms;
             });
 
-            Mapping<UISearchResponseDTO, PackagesListModel>.Configure((dto, model) =>
+            Mapping<UISearchResponse, PackagesListModel>.Configure((r, model) =>
             {
-                model.TotalPackages = dto.TotalHits;
+                model.TotalPackages = r.TotalCount;
 
-                model.Packages = Mapping<UISearchResultDTO, PackageListItemModel>.Map(dto.Results);
+                model.Packages = Mapping<UISearchResult, PackageListItemModel>.Map(r.searchResults);
+            });
+
+            Mapping<PackageDependency, PackageDependencyModel>.Configure((entity, model) =>
+            {
+                model.PackageId = entity.PackageId;
+                model.VersionRange = entity.VersionRange;
             });
 
         }

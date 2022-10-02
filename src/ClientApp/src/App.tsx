@@ -22,10 +22,11 @@ const App = () => {
       <Route element={<Layout />}>
         <Route index element={<HomePage />} />
         <Route path="/packages" element={<PackagesPage />} />
-        <Route path="/packages/:packageid/:packageVersion/" element={<PackagePage />} />
+        <Route path="/packages/:packageId/:packageVersion/" element={<PackagePage />} />
 
         <Route path="/upload" element={<UploadPage />} />
         <Route path="/downloads" element={<DownloadsPage />} />
+
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/confirmemail" element={<ConfirmEmailPage />} />
@@ -34,7 +35,9 @@ const App = () => {
         <Route path="/policies/terms" element={<TermsPage />} />
         <Route path="/policies/privacy" element={<PrivacyPage />} />
         <Route path="/policies/package" element={<PackagePoliciesPage />} />
+
         <Route path="/profiles/:userName" element={<ProfilePage />} />
+
         <Route path="*" element={<NotFoundPage />} />
       </Route>
       <Route path="*" element={<NotFoundPage />} />

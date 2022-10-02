@@ -1,7 +1,7 @@
 ﻿using DPMGallery.DTO;
 using DPMGallery.Models;
 using DPMGallery.Types;
-using DPMGallery.Utils;
+using DPMGallery.Extensions;
 using Ganss.XSS;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -9,19 +9,22 @@ using System.Threading;
 using System;
 using DPMGallery.Services;
 using Serilog;
+using NuGet.Packaging.Core;
+using DPMGallery.Entities;
+using System.Collections.Generic;
 
 namespace DPMGallery.Controllers.UI
 {
     [ApiController]
-    [Route("api/ui")]
+    [Route("ui")]
     public class UIPackagesController : Controller
     {
         private readonly ILogger _logger;
-        private readonly ISearchService _searchService;
-        public UIPackagesController(ILogger logger, ISearchService searchService)
+        private readonly IUIService _uiService;
+        public UIPackagesController(ILogger logger, IUIService uiService)
         {
             _logger = logger;
-            _searchService = searchService;
+            _uiService = uiService;
         }
 
 
@@ -66,21 +69,16 @@ namespace DPMGallery.Controllers.UI
                 return BadRequest();
             }
 
-
-            var take = 15;
+            var take = 12; //TODO Change to 20 this once we have more packages
             var skip = page > 0 ? (page - 1) * take : 0;
 
-            var seachResults = await _searchService.UISearchAsync(query, skip, take, prerelease, commercial, trial, cancellationToken);
-
-            //TODO : mapping from entity to dto to model is wasteful - have the service just return the model? 
-            PackagesListModel model = Mapping<UISearchResponseDTO, PackagesListModel>.Map(seachResults);
+            var model = await _uiService.UISearchAsync(query, skip, take, prerelease, commercial, trial, cancellationToken);
 
             var sanitizer = new HtmlSanitizer();
             //Sanitise any text fields - description etc. 
             foreach (var package in model.Packages)
             {
                 package.Description = sanitizer.Sanitize(package.Description);
-
             }
 
             model.Query = query;
@@ -97,5 +95,18 @@ namespace DPMGallery.Controllers.UI
 
             return Json(model);
         }
+
+        [HttpGet]
+        [Route("packagedetails/{packageId}/{packageVersion}")]
+        public async Task<IActionResult> PackageDetails([FromRoute] string packageId, [FromRoute] string packageVersion, CancellationToken cancellationToken = default) 
+        {
+
+            PackageDetailsModel model = await _uiService.UIGetPackageDetails(packageId, packageVersion, cancellationToken: cancellationToken);
+            if (model == null)
+                return NotFound();
+
+            return Json(model);
+        }
+
     }
 }

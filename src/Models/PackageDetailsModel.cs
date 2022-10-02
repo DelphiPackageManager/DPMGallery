@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace DPMGallery.Models
 {
-    public class PackageDetailsViewModel
+    public class PackageDetailsModel
     {
         public string PackageId { get; set; }
 
@@ -16,23 +16,32 @@ namespace DPMGallery.Models
 
         public bool IsPrerelease { get; set; }
 
+        public bool IsLatestVersion { get; set; }
+
+        public bool IsCommercial { get; set; }
+
+        public bool IsTrial { get; set; }
+
         public DateTime PublishedUtc { get; set; }
+
+        public string Published { get; set; } //prettydate
 
         public List<Platform> Platforms { get; set; }
 
         public List<CompilerVersion> CompilerVersions { get; set; }
 
-        public List<string> Versions { get; set; }
+        public List<PackageVersionModel> Versions { get; set; }
 
         public string ProjectUrl { get; set; } 
 
+        public string ReadMe { get; set; }
         public string RepositoryUrl { get; set; }
 
         public List<string> Licenses { get; set; }
 
         public List<string> Owners { get; set; }
 
-        public int TotalDownloads { get; set; }
+        public long TotalDownloads { get; set; }
 
         public int CurrentVersionDownload { get; set; } = 0;
 
@@ -40,5 +49,7 @@ namespace DPMGallery.Models
 
         public Dictionary<CompilerVersion, List<Platform>> CompilerPlatforms { get; set; }
 
+        public Dictionary<CompilerVersion, Dictionary<Platform, List<PackageDependencyModel>>> PackageDependencies { get; set; }
+       
     }
 }

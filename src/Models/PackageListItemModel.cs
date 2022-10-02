@@ -12,6 +12,8 @@ namespace DPMGallery.Models
     {
         public string PackageId { get; set; }
 
+        public string Version { get; set; }
+
         public string LatestVersion { get; set; }
 
         public bool IsPrerelease { get; set; }

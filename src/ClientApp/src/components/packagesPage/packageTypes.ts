@@ -24,3 +24,8 @@ export type PackageSearchResult = {
     prevPage : number,
     packages : PackageResultItem[]
 };
+
+export type PackageDetails = {
+
+    
+}

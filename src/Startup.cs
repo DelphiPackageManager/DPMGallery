@@ -147,7 +147,10 @@ namespace DPMGallery
             }); */
 
 
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(j =>
+            {
+                j.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
             services.AddSpaStaticFiles(configuration =>
             {

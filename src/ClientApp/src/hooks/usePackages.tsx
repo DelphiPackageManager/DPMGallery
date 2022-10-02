@@ -29,7 +29,7 @@ const usePackages = () => {
             if (params.page && params.page > 1) {
                 queryParams.append('page', params.page.toString());
             }
-            const response = await axios.get('/api/ui/packages', {
+            const response = await axios.get('/ui/packages', {
                 signal: controller.signal,
                 params: queryParams
 

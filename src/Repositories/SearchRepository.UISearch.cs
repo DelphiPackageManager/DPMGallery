@@ -31,9 +31,23 @@ namespace DPMGallery.Repositories
             return result;
         }
 
-        private async Task<List<int>> GetTagSearchIds(string tagName, int skip, int take, bool includePrerelease, CancellationToken cancellationToken)
+        private async Task<Tuple<long, List<int>>> GetTagSearchIds(string tagName, bool includePrerelease, int skip, int take, CancellationToken cancellationToken)
         {
             string view = includePrerelease ? V.SearchLatestVersion : V.SearchStableVersion;
+
+            var countSql = @$"select count(distinct id)
+                         from {view} 
+                         where 
+                         tags ILIKE @tagname COLLATE ""C""";
+
+            var countParams = new
+            {
+                tagname = $"%{tagName}%"
+            };
+
+
+            long count = await Context.ExecuteScalarAsync<long>(countSql, countParams, cancellationToken: cancellationToken);
+
 
             var idsSql = @$"select distinct id
                          from {view} 
@@ -51,24 +65,29 @@ namespace DPMGallery.Repositories
 
             var ids = await Context.QueryAsync<int>(idsSql, sqlParams, cancellationToken: cancellationToken);
 
-            return ids.ToList();
+            return new Tuple<long, List<int>>(count, ids.ToList());
 
         }
 
-        private async Task<List<int>> GetOwnerSearchIds(string owner, int skip, int take, CancellationToken cancellationToken)
+        private async Task<Tuple<long, List<int>>> GetOwnerSearchIds(string owner, int skip, int take, CancellationToken cancellationToken)
         {
-            string ownerIdSql = $@"select id from {T.Users} where normalized_user_name = @owner";
-
             var sqlParams = new
             {
                 owner = owner.Trim().ToUpper()
             };
 
+            string ownerIdSql = $@"select id from {T.Users} where normalized_user_name = @owner";
+
             int? ownerId = await Context.ExecuteScalarAsync<int>(ownerIdSql, sqlParams, cancellationToken: cancellationToken);
             if (!ownerId.HasValue)
             {
-                return new List<int>();
+                return new Tuple<long, List<int>>(0, new List<int>());
             }
+
+            string packageIdCountSql = $@"select count(*) from {T.PackageOwner} where owner_id = @ownerId";
+
+
+            long totalPackages = await Context.ExecuteScalarAsync<long>(packageIdCountSql, new { ownerId } , cancellationToken: cancellationToken);
 
             string packageIdSql = @$"select package_id from {T.PackageOwner} where owner_id = @ownerId
                                      offset @skip limit @take";
@@ -82,7 +101,7 @@ namespace DPMGallery.Repositories
 
             var ids = await Context.QueryAsync<int>(packageIdSql, idSqlParams, cancellationToken: cancellationToken);
 
-            return ids.ToList();
+            return new Tuple<long, List<int>>(totalPackages, ids.ToList());
         }
 
         public async Task<UISearchResponse> UISearchAsync(string query = null, int skip = 0, int take = 20, bool includePrerelease = true, bool includeCommercial = true, 
@@ -100,25 +119,25 @@ namespace DPMGallery.Repositories
                 string tagName = query.Substring(4).Trim('"').Replace(',', ' ').Trim();
 
 
-                var packageIds = await GetTagSearchIds(tagName, skip, take, includePrerelease, cancellationToken);
-                if (!packageIds.Any())
+                var packageIds = await GetTagSearchIds(tagName, includePrerelease, skip, take,  cancellationToken);
+                if (!packageIds.Item2.Any())
                     return result;
 
-                result.TotalCount = packageIds.Count;
+                result.TotalCount = packageIds.Item1;
 
-                ids = packageIds;
+                ids = packageIds.Item2;
             }
-            else if (!string.IsNullOrEmpty(query) && query.StartsWith("Owner:", StringComparison.InvariantCultureIgnoreCase))
+            else if (!string.IsNullOrEmpty(query) && query.StartsWith("owner:", StringComparison.InvariantCultureIgnoreCase))
             {
                 string ownerName = query.Substring(6).Trim('"');
 
-                var packageIds = await GetOwnerSearchIds(ownerName, skip, take, cancellationToken);
-                if (!packageIds.Any())
+                var ownerSearchIds = await GetOwnerSearchIds(ownerName, skip, take, cancellationToken);
+                if (!ownerSearchIds.Item2.Any())
                     return result;
 
-                result.TotalCount = packageIds.Count;
-
-                ids = packageIds;
+                result.TotalCount = ownerSearchIds.Item1;
+                
+                ids = ownerSearchIds.Item2;
             }
             else
             {

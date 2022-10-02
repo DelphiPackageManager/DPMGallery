@@ -52,6 +52,7 @@ namespace DPMGallery.Extensions
             services.AddScoped<IPackageContentService, PackageContentService>();
             services.AddScoped<IPackageIndexService, PackageIndexService>();
             services.AddScoped<ISearchService, SearchService>();
+            services.AddScoped<IUIService, UIService>();
 
             services.AddTransient<FileStorageService>();
 

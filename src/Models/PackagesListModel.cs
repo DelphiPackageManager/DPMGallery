@@ -11,6 +11,7 @@ namespace DPMGallery.Models
     public class PackagesListModel
     {
         public long TotalPackages { get; set; }
+
         public string Query { get; set; }
 
         public int NextPage { get; set; }
