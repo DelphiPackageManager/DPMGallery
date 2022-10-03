@@ -60,7 +60,7 @@ const PackagesPage = () => {
 
     return (
         <>
-            <div className="bg-primary sticky top-[3.5rem]">
+            <div className="bg-primary dark:bg-primary-900 sticky top-[3.5rem]">
                 <div className="container mx-auto flex flex-row items-center justify-center py-2 pt-1 mt-0 max-w-6xl ">
                     <PackageSearchBar value={query} />
                 </div>

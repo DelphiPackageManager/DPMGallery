@@ -4,7 +4,8 @@ import PageContainer from "./pageContainer";
 const HomePage = () => {
     return (
         <>
-            <div className="bg-primary w-full sticky top-[3.5rem] ">
+            {/* This can't be in the page container due to sticky position*/}
+            <div className="bg-primary  dark:bg-primary-900 w-full sticky top-[3.5rem] ">
                 <div className="container text-white pb-1 mx-auto center-text">
                     <div className="flex flex-col justify-center items-center">
                         <h1 className="text-xl md:text-2xl">DPM</h1>
