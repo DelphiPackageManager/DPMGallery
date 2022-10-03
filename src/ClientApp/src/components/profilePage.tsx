@@ -5,6 +5,8 @@ import { useSearchParams } from "react-router-dom";
 import { NavLink } from 'react-router-dom'
 import PackageItemRow from './packagesPage/packageItemRow'
 import usePackages, { SearchParams } from "../hooks/usePackages";
+import PackageSearchBar from './packageSearchBar';
+import PageContainer from './pageContainer';
 
 
 const ProfilePage = () => {
@@ -50,7 +52,7 @@ const ProfilePage = () => {
 
     //todo : use same code from packages page.
     return (
-        <div className='container mx-auto max-w-7xl h-full'>
+        <PageContainer>
             <div className='flex flex-col-reverse md:flex-row pt-2 flex-grow'>
                 <div className='px-4 mt-2 md:mt-1 md:ml-2  border-r border-gray-400 dark:border-gray-600 flex-grow'>
                     
@@ -109,7 +111,7 @@ const ProfilePage = () => {
 
             </div>
 
-        </div>
+        </PageContainer>
     );
 };
 

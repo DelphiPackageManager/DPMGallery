@@ -1,15 +1,14 @@
 import * as React from 'react';
+import PageContainer from './pageContainer';
 
 interface IUploadPageProps {
 }
 
 const UploadPage: React.FunctionComponent<IUploadPageProps> = (props) => {
   return (
-      <div className="w-full pt-4">
-          <div className="container text-base text-gray-600 dark:text-gray-300 pb-2 mx-auto max-w-7xl">
+        <PageContainer>
           <h1>Uploads</h1>
-          </div>    
-      </div>
+        </PageContainer>
   );
 };
 

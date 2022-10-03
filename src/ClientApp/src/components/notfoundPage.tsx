@@ -1,6 +1,10 @@
+import PageContainer from "./pageContainer"
+
 const  NotFoundPage = () => {
     return (
-        <h1>Page not found</h1>
+        <PageContainer>
+            <h1>Page not found</h1>
+        </PageContainer>
     )
 }
 
