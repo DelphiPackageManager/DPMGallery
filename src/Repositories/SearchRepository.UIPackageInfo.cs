@@ -100,7 +100,7 @@ namespace DPMGallery.Repositories
             var results = await Context.QueryAsync<SearchResult>(sql, sqlParams, cancellationToken: cancellationToken);
             var entries = results.ToList();
 
-            long totalDownloads = 0;
+            
             if (entries.Any())
             {
                 //get all the dependencies in one sql command rather than inside the loop. 
@@ -110,91 +110,76 @@ namespace DPMGallery.Repositories
                 var firstEntry = entries.First();
                 if (firstEntry != null)
                 {
+                    string ownersSql = @$"select 
+                                      u.user_name as owner, 
+                                      u.email  
+                                      from {T.Users} u
+                                      left join {T.PackageOwner}  o
+                                      on o.owner_id = u.id
+                                      where package_id = @packageId";
+
                     List<string> tags = string.IsNullOrEmpty(firstEntry.Tags) ? null : firstEntry.Tags.Replace(',', ' ').Split(' ').Select(x => x.Trim().ToLower()).ToList();
                     PackageDetailsModel model = new PackageDetailsModel()
                     {
                         PackageId = firstEntry.PackageId,
                         PackageVersion = firstEntry.Version,
-                        CompilerVersions = new List<CompilerVersion>(),
-                        Platforms = new List<Platform>(),
-                        CompilerPlatforms = new Dictionary<CompilerVersion, List<Platform>>(),
                         IsLatestVersion = firstEntry.Version == firstEntry.LatestVersion,
                         IsPrerelease = firstEntry.IsPreRelease,
                         IsCommercial = firstEntry.IsCommercial,
                         IsTrial = firstEntry.IsTrial,
-                        Owners = new List<string>(),
                         RepositoryUrl = firstEntry.RepositoryUrl,
                         ReadMe = firstEntry.ReadMe,
                         Published = firstEntry.PublishedUtc.ToPrettyDate(),
                         PublishedUtc = firstEntry.PublishedUtc,
                         ProjectUrl = firstEntry.ProjectUrl,
-                        //CurrentVersionDownload = firstEntry.VersionDownloads,
-                        Versions = new List<PackageVersionModel>(),
                         Tags = tags,
                         PackageName = firstEntry.PackageId.ToSentenceCase(),
                         Licenses = new List<string>(firstEntry.License.Split(' ')),
                         PrefixReserved = firstEntry.IsReservedPrefix,                       
-                        PackageDependencies = new Dictionary<CompilerVersion, Dictionary<Platform, List<PackageDependencyModel>>>()
                     };
 
-                    if (firstEntry.Owners != null)
+                    var owners = await Context.QueryAsync(ownersSql, new { packageId = firstEntry.Id }, cancellationToken: cancellationToken);
+
+                    foreach (var owner in owners)
                     {
-                        model.Owners.AddRange(firstEntry.Owners);
+                        model.Owners.Add(owner.owner);
+                        string email = (string)owner.email;
+                        model.OwnerMD5s.Add(email.ToLower().ToMd5());
                     }
 
-                    //Platform currentPlatform = Platform.UnknownPlatform;
-                    
+
+
+
+
+                    long currentVersionDownloads = 0;
 
                     foreach (var item in entries)
                     {
-                        totalDownloads += item.VersionDownloads;
-                        if (!model.CompilerVersions.Contains(item.Compiler))
+                        model.TotalDownloads = item.TotalDownloads;
+                        currentVersionDownloads += item.VersionDownloads;
+                        var currentCompiler = model.CompilerPlatforms.FirstOrDefault(x => x.CompilerVersion == item.Compiler);
+                        if (currentCompiler == null)
                         {
-                            model.CompilerVersions.Add(item.Compiler);
+                            //new compiler platform
+                            currentCompiler = new PackageDetailCompilerModel(item.Compiler);
+                            model.CompilerPlatforms.Add(currentCompiler);
                         }
 
-                        if (!model.Platforms.Contains(item.Platform))
+                        var currentPlatform = currentCompiler.Platforms.FirstOrDefault(x => x.Platform == item.Platform);
+                        if (currentPlatform == null)
                         {
-                            model.Platforms.Add(item.Platform);
-                        }
-
-                        List<Platform> compilerPlatforms = null;
-                        if (!model.CompilerPlatforms.TryGetValue(item.Compiler, out compilerPlatforms))
-                        {
-                            compilerPlatforms = new List<Platform>();
-                            model.CompilerPlatforms.Add(item.Compiler, compilerPlatforms);
-                        }
-
-                        compilerPlatforms.Add(item.Platform);
-
-                        
-                        var dependencies = packageDependencies.Where(x => x.PackageVersionId == item.VersionId).ToList();
-                        if (dependencies.Any()) {
-
-                            Dictionary<Platform, List<PackageDependencyModel>> platformDeps = null;
-                            if (!model.PackageDependencies.TryGetValue(item.Compiler, out platformDeps ))
+                            //new platform
+                            currentPlatform = new PackageDetailPlatformModel(item.Platform);
+                            currentCompiler.Platforms.Add(currentPlatform);
+                            var dependencies = packageDependencies.Where(x => x.PackageVersionId == item.VersionId).ToList();
+                            if (dependencies.Any())
                             {
-                                platformDeps = new Dictionary<Platform, List<PackageDependencyModel>>();
-                                model.PackageDependencies.Add(item.Compiler, platformDeps);
-                            }
-
-                            List<PackageDependencyModel> dependencyModels = null;
-
-                            if (!platformDeps.TryGetValue(item.Platform, out dependencyModels))
-                            {
-                                dependencyModels = new List<PackageDependencyModel>();        
-                                platformDeps.Add(item.Platform, dependencyModels);
-                            }
-
-                            foreach (var dependency in dependencies)
-                            {
-                                var depModel = Mapping<PackageDependency, PackageDependencyModel>.Map(dependency);
-                                dependencyModels.Add(depModel);
+                                currentPlatform.Dependencies.AddRange(Mapping<PackageDependency, PackageDependencyModel>.Map(dependencies));
                             }
                         }
                     }
                     
-                    model.TotalDownloads = totalDownloads;
+                    model.CurrentVersionDownload = currentVersionDownloads;
                     model.Versions = await GetPackageVersions(packageId, cancellationToken);
                     return model;
                 }

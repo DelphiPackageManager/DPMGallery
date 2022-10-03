@@ -34,48 +34,44 @@ export type PackageVersionModel = {
     downloads : number;
 }
 
-export type PackageDetailsModel = {
-    packageId : string
-    packageName : string;
-    packageVersion : string;
-    prefixReserved : boolean;
+export type PackageDependencyModel = {
+    packageId : string,
+    versionRange  : string;
+}
 
-    isPrerelease : boolean;
+export type PackageDetailPlatformModel = {
+    platform : Platform,
+    dependencies : PackageDependencyModel[],
+    downloadUrl : string;
+}
 
-    isLatestVersion : boolean;
+export type  PackageDetailCompilerModel = {
+    compilerVersion : CompilerVersion,
+    platforms : PackageDetailPlatformModel[]
+}
 
-    isCommercial : boolean;
 
-    isTrial : boolean;
-
-    publishedUtc : string;
-
-    published : string; //prettydate
-
-    platform : Platform[];
-
-    compilerVersions :  CompilerVersion[];
-
-    versions : PackageVersionModel[];
-
-    projectUrl : string 
-
-    readMe : string;
-    repositoryUrl : string;
-
-    licenses : string[];
-
-    owners : string[];
-
-    totalDownloads : number;
-
-    currentVersionDownload : number;
-
-    tags : string[] ;
-
-    //Record<T,S>
-    //CompilerVersion, List<Platform>> CompilerPlatforms : Dictionary<;
-
-    //CompilerVersion, Dictionary<Platform, List<PackageDependencyModel>>> PackageDependencies : Dictionary;
-   
+export type PackageDetailsModel = {        
+    packageId : string,
+    packageName : string,
+    packageVersion : string,
+    prefixReserved : boolean,
+    isPrerelease : boolean,
+    isLatestVersion : boolean,
+    isCommercial : boolean,
+    isTrial : boolean,
+    icon : string,
+    publishedUtc : string,
+    published: string,
+    versions : PackageVersionModel[],
+    compilerPlatforms : PackageDetailCompilerModel[],
+    projectUrl : string,
+    readMe : string,
+    repositoryUrl : string,
+    licenses : string[]
+    owners : string[],
+    ownerMD5s : string[],
+    totalDownloads : number,
+    currentVersionDownload : number,
+    tags : string[], 
 }

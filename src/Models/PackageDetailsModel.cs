@@ -6,6 +6,16 @@ namespace DPMGallery.Models
 {
     public class PackageDetailsModel
     {
+        public PackageDetailsModel()
+        {
+            Versions = new List<PackageVersionModel>();
+            CompilerPlatforms = new List<PackageDetailCompilerModel>();
+            Licenses = new List<string>();
+            Tags = new List<string>();
+            Owners = new List<string>();
+            OwnerMD5s = new List<string>();
+        }
+        
         public string PackageId { get; set; }
 
         public string PackageName { get; set; }
@@ -22,15 +32,15 @@ namespace DPMGallery.Models
 
         public bool IsTrial { get; set; }
 
+        public string Icon { get; set; }
+
         public DateTime PublishedUtc { get; set; }
 
         public string Published { get; set; } //prettydate
 
-        public List<Platform> Platforms { get; set; }
-
-        public List<CompilerVersion> CompilerVersions { get; set; }
-
         public List<PackageVersionModel> Versions { get; set; }
+
+        public List<PackageDetailCompilerModel> CompilerPlatforms { get; set; }
 
         public string ProjectUrl { get; set; } 
 
@@ -41,15 +51,13 @@ namespace DPMGallery.Models
 
         public List<string> Owners { get; set; }
 
+        public List<string> OwnerMD5s { get; set; }
+
         public long TotalDownloads { get; set; }
 
-        public int CurrentVersionDownload { get; set; } = 0;
+        public long CurrentVersionDownload { get; set; } = 0;
 
         public List<string> Tags { get; set; }
 
-        public Dictionary<CompilerVersion, List<Platform>> CompilerPlatforms { get; set; }
-
-        public Dictionary<CompilerVersion, Dictionary<Platform, List<PackageDependencyModel>>> PackageDependencies { get; set; }
-       
     }
 }

@@ -21,6 +21,7 @@ namespace DPMGallery.Controllers.UI
     {
         private readonly ILogger _logger;
         private readonly IUIService _uiService;
+
         public UIPackagesController(ILogger logger, IUIService uiService)
         {
             _logger = logger;

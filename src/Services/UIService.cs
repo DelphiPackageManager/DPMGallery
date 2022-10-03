@@ -1,5 +1,6 @@
 ﻿using DPMGallery.Entities;
 using DPMGallery.Repositories;
+using DPMGallery.Extensions;
 using Serilog;
 using System.Threading.Tasks;
 using System.Threading;
@@ -8,6 +9,10 @@ using DPMGallery.Utils;
 using MailKit.Search;
 using Microsoft.Extensions.Caching.Memory;
 using System;
+using DPMGallery.Types;
+using static DPMGallery.Constants;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace DPMGallery.Services
 {
@@ -16,9 +21,14 @@ namespace DPMGallery.Services
         private readonly ILogger _logger;
         private readonly SearchRepository _searchRepository;
         private readonly IMemoryCache _memoryCache;
-        public UIService(ILogger logger, SearchRepository searchRepository, IMemoryCache memoryCache)
+        private readonly IStorageService _storageService;
+        private readonly ServerConfig _serverConfig;
+
+        public UIService(ILogger logger, ServerConfig serverConfig, SearchRepository searchRepository, IMemoryCache memoryCache, IStorageService storageService)
         {
             _logger = logger;
+            _serverConfig = serverConfig;
+            _storageService = storageService;
             _searchRepository = searchRepository;
             _memoryCache = memoryCache;
         }
@@ -33,6 +43,10 @@ namespace DPMGallery.Services
             return model;
         }
 
+        private string GetDownloadUrl(string packageId, string packageVersion, string compilerVersion, string platform, string fileType)
+        {
+            return $"/api/v1/package/{packageId.ToLower()}/{compilerVersion.ToLower()}/{platform.ToLower()}/{packageVersion.ToLower()}/{fileType}";
+        }
 
         public async Task<PackageDetailsModel> UIGetPackageDetails(string packageId, string packageVersion, CancellationToken cancellationToken = default)
         {
@@ -44,7 +58,25 @@ namespace DPMGallery.Services
             var model = await _memoryCache.GetOrCreateAsync<PackageDetailsModel>(key, async (cacheEntry) =>
             {
                 cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
-                return await _searchRepository.GetPackageInfo(packageId, packageVersion, cancellationToken);
+                var result =  await _searchRepository.GetPackageInfo(packageId, packageVersion, cancellationToken);
+                if (result == null)
+                    return null;
+
+                
+                result.Icon = ""; //clear out the value from the db
+                foreach (var item in result.CompilerPlatforms)
+                {
+                    foreach (var platform in item.Platforms)
+                    {
+                        if (string.IsNullOrEmpty(result.Icon))
+                        {
+                            result.Icon = GetDownloadUrl(result.PackageId, result.PackageVersion, item.CompilerVersion.ToString(), platform.Platform.ToString(), "icon");
+                        }
+                        platform.DownloadUrl = GetDownloadUrl(result.PackageId, result.PackageVersion, item.CompilerVersion.ToString(), platform.Platform.ToString(), "dpkg");
+                    }
+                }
+
+                return result;
             });
 
             return model;
