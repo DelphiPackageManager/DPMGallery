@@ -1,17 +1,12 @@
-﻿using DPMGallery.DTO;
-using DPMGallery.Models;
+﻿using DPMGallery.Models;
 using DPMGallery.Types;
-using DPMGallery.Extensions;
-using Ganss.XSS;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
 using DPMGallery.Services;
 using Serilog;
-using NuGet.Packaging.Core;
-using DPMGallery.Entities;
-using System.Collections.Generic;
+using Ganss.Xss;
 
 namespace DPMGallery.Controllers.UI
 {
