@@ -194,7 +194,7 @@ namespace DPMGallery
             }
             
             app.UseForwardedHeaders();
-            app.UseIpRateLimiting();
+            app.UseIpRateLimiting(); //TODO : replace with built in rate limiting
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
@@ -216,11 +216,11 @@ namespace DPMGallery
             //app.UseCookiePolicy();
             app.UseSerilogRequestLogging();
             app.UseRouting();
-//            app.UseApiKeyAuthMiddleware();
-            //app.UseAuthentication();
-            //app.UseAuthorization();
-//            app.UseOperationCancelledMiddleware();
-            //app.UseHttpLogging();
+            app.UseApiKeyAuthMiddleware();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.UseOperationCancelledMiddleware();
+            app.UseHttpLogging();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
