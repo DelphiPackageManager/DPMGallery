@@ -11,7 +11,6 @@ const PackagesPage = () => {
   const pageStr = searchParams.get("page") || "1";
   const page = Number.parseInt(pageStr);
 
-  console.log(query);
   const sq: SearchParams = {
     query: query,
     page: page,

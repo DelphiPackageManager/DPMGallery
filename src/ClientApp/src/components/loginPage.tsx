@@ -46,10 +46,7 @@ const LoginPage = () => {
           avatarUrl: avatarUrl,
         },
       };
-      console.log("Login - setting auth");
-      console.log(currentUser);
       setAuth(currentUser);
-      console.log("navigating to [" + from + "]");
       navigate(from, { replace: true });
     } catch (err: any) {
       if (!err?.response) {

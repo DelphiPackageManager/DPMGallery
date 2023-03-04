@@ -23,58 +23,6 @@ import RegisterPage from "./registerPage";
 import RequireAuthRoute from "./requireAuth";
 import UploadPage from "./uploadPage";
 
-type AuthWrapperProps = {
-  children: ReactNode;
-};
-
-// const AuthWrapper = ({ children }: AuthWrapperProps) => {
-//   const { setAuth } = useAuth();
-//   const axiosPrivate = useAxiosPrivate();
-
-//   const PROFILE_URL = "/ui/auth/profile";
-
-//   useEffect(() => {
-//     const fetchData = async () => {
-//       try {
-//         //using axios private so we get the new refresh token.
-//         const response = await axiosPrivate.post(
-//           PROFILE_URL,
-//           {},
-//           {
-//             withCredentials: true,
-//           }
-//         );
-//         if (!response.data) {
-//           console.log("no data");
-//           return;
-//         }
-
-//         const username = response?.data?.userName;
-//         const email = response?.data?.email;
-//         const emailConfirmed = response?.data?.emailConfirmed;
-//         const roles = response?.data?.roles;
-//         const avatarUrl = response?.data?.avatarUrl;
-
-//         const currentUser: User = {
-//           user: {
-//             userName: username,
-//             email: email,
-//             emailConfirmed: emailConfirmed,
-//             roles: roles,
-//             avatarUrl: avatarUrl,
-//           },
-//         };
-//         console.log("profile");
-//         console.log(currentUser);
-//         setAuth(currentUser);
-//       } catch (err) {}
-//     };
-//     fetchData();
-//   }, []);
-
-//   return <Fragment>{children}</Fragment>;
-// };
-
 const App = () => {
   const router = createBrowserRouter(
     createRoutesFromElements(

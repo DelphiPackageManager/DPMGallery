@@ -10,7 +10,6 @@ import "./index.css";
 const refresh = useRefreshToken();
 
 const fetchData = async () => {
-  console.log("fetching Profile");
   const PROFILE_URL = "/ui/auth/profile";
   const axiosInitial = createAxiosInitial();
   try {
@@ -23,7 +22,6 @@ const fetchData = async () => {
       }
     );
     if (!response.data) {
-      console.log("no data");
       return {
         user: null,
       };

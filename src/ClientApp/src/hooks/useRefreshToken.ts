@@ -4,7 +4,6 @@ import useAuth from "./useAuth";
 
 const useRefreshToken = () => {
   const refresh = async () => {
-    console.log("refreshing token");
     const response = await axios.post("/ui/auth/refresh-token", {
       withCredentials: true, //send cookies
     });

@@ -138,10 +138,10 @@ namespace DPMGallery
                 options.Cookie.SameSite = SameSiteMode.Strict;
                 options.Cookie.SecurePolicy = CookieSecurePolicy.None;
                 options.Cookie.IsEssential = true;
-            }); ;
+            })
 
             //need to figure out how to use these with react
-            /*
+            
             .AddMicrosoftAccount(microsoftOptions =>
             {
                 microsoftOptions.ClientId = serverConfig.Authentication.Microsoft.ClientId;// Configuration["Authentication:Microsoft:ClientId"];
@@ -154,7 +154,9 @@ namespace DPMGallery
 
                 options.ClientId = serverConfig.Authentication.Google.ClientId;// .googleAuthNSection["ClientId"];
                 options.ClientSecret = serverConfig.Authentication.Google.ClientSecret;//  googleAuthNSection["ClientSecret"];
-            }).AddGitHub(options =>
+                
+            });
+            /*.AddGitHub(options =>
             {
                 options.ClientId = serverConfig.Authentication.GitHub.ClientId;
                 options.ClientSecret = serverConfig.Authentication.GitHub.ClientSecret;

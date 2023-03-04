@@ -33,7 +33,6 @@ type AuthProviderProps = {
 };
 
 export function AuthProvider({ children, user }: AuthProviderProps) {
-  console.log("AuthProvider user : " + user?.user);
   const [auth, setAuth] = useState<User>(user);
 
   return <AuthContext.Provider value={{ auth, setAuth }}>{children}</AuthContext.Provider>;

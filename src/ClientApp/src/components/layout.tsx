@@ -20,7 +20,6 @@ const Layout = () => {
   const PROFILE_URL = "/ui/auth/profile";
 
   const fetchData = async () => {
-    console.log("fetching Profile");
     try {
       if (auth) return;
 
@@ -33,7 +32,6 @@ const Layout = () => {
         }
       );
       if (!response.data) {
-        console.log("no data");
         return;
       }
 
@@ -52,9 +50,7 @@ const Layout = () => {
           avatarUrl: avatarUrl,
         },
       };
-      console.log(currentUser);
       setAuth(currentUser);
-      console.log("profile is set");
     } catch (err) {}
   };
 

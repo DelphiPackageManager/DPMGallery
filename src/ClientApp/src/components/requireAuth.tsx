@@ -6,13 +6,11 @@ export type RequireAuthProps = {
 };
 
 const RequireAuthRoute = (props: RequireAuthProps) => {
-  console.log("requireauth");
   const location = useLocation();
   const { auth } = useAuth();
 
   // const PROFILE_URL = "/ui/auth/profile";
   const user = auth?.user;
-  console.log(user);
 
   return user?.roles?.find((role) => props.allowedRoles?.includes(role)) ? (
     <Outlet />
