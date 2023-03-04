@@ -95,9 +95,10 @@ namespace DPMGallery.Identity
 
 				const string createSql = "INSERT INTO " + Constants.Database.TableNames.Users + " " +
 					"(user_name, normalized_user_name, email, normalized_email, email_confirmed, password_hash, security_stamp, concurrency_stamp, phone_number, phone_number_confirmed, two_factor_enabled," +
-					" lockout_end, lockout_enabled, access_failed_count, is_organisation, account_suspended) " +  
+					" lockout_end, lockout_enabled, access_failed_count, is_organisation, account_suspended, refresh_token, refresh_token_expiry) " +  
 					"VALUES (@UserName, @NormalizedUserName, @Email, @NormalizedEmail, @EmailConfirmed, @PasswordHash, @SecurityStamp, @ConcurrencyStamp, " +
-							"@PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled, @LockoutEnd, @LockoutEnabled, @AccessFailedCount, @IsOrganisation, @AccountSuspended) RETURNING id;";
+							"@PhoneNumber, @PhoneNumberConfirmed, @TwoFactorEnabled, @LockoutEnd, @LockoutEnabled, @AccessFailedCount, @IsOrganisation, @AccountSuspended, " +
+                            "@RefreshToken, @RefreshTokenExpiryTime) RETURNING id;";
 
 				user.Id = await _dbContext.ExecuteScalarAsync<int>(createSql, new
 				{
@@ -116,7 +117,9 @@ namespace DPMGallery.Identity
 					user.LockoutEnabled,
 					user.AccessFailedCount,
 					user.IsOrganisation,
-					user.AccountSuspended
+					user.AccountSuspended,
+					user.RefreshToken,
+					user.RefreshTokenExpiryTime
 				}, cancellationToken: cancellationToken);
 				_unitOfWork.Commit();
 				result = IdentityResult.Success;
@@ -305,7 +308,8 @@ namespace DPMGallery.Identity
 					"SET user_name = @UserName, normalized_user_name = @NormalizedUserName, email = @Email, normalized_email = @NormalizedEmail, email_confirmed = @EmailConfirmed, " +
 						"password_hash = @PasswordHash, security_stamp = @SecurityStamp, concurrency_stamp = @ConcurrencyStamp, phone_number = @PhoneNumber, " +
 						"phone_number_confirmed = @PhoneNumberConfirmed, two_factor_enabled = @TwoFactorEnabled, lockout_end = @LockoutEnd, lockout_enabled = @LockoutEnabled, " +
-						"access_failed_count = @AccessFailedCount , is_organisation = @IsOrganisation, account_suspended = @AccountSuspended \n" +
+                        "access_failed_count = @AccessFailedCount , is_organisation = @IsOrganisation, account_suspended = @AccountSuspended, " +
+						"refresh_token = @RefreshToken, refresh_token_expiry = @RefreshTokenExpiryTime  \n" +
 					"WHERE id = @Id;";
 
 				//await _dbContext.UpdateAsync<User>(user); //doesn't work as it doesn't use the column mappings
@@ -329,7 +333,9 @@ namespace DPMGallery.Identity
 						user.AccessFailedCount,
 						user.Id,
 						user.IsOrganisation,
-						user.AccountSuspended
+						user.AccountSuspended,
+						user.RefreshToken,
+						user.RefreshTokenExpiryTime
 					}, cancellationToken: cancellationToken);
 
 				_unitOfWork.Commit();

@@ -6,7 +6,6 @@ import PageContainer from "../pageContainer";
 import PackageItemRow from "./packageItemRow";
 
 const PackagesPage = () => {
-  const effectRan = useRef(false);
   let [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const pageStr = searchParams.get("page") || "1";
@@ -23,16 +22,8 @@ const PackagesPage = () => {
 
   useEffect(() => {
     //dealing with useffect running twice in dev mode due to strict mode
-    if (effectRan.current === true) {
-      getPackages(sq, controller);
-    }
-    return () => {
-      if (effectRan.current === true) {
-        controller.abort();
-      }
-      effectRan.current = true;
-    };
-  }, [query, page, getPackages]);
+    getPackages(sq, controller);
+  }, [query, page]);
 
   function getPageLink(query: string, page: number): string {
     let result = "";

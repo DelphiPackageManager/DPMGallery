@@ -13,7 +13,7 @@ namespace DPMGallery.DBMigration.Conventions
 	[Migration(1, "Initial Schema creation")]
 	public class DPMGallery_1_001 : Migration
 	{
-		//do't hide not listed from this view as it would stop people restoring
+		//don't hide unlisted from this view as it would stop people restoring
 		private const string SearchPackageVersionView = @"create view " + V.SearchPackageVersion + @" as
 															SELECT p.id,
 															pv.id as versionid,

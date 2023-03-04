@@ -1,21 +1,18 @@
-import { useNavigate } from "react-router-dom"
-import PageContainer from "./pageContainer";
+import { useNavigate } from "react-router";
 
-const Unauthorized = () => {
-    const navigate = useNavigate();
+const UnAuthorizedPage = () => {
+  const navigate = useNavigate();
 
-    const goBack = () => navigate(-1);
+  const goBack = () => navigate(-1);
 
-    return (
-        <PageContainer className="text-center">
-            <h1>Unauthorized</h1>
-            <br />
-            <p>You do not have access to the requested page.</p>
-            <div className="flexGrow">
-                <button onClick={goBack}>Go Back</button>
-            </div>
-        </PageContainer>
-    )
-}
+  return (
+    <section>
+      <h1>You are not Authorized to view the requested page</h1>
+      <div className="flex flex-col">
+        <button onClick={goBack}>Go Back</button>
+      </div>
+    </section>
+  );
+};
 
-export default Unauthorized
+export default UnAuthorizedPage;

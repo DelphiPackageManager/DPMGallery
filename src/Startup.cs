@@ -48,7 +48,7 @@ namespace DPMGallery
                 return Serilog.Log.Logger;
             });
 
-            //allows running behind nginx
+            //allows running behind nginx or yarp
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -112,12 +112,33 @@ namespace DPMGallery
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
                     ClockSkew = TimeSpan.Zero,
-
-                    ValidAudience = serverConfig.Authentication.JwtConfig.ValidAudience,
-                    ValidIssuer = serverConfig.Authentication.JwtConfig.ValidIssuer,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(serverConfig.Authentication.JwtConfig.Secret))
+                    ValidAudience = serverConfig.Authentication.Jwt.ValidAudience,
+                    ValidIssuer = serverConfig.Authentication.Jwt.ValidIssuer,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(serverConfig.Authentication.Jwt.Secret))
                 };
-            });
+                options.Events = new JwtBearerEvents();
+                options.Events.OnMessageReceived = context => {
+                    if (context.Request.Cookies.ContainsKey("X-Access-Token"))
+                    {
+                        context.Token = context.Request.Cookies["X-Access-Token"];
+                    }
+
+                    return Task.CompletedTask;
+                };
+                options.Events.OnAuthenticationFailed = context =>
+                {
+                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    {
+                        context.Response.Headers.Add("IS-TOKEN-EXPIRED", "true");
+                    }
+                    return Task.CompletedTask;
+                };
+            }).AddCookie(options =>
+            {
+                options.Cookie.SameSite = SameSiteMode.Strict;
+                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
+                options.Cookie.IsEssential = true;
+            }); ;
 
             //need to figure out how to use these with react
             /*

@@ -16,6 +16,10 @@ using Microsoft.AspNetCore.Http;
 using FluentMigrator.Infrastructure;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using Markdig.Helpers;
+using DPMGallery.Extensions;
+using System.Security.Policy;
+using NuGet.Common;
 
 namespace DPMGallery.Controllers.UI
 {
@@ -50,6 +54,8 @@ namespace DPMGallery.Controllers.UI
     [ApiController]
     public class AuthController : Controller
     {
+        private const string EmailConfirmedClaim = "EmailConfirmedClaim";
+
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ServerConfig _serverConfig;
@@ -58,6 +64,61 @@ namespace DPMGallery.Controllers.UI
             _userManager = userManager;
             _signInManager = signInManager;
             _serverConfig = serverConfig;
+        }
+
+        private async Task<Tuple<object,List<Claim>>> GenerateProfileObject(User user)
+        {
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var authClaims = new List<Claim>
+                {
+                    new Claim(ClaimTypes.Name, user.UserName),
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                };
+
+            userRoles.Add("RegisteredUser");
+            foreach (var userRole in userRoles)
+            {
+                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            }
+            authClaims.Add(new Claim(ClaimTypes.Email, user.Email));
+            authClaims.Add(new Claim(EmailConfirmedClaim, user.EmailConfirmed.ToString()));
+
+            var hash = user.Email.ToLower().ToMd5();
+
+            var userProfile = new
+            {
+                email = user.Email,
+                emailConfirmed = user.EmailConfirmed,
+                userName = user.UserName,
+                avatarUrl = $"https://www.gravatar.com/avatar/{hash}",
+                roles = userRoles.ToArray()
+            };
+
+            return new Tuple<object, List<Claim>>(userProfile, authClaims);
+        }
+
+
+        [HttpPost]
+        [Route("profile")]
+        //[Authorize]
+        public async Task<IActionResult> Profile()
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            var result = await GenerateProfileObject(user);
+
+            return Ok(result.Item1);
         }
 
 
@@ -70,45 +131,47 @@ namespace DPMGallery.Controllers.UI
             var user = await _userManager.FindByNameAsync(requestDTO.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, requestDTO.Password))
             {
-                var userRoles = await _userManager.GetRolesAsync(user);
+                var result = await GenerateProfileObject(user);
 
-                var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-
-                foreach (var userRole in userRoles)
-                {
-                    authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-                }
-
-                var token = CreateToken(authClaims);
+                var token = CreateToken(result.Item2);
                 var refreshToken = GenerateRefreshToken();
 
-
                 user.RefreshToken = refreshToken;
-                user.RefreshTokenExpiryTime = DateTime.Now.AddDays(_serverConfig.Authentication.JwtConfig.RefreshTokenValidityInDays);
+                DateTimeOffset refreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays);
+
+                user.RefreshTokenExpiryTime = refreshTokenExpires;
 
                 await _userManager.UpdateAsync(user);
 
-                return Ok(new
+                string Token = new JwtSecurityTokenHandler().WriteToken(token);
+
+                DateTimeOffset? accessTokenExpires = null;
+
+                if (requestDTO.RememberMe)
                 {
-                    Token = new JwtSecurityTokenHandler().WriteToken(token),
-                    RefreshToken = refreshToken,
-                    Expiration = token.ValidTo
-                });
+#if DEBUG
+                    accessTokenExpires = DateTimeOffset.UtcNow.AddMinutes(1); //TESTING Remove
+#else
+                    accessTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays + 1);
+#endif
+                    Response.Cookies.Append("X-Remember-Me", "true", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires?.AddMinutes(2) });
+                }
+                Response.Cookies.Append("X-Access-Token", Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires });
+
+                Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
+                return Ok(result.Item1);
             }
             return Unauthorized();
         }
 
         [HttpPost]
         [Route("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel { Status = "Error", Message = "User already exists!" });
+                return StatusCode(StatusCodes.Status409Conflict, new ResponseModel { Status = "Error", Message = "User already exists!" });
 
             User user = new()
             {
@@ -125,46 +188,61 @@ namespace DPMGallery.Controllers.UI
 
         [HttpPost]
         [Route("refresh-token")]
-        public async Task<IActionResult> RefreshToken(TokenModel tokenModel)
+        public async Task<IActionResult> RefreshToken()
         {
-            if (tokenModel is null)
-            {
-                return BadRequest("Invalid client request");
-            }
+            string oldAccessToken = Request.Cookies.FirstOrDefault(x => x.Key == "X-Access-Token").Value;
+            string refreshToken = Request.Cookies.FirstOrDefault(x => x.Key == "X-Refresh-Token").Value;
+            string rememberMe = Request.Cookies.FirstOrDefault(x => x.Key == "X-Remember-Me").Value;
+            if (string.IsNullOrEmpty(oldAccessToken) || string.IsNullOrEmpty(refreshToken))
+                   return Unauthorized();
 
-            string accessToken = tokenModel.AccessToken;
-            string refreshToken = tokenModel.RefreshToken;
-
-            var principal = GetPrincipalFromExpiredToken(accessToken);
+            var principal = GetPrincipalFromExpiredToken(oldAccessToken);
             if (principal == null)
             {
-                return BadRequest("Invalid access token or refresh token");
+                return BadRequest("Invalid access token");
             }
 
-#pragma warning disable CS8600 // Converting null literal or possible null value to non-nullable type.
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-            string username = principal.Identity.Name;
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
-#pragma warning restore CS8600 // Converting null literal or possible null value to non-nullable type.
+            string username = principal.Identity?.Name;
+            if(string.IsNullOrEmpty(username))
+            {
+                return BadRequest("Invalid access token");
+            }
 
             var user = await _userManager.FindByNameAsync(username);
 
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTime.Now)
+            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTimeOffset.UtcNow)
             {
-                return BadRequest("Invalid access token or refresh token");
+                return Unauthorized();
             }
 
             var newAccessToken = CreateToken(principal.Claims.ToList());
             var newRefreshToken = GenerateRefreshToken();
 
             user.RefreshToken = newRefreshToken;
+            var refreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays);
+            user.RefreshTokenExpiryTime = refreshTokenExpires;
+
             await _userManager.UpdateAsync(user);
 
-            return new ObjectResult(new
+
+
+            DateTimeOffset? accessTokenExpires = null;
+            if (!string.IsNullOrEmpty(rememberMe)) //hacky way to set rememberme
             {
-                accessToken = new JwtSecurityTokenHandler().WriteToken(newAccessToken),
-                refreshToken = newRefreshToken
-            });
+
+#if DEBUG
+                accessTokenExpires = DateTimeOffset.UtcNow.AddMinutes(1); //TESTING Remove
+#else
+                accessTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays + 1);
+#endif
+                Response.Cookies.Append("X-Remember-Me", "true", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires?.AddMinutes(2) });
+            }
+
+            var token = new JwtSecurityTokenHandler().WriteToken(newAccessToken);
+            Response.Cookies.Append("X-Access-Token", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires });
+            Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
+
+            return Ok();
         }
 
 
@@ -199,12 +277,12 @@ namespace DPMGallery.Controllers.UI
 
         private JwtSecurityToken CreateToken(List<Claim> authClaims)
         {
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.JwtConfig.Secret));
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.Jwt.Secret));
 
             var token = new JwtSecurityToken(
-                issuer: _serverConfig.Authentication.JwtConfig.ValidIssuer,
-                audience: _serverConfig.Authentication.JwtConfig.ValidAudience,
-                expires: DateTime.Now.AddMinutes(_serverConfig.Authentication.JwtConfig.TokenValidityInMinutes),
+                issuer: _serverConfig.Authentication.Jwt.ValidIssuer,
+                audience: _serverConfig.Authentication.Jwt.ValidAudience,
+                expires: DateTime.Now.AddMinutes(_serverConfig.Authentication.Jwt.TokenValidityInMinutes),
                 claims: authClaims,
                 signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
                 );
@@ -227,7 +305,7 @@ namespace DPMGallery.Controllers.UI
                 ValidateAudience = false,
                 ValidateIssuer = false,
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.JwtConfig.Secret)),
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.Jwt.Secret)),
                 ValidateLifetime = false
             };
 

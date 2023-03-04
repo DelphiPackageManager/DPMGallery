@@ -16,7 +16,7 @@ namespace DPMGallery.Configuration
 
 		public GitHubAuthConfig GitHub { get; set; } = new GitHubAuthConfig();
 
-		public JwtConfig JwtConfig { get; set; } = new JwtConfig();
+		public JwtConfig Jwt { get; set; } = new JwtConfig();
 
 	}
 }

@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { useWindowSize } from "usehooks-ts";
+import useAuth from "../hooks/useAuth";
 import DarkModeToggle from "./darkModeToggle";
 
 // import useAuth so we can tell if logged in
 export default function NavBar() {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
+  const { auth } = useAuth();
   let location = useLocation();
   const { width, height } = useWindowSize();
 
@@ -22,6 +24,20 @@ export default function NavBar() {
   const navStyle =
     "block py-2 pr-4 pl-3 border-b border-primary-600 hover:bg-primary-900 dark:hover:bg-primary  md:hover:bg-inherit md:dark:hover:bg-inherit md:hover:opacity-80   md:border-0 md:p-0";
 
+  const isLoggedIn = auth?.user ? true : false;
+
+  const Profile = () => {
+    if (!isLoggedIn) {
+      return (
+        <NavLink className=" focus:ring-4 font-medium rounded-lg text-sm py-2 mx-1 hover:opacity-80" to="/login" state={{ from: location.pathname }}>
+          Login
+        </NavLink>
+      );
+    } else {
+      return <div>{`${auth?.user?.userName}`}</div>;
+    }
+  };
+
   return (
     <nav className="bg-primary dark:bg-primary-900 text-white  min-h-[3.5rem] py-2 z-10 px-4 md:px-6 fixed top-0 w-full ">
       <div className="flex flex-wrap justify-between items-center mx-auto max-w-5xl">
@@ -32,9 +48,7 @@ export default function NavBar() {
         </div>
         <div className="flex flex-row items-center md:order-2">
           <DarkModeToggle />
-          <NavLink className=" focus:ring-4 font-medium rounded-lg text-sm py-2 mx-1 hover:opacity-80" to="/login">
-            Login
-          </NavLink>
+          <Profile />
           <button
             type="button"
             onClick={buttonHandler}
