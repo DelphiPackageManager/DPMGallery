@@ -140,6 +140,16 @@ const LoginPage = () => {
           </div>
         </div>
       </div>
+      <div>
+        <form action="/ui/auth/external" method="POST">
+          <button className="btn btn-primary" name="provider" value="Google">
+            Google
+          </button>
+          <button className="btn btn-primary" name="provider" value="GitHub">
+            GitHub
+          </button>
+        </form>
+      </div>
     </PageContainer>
   );
 };

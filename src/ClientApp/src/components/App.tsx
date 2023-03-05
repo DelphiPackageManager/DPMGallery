@@ -1,12 +1,7 @@
-import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } from "react-router-dom";
+import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom";
 import ConfirmEmailPage from "./confirmEmailPage";
 import DownloadsPage from "./downloadsPage";
 
-import { Fragment, ReactNode, useEffect } from "react";
-import { useFetcher } from "react-router-dom";
-import { User } from "../context/AuthProvider";
-import useAuth from "../hooks/useAuth";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import LoginPage from ".//loginPage";
 import ErrorPage from "./errorPage";
 import ForgotPasswordPage from "./forgotPasswordPage";
@@ -46,7 +41,6 @@ const App = () => {
         <Route path="/policies/package" element={<PackagePoliciesPage />} />
 
         <Route path="/profiles/:userName" element={<ProfilePage />} />
-
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     )

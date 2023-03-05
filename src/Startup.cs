@@ -12,16 +12,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
-using System.Text.Json;
 using DPMGallery.Services;
 using Serilog;
 using DPMGallery.Models;
 using AspNetCoreRateLimit;
-using Microsoft.AspNetCore.HttpLogging;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace DPMGallery
 {
@@ -101,6 +99,8 @@ namespace DPMGallery
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+
             }).AddJwtBearer(options =>
             {
                 options.SaveToken = true;
@@ -133,41 +133,42 @@ namespace DPMGallery
                     }
                     return Task.CompletedTask;
                 };
-            }).AddCookie(options =>
-            {
-                options.Cookie.SameSite = SameSiteMode.Strict;
-                options.Cookie.SecurePolicy = CookieSecurePolicy.None;
-                options.Cookie.IsEssential = true;
-            })
+            })//.AddCookie(options =>
+            //{
+            //    options.Cookie.SameSite = SameSiteMode.Lax;
+            //    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+            //    options.Cookie.IsEssential = true;
+            //    options.Events.OnRedirectToLogin += context =>
+            //    {
+            //        context.Response.StatusCode = 401;
+            //        return Task.CompletedTask;
+            //    };
+            //})
 
             //need to figure out how to use these with react
-            
-            .AddMicrosoftAccount(microsoftOptions =>
-            {
-                microsoftOptions.ClientId = serverConfig.Authentication.Microsoft.ClientId;// Configuration["Authentication:Microsoft:ClientId"];
-                microsoftOptions.ClientSecret = serverConfig.Authentication.Microsoft.ClientSecret;// Configuration["Authentication:Microsoft:ClientSecret"];
-            })
             .AddGoogle(options =>
             {
                 //IConfigurationSection googleAuthNSection =
                 //Configuration.GetSection("Authentication:Google");
-
                 options.ClientId = serverConfig.Authentication.Google.ClientId;// .googleAuthNSection["ClientId"];
                 options.ClientSecret = serverConfig.Authentication.Google.ClientSecret;//  googleAuthNSection["ClientSecret"];
-                
-            });
-            /*.AddGitHub(options =>
+                options.Scope.Add("profile");
+  //              options.SignInScheme = IdentityConstants.ExternalScheme;
+
+            })
+            .AddGitHub(options =>
             {
                 options.ClientId = serverConfig.Authentication.GitHub.ClientId;
                 options.ClientSecret = serverConfig.Authentication.GitHub.ClientSecret;
-                options.CallbackPath = new PathString("/github-oauth");
+                options.CallbackPath = new PathString("/signin-github");
                 options.Scope.Add("user:email");
                 options.Scope.Add("user:login");
                 options.ClaimActions.MapJsonKey("urn:github:login", "login");
                 options.ClaimActions.MapJsonKey("urn:github:login", "email");
                 options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
                 options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
-            }); */
+//                options.SignInScheme = IdentityConstants.ApplicationScheme;
+            });
 
 
             services.AddControllers().AddJsonOptions(j =>
@@ -217,11 +218,11 @@ namespace DPMGallery
             }
             
             app.UseForwardedHeaders();
-            app.UseIpRateLimiting(); //TODO : replace with built in rate limiting
+            //app.UseIpRateLimiting(); //TODO : replace with built in rate limiting
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            app.MapWhen(x => !(x.Request.Path.Value.StartsWith("/api") | x.Request.Path.Value.StartsWith("/ui")), builder =>
+            app.MapWhen(x => !(x.Request.Path.Value.StartsWith("/api") | x.Request.Path.Value.StartsWith("/ui") | x.Request.Path.Value.StartsWith("/signin-")), builder =>
             {
                 builder.UseSpa(spa =>
                 {
@@ -238,16 +239,16 @@ namespace DPMGallery
 
             //app.UseCookiePolicy();
             app.UseSerilogRequestLogging();
-            app.UseRouting();
             app.UseApiKeyAuthMiddleware();
+            app.UseOperationCancelledMiddleware();
+            app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseOperationCancelledMiddleware();
             app.UseHttpLogging();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
-                //endpoints.MapApiRoutes();
+                endpoints.MapApiRoutes();
                 endpoints.MapFallbackToFile("/index.html");
                 
             });

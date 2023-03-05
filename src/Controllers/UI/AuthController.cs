@@ -20,6 +20,10 @@ using Markdig.Helpers;
 using DPMGallery.Extensions;
 using System.Security.Policy;
 using NuGet.Common;
+using DPMGallery.Identity;
+using System.Threading;
+using System.Timers;
+using System.Runtime.InteropServices;
 
 namespace DPMGallery.Controllers.UI
 {
@@ -59,11 +63,15 @@ namespace DPMGallery.Controllers.UI
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly ServerConfig _serverConfig;
-        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, ServerConfig serverConfig)
+        private readonly IUserStore<User> _userStore;
+        private readonly IUserEmailStore<User> _emailStore;
+        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IUserStore<User> userStore, IUserEmailStore<User> emailStore,  ServerConfig serverConfig)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _serverConfig = serverConfig;
+            _userStore = userStore;
+            _emailStore = emailStore;
         }
 
         private async Task<Tuple<object,List<Claim>>> GenerateProfileObject(User user)
@@ -100,9 +108,9 @@ namespace DPMGallery.Controllers.UI
 
 
         [HttpPost]
-        [Route("profile")]
+        [Route("identity")]
         //[Authorize]
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> Identity()
         {
             string userName = HttpContext.User.Identity?.Name;
             if (userName == null)
@@ -121,7 +129,38 @@ namespace DPMGallery.Controllers.UI
             return Ok(result.Item1);
         }
 
+        private async Task<Tuple<object, List<Claim>>> GenerateJWT(User user, bool rememberMe)
+        {
+            var result = await GenerateProfileObject(user);
 
+            var token = CreateToken(result.Item2);
+            var refreshToken = GenerateRefreshToken();
+
+            user.RefreshToken = refreshToken;
+            DateTimeOffset refreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays);
+
+            user.RefreshTokenExpiryTime = refreshTokenExpires;
+
+            await _userManager.UpdateAsync(user);
+
+            string Token = new JwtSecurityTokenHandler().WriteToken(token);
+
+            DateTimeOffset? accessTokenExpires = null;
+
+            if (rememberMe)
+            {
+#if DEBUG
+                accessTokenExpires = DateTimeOffset.UtcNow.AddMinutes(1); //TESTING Remove
+#else
+                    accessTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays + 1);
+#endif
+                Response.Cookies.Append("X-Remember-Me", "true", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires?.AddMinutes(2) });
+            }
+            Response.Cookies.Append("X-Access-Token", Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires });
+
+            Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
+            return result;
+        }
 
         [HttpPost]
         [Route("login")]
@@ -131,34 +170,34 @@ namespace DPMGallery.Controllers.UI
             var user = await _userManager.FindByNameAsync(requestDTO.Username);
             if (user != null && await _userManager.CheckPasswordAsync(user, requestDTO.Password))
             {
-                var result = await GenerateProfileObject(user);
+                var result = await GenerateJWT(user, requestDTO.RememberMe);
 
-                var token = CreateToken(result.Item2);
-                var refreshToken = GenerateRefreshToken();
+//                var token = CreateToken(result.Item2);
+//                var refreshToken = GenerateRefreshToken();
 
-                user.RefreshToken = refreshToken;
-                DateTimeOffset refreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays);
+//                user.RefreshToken = refreshToken;
+//                DateTimeOffset refreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays);
 
-                user.RefreshTokenExpiryTime = refreshTokenExpires;
+//                user.RefreshTokenExpiryTime = refreshTokenExpires;
 
-                await _userManager.UpdateAsync(user);
+//                await _userManager.UpdateAsync(user);
 
-                string Token = new JwtSecurityTokenHandler().WriteToken(token);
+//                string Token = new JwtSecurityTokenHandler().WriteToken(token);
 
-                DateTimeOffset? accessTokenExpires = null;
+//                DateTimeOffset? accessTokenExpires = null;
 
-                if (requestDTO.RememberMe)
-                {
-#if DEBUG
-                    accessTokenExpires = DateTimeOffset.UtcNow.AddMinutes(1); //TESTING Remove
-#else
-                    accessTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays + 1);
-#endif
-                    Response.Cookies.Append("X-Remember-Me", "true", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires?.AddMinutes(2) });
-                }
-                Response.Cookies.Append("X-Access-Token", Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires });
+//                if (requestDTO.RememberMe)
+//                {
+//#if DEBUG
+//                    accessTokenExpires = DateTimeOffset.UtcNow.AddMinutes(1); //TESTING Remove
+//#else
+//                    accessTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays + 1);
+//#endif
+//                    Response.Cookies.Append("X-Remember-Me", "true", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires?.AddMinutes(2) });
+//                }
+//                Response.Cookies.Append("X-Access-Token", Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires });
 
-                Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
+//                Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
                 return Ok(result.Item1);
             }
             return Unauthorized();
@@ -243,6 +282,84 @@ namespace DPMGallery.Controllers.UI
             Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
 
             return Ok();
+        }
+
+        /// <summary>
+        /// when an external auth button is clicked on the login form we do a post to here.
+        /// </summary>
+        /// <param name="provider"></param>
+        /// <returns></returns>
+
+        [HttpPost]
+        [Route("external")]
+        public IActionResult External([FromForm] string provider, string returnUrl)
+        {
+            var redirectUrl = $"/ui/auth/external-register?returnUrl={returnUrl}";
+
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            properties.AllowRefresh = true;
+            return new ChallengeResult(provider, properties);
+        }
+
+
+        [HttpGet]
+        [Route("external-register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalCallback(string returnUrl = null, string remoteError = null)
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+
+            if (info == null)
+                return Unauthorized();
+
+            string redirectTo = String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl;
+
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            var user = await _userManager.FindByEmailAsync(email);
+
+            //see if the user already has an external login associated with an account here.
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            if (result.Succeeded) {
+                await GenerateJWT(user, false);
+                return LocalRedirect(redirectTo);
+            }
+            //no existing external login - but perhaps there is an account.
+            if (email != null)
+            {
+                if (user != null)
+                {
+                    await _userManager.AddLoginAsync(user, info);
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    await GenerateJWT(user, false);
+                    return LocalRedirect(redirectTo);
+                }
+            }
+            //no account or externalLogin so create one
+            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
+            string userName = name.Replace(' ', '-').ToLower();
+            var newUser = new User()
+            {
+                Email = email,
+                SecurityStamp = Guid.NewGuid().ToString(),
+                UserName = userName,
+                NormalizedEmail = email.ToUpper(),
+                NormalizedUserName = userName.ToUpper(),
+            };
+
+            //_userManager.CreateAsync()
+            var createResult = await _userStore.CreateAsync(newUser, CancellationToken.None);
+            if (createResult.Succeeded)
+            {
+                createResult = await _userManager.AddLoginAsync(newUser, info);
+                if (createResult.Succeeded)
+                {
+                    await _signInManager.SignInAsync(newUser, isPersistent: false);
+                    await GenerateJWT(user, false);
+                    return LocalRedirect(redirectTo);
+                }
+            }
+
+            return LocalRedirect("/login");
         }
 
 

@@ -37,6 +37,7 @@ namespace DPMGallery.Identity
                 services.TryAddScoped<IEmailSender, EmailSender>();
                 services.TryAddScoped<IRoleStore<Role>, RoleStore>();
                 services.TryAddScoped<IUserStore<User>, UserStore>();
+                services.TryAddScoped<IUserEmailStore<User>, UserStore>();
 
                 services.TryAddTransient<UserManager<User>>();
             }

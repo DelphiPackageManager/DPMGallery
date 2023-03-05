@@ -7,15 +7,13 @@ import { AuthProvider, User } from "./context/AuthProvider";
 import useRefreshToken from "./hooks/useRefreshToken";
 import "./index.css";
 
-const refresh = useRefreshToken();
-
 const fetchData = async () => {
-  const PROFILE_URL = "/ui/auth/profile";
+  const IDENTITY_URL = "/ui/auth/identity";
   const axiosInitial = createAxiosInitial();
   try {
     //using axios private so we get the new refresh token.
     const response = await axiosInitial.post(
-      PROFILE_URL,
+      IDENTITY_URL,
       {},
       {
         withCredentials: true,

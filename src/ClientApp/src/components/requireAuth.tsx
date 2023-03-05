@@ -9,7 +9,6 @@ const RequireAuthRoute = (props: RequireAuthProps) => {
   const location = useLocation();
   const { auth } = useAuth();
 
-  // const PROFILE_URL = "/ui/auth/profile";
   const user = auth?.user;
 
   return user?.roles?.find((role) => props.allowedRoles?.includes(role)) ? (
