@@ -20,6 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using Microsoft.AspNetCore.HttpOverrides;
+using System.Linq;
 
 namespace DPMGallery
 {
@@ -153,14 +154,15 @@ namespace DPMGallery
                 options.ClientId = serverConfig.Authentication.Google.ClientId;// .googleAuthNSection["ClientId"];
                 options.ClientSecret = serverConfig.Authentication.Google.ClientSecret;//  googleAuthNSection["ClientSecret"];
                 options.Scope.Add("profile");
-  //              options.SignInScheme = IdentityConstants.ExternalScheme;
+                options.CallbackPath = new PathString("/oauth-google");
+                //              options.SignInScheme = IdentityConstants.ExternalScheme;
 
             })
             .AddGitHub(options =>
             {
                 options.ClientId = serverConfig.Authentication.GitHub.ClientId;
                 options.ClientSecret = serverConfig.Authentication.GitHub.ClientSecret;
-                options.CallbackPath = new PathString("/signin-github");
+                options.CallbackPath = new PathString("/oauth-github");
                 options.Scope.Add("user:email");
                 options.Scope.Add("user:login");
                 options.ClaimActions.MapJsonKey("urn:github:login", "login");
@@ -222,13 +224,16 @@ namespace DPMGallery
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
-            app.MapWhen(x => !(x.Request.Path.Value.StartsWith("/api") | x.Request.Path.Value.StartsWith("/ui") | x.Request.Path.Value.StartsWith("/signin-")), builder =>
+            string[] nonSpaUrls = { "/api", "/ui", "/oauth-" };
+
+            //app.MapWhen(x => !(x.Request.Path.Value.StartsWith("/api") | x.Request.Path.Value.StartsWith("/ui") | x.Request.Path.Value.StartsWith("/signin-")), builder =>
+            app.MapWhen(x => !nonSpaUrls.Any(y => x.Request.Path.Value.StartsWith(y)), builder =>
             {
                 builder.UseSpa(spa =>
                 {
                     if (env.IsDevelopment())
                     {
-                        // Make sure you have started the frontend with npm run dev on port 4000
+                        // Make sure you have started the frontend with npm run dev
                         spa.UseProxyToSpaDevelopmentServer("http://localhost:3175");
                     }
                 });

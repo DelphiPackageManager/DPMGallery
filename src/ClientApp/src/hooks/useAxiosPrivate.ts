@@ -21,7 +21,7 @@ const useAxiosPrivate = () => {
       async (error) => {
         const prevRequest = error?.config;
         //all the examples I found say 403, however aspnet returns 401
-        if (error?.response?.status === 401 && !prevRequest?.sent) {
+        if (error?.response?.status === 401 && !prevRequest?.sent && !(prevRequest?.url === "/ui/auth/login")) {
           prevRequest.sent = true;
           const refreshResponse = await refresh();
           if (refreshResponse.status !== 200) {

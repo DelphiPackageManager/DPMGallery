@@ -47,5 +47,11 @@ namespace DPMGallery.Extensions
                                                                                    // MatchEvaluator delegate defines replacement of setence starts to uppercase
             return r.Replace(lowerCase, s => s.Value.ToUpper());
         }
+
+        public static bool StartsWithAnyOf(this string value, string[] values)
+        {
+            var result = values.FirstOrDefault(x => value.StartsWith(x));
+            return !string.IsNullOrEmpty(result);
+        }
     }
 }

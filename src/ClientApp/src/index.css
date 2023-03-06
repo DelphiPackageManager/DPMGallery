@@ -1,3 +1,70 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.errmsg {
+  @apply text-red-800;
+}
+
+.dropdown {
+  @apply relative inline-block;
+}
+
+.dropdown-content {
+  @apply hidden absolute rounded-md  border-gray-600  p-3 right-0 max-w-lg dark:shadow-none z-10 text-left shadow w-64 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 list-none;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropdown-content li {
+  @apply px-2 py-1 rounded-sm cursor-pointer;
+}
+
+.dropdown-content .divider {
+  @apply h-[1px] m-0 p-0 mt-1 mb-1 rounded-none overflow-hidden bg-gray-400;
+}
+
+.dropdown-content .dropdown-header {
+  @apply cursor-default;
+}
+
+.dropdown-content li > a,
+.dropdown-content .link {
+  @apply block clear-both px-2 py-1 whitespace-nowrap;
+}
+
+.dropdown-content li > a:hover,
+.dropdown-content .link:hover {
+  @apply bg-gray-300 dark:bg-gray-700 dark:text-white;
+}
+
+.btn {
+  @apply flex items-center justify-center p-3 rounded-md;
+}
+
+.btn-primary {
+  @apply bg-primary-800 hover:bg-primary-700 text-white dark:text-gray-100  dark:bg-primary-700 dark:hover:bg-primary-800;
+}
+
+.btn-outline {
+  @apply border border-gray-300 dark:border-gray-500;
+}
+
+.btn-outline:hover {
+  @apply bg-gray-200 text-gray-700 dark:bg-gray-400 dark:text-gray-800 dark:border-gray-800;
+}
+
+.sidebar {
+  @apply px-2 py-2 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white/80;
+}
+
+.sidebar li > a {
+  @apply block clear-both px-3 py-2 whitespace-nowrap;
+}
+
+.sidebar li > a:hover,
+.sidebar .link:hover {
+  @apply bg-gray-300 dark:bg-gray-700 dark:text-white;
+}

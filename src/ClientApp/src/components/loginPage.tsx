@@ -54,9 +54,13 @@ const LoginPage = () => {
       } else if (err.response?.status === 400) {
         setErrMsg("Missing Username or Password");
       } else if (err.response?.status === 401) {
-        setErrMsg("Unauthorized");
+        if (err.response?.data) {
+          setErrMsg(err.response?.data);
+        } else {
+          setErrMsg("Invalid username or password");
+        }
       } else {
-        setErrMsg("Login Failed");
+        setErrMsg("Login Failed : Error code :  " + `${err?.response?.status}`);
       }
       const currentUser: User = {
         user: null,
@@ -72,15 +76,15 @@ const LoginPage = () => {
         {errMsg}
       </p>
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-4">
-        <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+        <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-800 dark:text-white">
           <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo"></img>DPM
         </a>
-        <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+        <div className="w-full bg-white rounded-lg shadow-md dark:shadow-none shadow-gray-200 dark:shadow-gray-800 border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">Sign in to your account</h1>
+            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">Log In to your account</h1>
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
               <div>
-                <label htmlFor="userName" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                <label htmlFor="userName" className="block mb-2 text-sm font-medium text-gray-800 dark:text-white">
                   UserName
                 </label>
                 <input
@@ -125,30 +129,50 @@ const LoginPage = () => {
                   Forgot password?
                 </Link>
               </div>
+              {/* 
               <button
                 type="submit"
                 className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                Sign in
+                Log In
+              </button>
+  */}
+              <button type="submit" className="w-full btn btn-primary">
+                Log In
               </button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Don’t have an account yet?{" "}
-                <Link to="/register" className="font-medium text-primary-600 hover:underline dark:text-primary-500">
-                  Sign up
+                <Link to="/createaccount" replace className="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                  Create an Account
                 </Link>
               </p>
             </form>
           </div>
         </div>
-      </div>
-      <div>
-        <form action="/ui/auth/external" method="POST">
-          <button className="btn btn-primary" name="provider" value="Google">
-            Google
-          </button>
-          <button className="btn btn-primary" name="provider" value="GitHub">
-            GitHub
-          </button>
-        </form>
+        <div className="pt-3">
+          <div className="flex items-center">
+            <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
+            <div className="px-5 text-center text-gray-500 dark:text-gray-400">or</div>
+            <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
+          </div>
+
+          <form action="/ui/auth/external" method="POST">
+            <div className="flex items-center justify-center gap-4 py-4">
+              <button className="btn btn-outline" name="provider" value="Google">
+                <svg className="w-4 h-4" fill="currentColor">
+                  <use href="#google" />
+                </svg>
+
+                <span className="pl-2">Log In with Google</span>
+              </button>
+              <button className="btn btn-outline" name="provider" value="GitHub">
+                <svg className="w-5 h-5">
+                  <use href="#github" />
+                </svg>
+                <span className="pl-2">Log In with GitHub</span>
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </PageContainer>
   );

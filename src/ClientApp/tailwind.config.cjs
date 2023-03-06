@@ -3,7 +3,6 @@ const defaultTheme = require("tailwindcss/defaultTheme");
 module.exports = {
   darkMode: "class",
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
-  plugins: [require("daisyui")],
   theme: {
     extend: {
       fontFamily: {
@@ -24,21 +23,6 @@ module.exports = {
           800: "#005296",
           900: "#00335E",
         },
-        /*
-        'gray': {
-          DEFAULT: '#121212',
-          '50': '#BFBFBF',
-          '100': '#B5B5B5',
-          '200': '#A1A1A1',
-          '300': '#8C8C8C',
-          '400': '#787878',
-          '500': '#646464',
-          '600': '#4F4F4F',
-          '700': '#3B3B3B',
-          '800': '#262626',
-          '900': '#121212'
-        },
-*/
       },
     },
   },

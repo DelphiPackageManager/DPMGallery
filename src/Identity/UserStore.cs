@@ -48,6 +48,7 @@ namespace DPMGallery.Identity
 							 IUserAuthenticatorKeyStore<User>,
 							 IUserTwoFactorRecoveryCodeStore<User>,
 							 IUserStore<User>
+							 
 
 	{
 

@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useWindowSize } from "usehooks-ts";
 import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import DarkModeToggle from "./darkModeToggle";
 
 // import useAuth so we can tell if logged in
@@ -27,14 +28,78 @@ export default function NavBar() {
   const isLoggedIn = auth?.user ? true : false;
 
   const Profile = () => {
+    const navigate = useNavigate();
+    const axiosPrivate = useAxiosPrivate();
+    const { setAuth } = useAuth();
+    const handlClick = (event: React.MouseEvent<HTMLDivElement>) => {
+      event.preventDefault();
+      //post to logout endpoint and then redirect to home.
+      axiosPrivate
+        .post("/ui/auth/logout")
+        .then((response) => {
+          setAuth({
+            user: null,
+          });
+          navigate("/");
+        })
+        .catch();
+    };
+
     if (!isLoggedIn) {
       return (
-        <NavLink className=" focus:ring-4 font-medium rounded-lg text-sm py-2 mx-1 hover:opacity-80" to="/login" state={{ from: location.pathname }}>
-          Login
-        </NavLink>
+        <Link
+          className="focus:ring-4 font-medium rounded-lg text-sm py-2 mx-1 hover:opacity-80"
+          to="/login"
+          state={{ from: location.pathname }}
+          title="Login In or Create an account">
+          Log In
+        </Link>
       );
     } else {
-      return <div>{`${auth?.user?.userName}`}</div>;
+      return (
+        <div className="dropdown dropdown-hover dropdown-end">
+          <label tabIndex={0} className="m-1 p-2">{`${auth?.user?.userName}`}</label>
+          <ul tabIndex={0} className="dropdown-content w-72">
+            <li className="dropdown-header">
+              <div className="flex flex-row gap-3 items-center">
+                <div className="w-18 h-18">
+                  <img className=" rounded-md" src={`${auth?.user?.avatarUrl}`} alt="" />
+                </div>
+                <div className="">
+                  <div>{`${auth?.user?.userName}`}</div>
+                  <div className="text-sm text-gray-400">{`${auth?.user?.email}`}</div>
+                </div>
+              </div>
+            </li>
+            <li className="divider"></li>
+            <li>
+              <Link to="/account/settings">Account Settings</Link>
+            </li>
+            <li>
+              <Link to={`/profiles/${auth?.user?.userName}`}>My Profile</Link>
+            </li>
+            <li>
+              <Link to="/account/apikeys">API Keys</Link>
+            </li>
+            <li>
+              <Link to="/account/packages">Manage Packages</Link>
+            </li>
+            <li>
+              <Link to="/account/organisations">Manage Organisations</Link>
+            </li>
+            <li className="divider"></li>
+            <li>
+              <Link to="/upload">Upload Packages</Link>
+            </li>
+            <li className="divider"></li>
+            <li>
+              <div className="link" onClick={handlClick}>
+                Log Out
+              </div>
+            </li>
+          </ul>
+        </div>
+      );
     }
   };
 

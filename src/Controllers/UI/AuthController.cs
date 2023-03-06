@@ -3,7 +3,6 @@ using DPMGallery.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -13,17 +12,10 @@ using System;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using FluentMigrator.Infrastructure;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using Markdig.Helpers;
 using DPMGallery.Extensions;
-using System.Security.Policy;
-using NuGet.Common;
-using DPMGallery.Identity;
 using System.Threading;
-using System.Timers;
-using System.Runtime.InteropServices;
 
 namespace DPMGallery.Controllers.UI
 {
@@ -101,7 +93,7 @@ namespace DPMGallery.Controllers.UI
                 userName = user.UserName,
                 avatarUrl = $"https://www.gravatar.com/avatar/{hash}",
                 roles = userRoles.ToArray()
-            };
+            }; 
 
             return new Tuple<object, List<Claim>>(userProfile, authClaims);
         }
@@ -163,44 +155,34 @@ namespace DPMGallery.Controllers.UI
         }
 
         [HttpPost]
+        [Route("logout")]
+        [Authorize]
+        public IActionResult Logout()
+        {
+            //just delete the the token cookies.
+            Response.Cookies.Delete("X-Access-Token");
+            Response.Cookies.Delete("X-Refresh-Token");
+            Response.Cookies.Delete("X-Remember-Me");
+            return Ok();
+        }
+
+        [HttpPost]
         [Route("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] LoginRequestDTO requestDTO)
         {
             var user = await _userManager.FindByNameAsync(requestDTO.Username);
+            if (user.IsOrganisation)
+            {
+                return BadRequest("Organisation cannot login, login as an org administrator");
+            }
+
             if (user != null && await _userManager.CheckPasswordAsync(user, requestDTO.Password))
             {
                 var result = await GenerateJWT(user, requestDTO.RememberMe);
-
-//                var token = CreateToken(result.Item2);
-//                var refreshToken = GenerateRefreshToken();
-
-//                user.RefreshToken = refreshToken;
-//                DateTimeOffset refreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays);
-
-//                user.RefreshTokenExpiryTime = refreshTokenExpires;
-
-//                await _userManager.UpdateAsync(user);
-
-//                string Token = new JwtSecurityTokenHandler().WriteToken(token);
-
-//                DateTimeOffset? accessTokenExpires = null;
-
-//                if (requestDTO.RememberMe)
-//                {
-//#if DEBUG
-//                    accessTokenExpires = DateTimeOffset.UtcNow.AddMinutes(1); //TESTING Remove
-//#else
-//                    accessTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays + 1);
-//#endif
-//                    Response.Cookies.Append("X-Remember-Me", "true", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires?.AddMinutes(2) });
-//                }
-//                Response.Cookies.Append("X-Access-Token", Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires });
-
-//                Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
                 return Ok(result.Item1);
             }
-            return Unauthorized();
+            return Unauthorized("Invalid username or password.");
         }
 
         [HttpPost]
@@ -210,12 +192,11 @@ namespace DPMGallery.Controllers.UI
         {
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
-                return StatusCode(StatusCodes.Status409Conflict, new ResponseModel { Status = "Error", Message = "User already exists!" });
+                return StatusCode(StatusCodes.Status409Conflict, new ResponseModel { Status = "Error", Message = "Username already in use!" });
 
             User user = new()
             {
                 Email = model.Email,
-                SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = model.Username
             };
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -309,45 +290,48 @@ namespace DPMGallery.Controllers.UI
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
+            //no info from the oauth server - shouldn't happen
             if (info == null)
                 return Unauthorized();
 
             string redirectTo = String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl;
 
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            //this may return null
             var user = await _userManager.FindByEmailAsync(email);
-
-            //see if the user already has an external login associated with an account here.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
-            if (result.Succeeded) {
-                await GenerateJWT(user, false);
-                return LocalRedirect(redirectTo);
-            }
-            //no existing external login - but perhaps there is an account.
-            if (email != null)
+            if (user != null)
             {
-                if (user != null)
+                //see if the user already has an external login associated with an account here.
+                var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+                if (result.Succeeded)
                 {
-                    await _userManager.AddLoginAsync(user, info);
-                    await _signInManager.SignInAsync(user, isPersistent: false);
                     await GenerateJWT(user, false);
                     return LocalRedirect(redirectTo);
                 }
             }
+            //no existing external login - but perhaps there is an account.
+            if (user != null)
+            {
+                await _userManager.AddLoginAsync(user, info);
+                //mark the user's email as confirmed since the external provider has likely already confirmed it.
+                user.EmailConfirmed = true;
+                await _userStore.UpdateAsync(user, CancellationToken.None);
+
+                await _signInManager.SignInAsync(user, isPersistent: false);
+                await GenerateJWT(user, false);
+                return LocalRedirect(redirectTo);
+            }
             //no account or externalLogin so create one
             var name = info.Principal.FindFirstValue(ClaimTypes.Name);
-            string userName = name.Replace(' ', '-').ToLower();
+            string userName = name.Replace(' ', '-').ToLower(); //TODO Find best option for creating username
             var newUser = new User()
             {
                 Email = email,
-                SecurityStamp = Guid.NewGuid().ToString(),
+//                SecurityStamp = Guid.NewGuid().ToString(),
                 UserName = userName,
-                NormalizedEmail = email.ToUpper(),
-                NormalizedUserName = userName.ToUpper(),
+                EmailConfirmed = true //since the external provider has already confirmed it
             };
-
-            //_userManager.CreateAsync()
-            var createResult = await _userStore.CreateAsync(newUser, CancellationToken.None);
+            var createResult = await _userManager.CreateAsync(newUser);
             if (createResult.Succeeded)
             {
                 createResult = await _userManager.AddLoginAsync(newUser, info);
