@@ -41,11 +41,19 @@
 }
 
 .btn {
-  @apply flex items-center justify-center p-3 rounded-md;
+  @apply flex items-center justify-center p-2 rounded-md;
 }
 
 .btn-primary {
   @apply bg-primary-800 hover:bg-primary-700 text-white dark:text-gray-100  dark:bg-primary-700 dark:hover:bg-primary-800;
+}
+
+.btn-danger {
+  @apply bg-red-800 text-white;
+}
+
+.btn-small {
+  @apply px-2 py-1 text-sm;
 }
 
 .btn-outline {
@@ -61,10 +69,22 @@
 }
 
 .sidebar li > a {
-  @apply block clear-both px-3 py-2 whitespace-nowrap;
+  @apply block clear-both px-3 py-2 whitespace-nowrap rounded-md;
+}
+
+.sidebar li > a.active {
+  @apply block clear-both px-3 py-2 whitespace-nowrap rounded-md bg-gray-300 dark:bg-primary-800 dark:text-white;
 }
 
 .sidebar li > a:hover,
 .sidebar .link:hover {
-  @apply bg-gray-300 dark:bg-gray-700 dark:text-white;
+  @apply bg-gray-300 dark:bg-primary-700 dark:text-white;
+}
+
+.alert {
+  @apply relative p-4 mb-4 border  border-transparent rounded-sm;
+}
+
+.alert-warning {
+  @apply bg-orange-300 text-orange-800;
 }

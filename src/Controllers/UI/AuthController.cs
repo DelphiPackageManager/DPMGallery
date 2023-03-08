@@ -16,6 +16,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using DPMGallery.Extensions;
 using System.Threading;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace DPMGallery.Controllers.UI
 {
@@ -169,21 +170,74 @@ namespace DPMGallery.Controllers.UI
         [HttpPost]
         [Route("login")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody] LoginRequestDTO requestDTO)
+        public async Task<IActionResult> Login([FromBody] LoginRequestDTO requestDTO, string returnUrl = null)
         {
             var user = await _userManager.FindByNameAsync(requestDTO.Username);
+            if (user == null)
+            {
+                return Unauthorized("Invalid username or password.");
+            }
             if (user.IsOrganisation)
             {
                 return BadRequest("Organisation cannot login, login as an org administrator");
             }
-
-            if (user != null && await _userManager.CheckPasswordAsync(user, requestDTO.Password))
-            {
-                var result = await GenerateJWT(user, requestDTO.RememberMe);
-                return Ok(result.Item1);
+            var result = await _signInManager.PasswordSignInAsync(user, requestDTO.Password, requestDTO.RememberMe, lockoutOnFailure: false);
+            if (result.Succeeded) {
+                var jwt = await GenerateJWT(user, requestDTO.RememberMe);
+                return Ok(jwt.Item1);
             }
+            if (result.RequiresTwoFactor)
+            {
+                return Ok(
+                    new
+                    {
+                        requires2fa = true,
+                    });
+                
+            }
+            if (result.IsLockedOut)
+            {
+                return Unauthorized(new
+                {
+                    lockedOut = true,
+                });
+            }
+            
             return Unauthorized("Invalid username or password.");
         }
+
+        [HttpPost]
+        [Route("login-2fa")]
+        public async Task<IActionResult> LoginWith2fa([FromBody] string code,[FromBody] bool rememberMachine, [FromBody] bool rememberMe)
+        {
+            var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
+            if (user == null)
+            {
+                return BadRequest("Unable to load two-factor authentication user.");
+            }
+
+            var authenticatorCode = code.Replace(" ", string.Empty).Replace("-", string.Empty);
+
+            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, rememberMachine);
+
+          if (result.Succeeded)
+            {
+                var jwt = await GenerateJWT(user, rememberMe);
+                return Ok(jwt.Item1);
+            }
+            else if (result.IsLockedOut)
+            {
+                return Ok(new
+                {
+                    lockedOut = true
+                });
+            }
+            else
+            {
+                return BadRequest("Invalid authenticator code.");
+            }
+        }
+
 
         [HttpPost]
         [Route("register")]
@@ -235,33 +289,8 @@ namespace DPMGallery.Controllers.UI
                 return Unauthorized();
             }
 
-            var newAccessToken = CreateToken(principal.Claims.ToList());
-            var newRefreshToken = GenerateRefreshToken();
-
-            user.RefreshToken = newRefreshToken;
-            var refreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays);
-            user.RefreshTokenExpiryTime = refreshTokenExpires;
-
-            await _userManager.UpdateAsync(user);
-
-
-
-            DateTimeOffset? accessTokenExpires = null;
-            if (!string.IsNullOrEmpty(rememberMe)) //hacky way to set rememberme
-            {
-
-#if DEBUG
-                accessTokenExpires = DateTimeOffset.UtcNow.AddMinutes(1); //TESTING Remove
-#else
-                accessTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays + 1);
-#endif
-                Response.Cookies.Append("X-Remember-Me", "true", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires?.AddMinutes(2) });
-            }
-
-            var token = new JwtSecurityTokenHandler().WriteToken(newAccessToken);
-            Response.Cookies.Append("X-Access-Token", token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires });
-            Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
-
+            await GenerateJWT(user,!string.IsNullOrEmpty(rememberMe));
+            //should we return profile here?
             return Ok();
         }
 
@@ -378,6 +407,10 @@ namespace DPMGallery.Controllers.UI
 
         private JwtSecurityToken CreateToken(List<Claim> authClaims)
         {
+            //var aud = authClaims.FirstOrDefault(x => x.Type == "aud");
+            //if (aud != null)
+            //    authClaims.Remove(aud);
+
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.Jwt.Secret));
 
             var token = new JwtSecurityToken(

@@ -17,6 +17,7 @@ const LoginPage = () => {
 
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
+  const [rememberMe, setRememberMe] = useState(false);
   const [errMsg, setErrMsg] = useState("");
 
   //clear the error when ever the user or pwd changes
@@ -31,6 +32,18 @@ const LoginPage = () => {
 
     try {
       const response = await axios.post(LOGIN_URL, { username: user, password: pwd });
+      if (response?.data?.requires2fa) {
+        navigate("/loginwith2fa", {
+          state: {
+            returnUrl: from,
+            rememberMe: rememberMe,
+          },
+        });
+      }
+      if (response?.data?.lockedOut) {
+        navigate("/lockedout");
+      }
+
       const username = response?.data?.userName;
       const email = response?.data?.email;
       const emailConfirmed = response?.data?.emailConfirmed;
@@ -117,6 +130,8 @@ const LoginPage = () => {
                       id="remember"
                       aria-describedby="remember"
                       type="checkbox"
+                      onChange={(e) => setRememberMe(e.target.value === "checked")}
+                      value={rememberMe ? "checked" : "unchecked"}
                       className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"></input>
                   </div>
                   <div className="ml-3 text-sm">
@@ -129,13 +144,6 @@ const LoginPage = () => {
                   Forgot password?
                 </Link>
               </div>
-              {/* 
-              <button
-                type="submit"
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                Log In
-              </button>
-  */}
               <button type="submit" className="w-full btn btn-primary">
                 Log In
               </button>

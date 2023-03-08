@@ -7,13 +7,17 @@ import APIKeysPage from "./account/apiKeys";
 import EnableAuthenticatorPage from "./account/enableauthenticator";
 import MyPackagesPage from "./account/myPackages";
 import OrganisationsPage from "./account/organisations";
+import ResetAuthenticatorAppPage from "./account/resetAuthenticatorApp";
 import UserSettingsPage from "./account/settings";
+import ShowRecoveryCodesPage from "./account/showRecoveryCodes";
 import TwoFactorAuthenticationPage from "./account/twoFactorAuthentication";
 import ErrorPage from "./errorPage";
 import ForgotPasswordPage from "./forgotPasswordPage";
 import HomePage from "./homePage";
 import Layout, { LayoutLoader } from "./layout";
+import LockedOutPage from "./lockedOutPage";
 import LoginPage from "./loginPage";
+import LoginWith2faPage from "./loginWith2fa";
 import NotFoundPage from "./notfoundPage";
 import PackagePoliciesPage from "./packagePoliciesPage";
 import PackagePage from "./packagesPage/packagePage";
@@ -41,6 +45,8 @@ const App = () => {
             <Route path="/account/packages" element={<MyPackagesPage />} />
             <Route path="/account/twofactorauth" element={<TwoFactorAuthenticationPage />} />
             <Route path="/account/enableauthenticator" element={<EnableAuthenticatorPage />} />
+            <Route path="/account/resetauthenticator" element={<ResetAuthenticatorAppPage />} />
+            <Route path="/account/showrecoverycodes" element={<ShowRecoveryCodesPage />} />
             <Route path="/account/organisations" element={<OrganisationsPage />} />
           </Route>
         </Route>
@@ -48,6 +54,8 @@ const App = () => {
         <Route path="/downloads" element={<DownloadsPage />} />
 
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/loginwith2fa" element={<LoginWith2faPage />} />
+        <Route path="/lockedout" element={<LockedOutPage />} />
         <Route path="/createaccount" element={<RegisterPage />} />
         <Route path="/confirmemail" element={<ConfirmEmailPage />} />
         <Route path="/forgotpassword" element={<ForgotPasswordPage />} />

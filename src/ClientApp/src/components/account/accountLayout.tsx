@@ -2,6 +2,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import PageContainer from "../pageContainer";
 
 const AccountLayout = () => {
+  const activeClassName = "active";
   return (
     <PageContainer className="pt-2">
       <div className="flex flex-row flex-wrap md:flex-nowrap gap-2 ">

@@ -5,10 +5,10 @@ import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import PageContainer from "../pageContainer";
 
 type TwoFactorAuthModel = {
-  TwoFactorEnabled: boolean;
-  HasAuthenticator: boolean;
-  RecoveryCodesLeft: number;
-  IsMachineRemembered: boolean;
+  twoFactorEnabled: boolean;
+  hasAuthenticator: boolean;
+  recoveryCodesLeft: number;
+  isMachineRemembered: boolean;
 } | null;
 
 const TwoFactorAuthenticationPage = () => {
@@ -39,9 +39,9 @@ const TwoFactorAuthenticationPage = () => {
     <PageContainer>
       <h1>Two-factor authentication (2FA)</h1>
       {errMsg !== "" && <h2>{errMsg}</h2>}
-      {twofaConfig?.TwoFactorEnabled && (
+      {twofaConfig?.twoFactorEnabled && (
         <div>
-          {twofaConfig.RecoveryCodesLeft == 0 && (
+          {twofaConfig.recoveryCodesLeft == 0 && (
             <div>
               <strong>You have no recovery codes left.</strong>
               <p>
@@ -50,15 +50,15 @@ const TwoFactorAuthenticationPage = () => {
               </p>
             </div>
           )}
-          {twofaConfig.RecoveryCodesLeft < 3 && (
+          {twofaConfig.recoveryCodesLeft < 3 && (
             <div>
-              <strong>You have `${twofaConfig.RecoveryCodesLeft}` recovery code left.</strong>
+              <strong>You have `${twofaConfig.recoveryCodesLeft}` recovery code left.</strong>
               <p>
                 You should <Link to="/account/generateRecoveryCodes">generate a new set of recovery codes</Link>.
               </p>
             </div>
           )}
-          {twofaConfig.IsMachineRemembered && (
+          {twofaConfig.isMachineRemembered && (
             <form method="post" className="inline-block">
               <button type="submit" className="btn btn-primary">
                 Forget this browser
@@ -76,13 +76,13 @@ const TwoFactorAuthenticationPage = () => {
 
       <h4>Authenticator app</h4>
       <div className="pt-2">
-        {!twofaConfig?.HasAuthenticator && (
+        {!twofaConfig?.hasAuthenticator && (
           <Link to="/account/enableauthenticator" className="btn btn-primary">
             Add Authenticator app
           </Link>
         )}
-        {twofaConfig?.HasAuthenticator && (
-          <div>
+        {twofaConfig?.hasAuthenticator && (
+          <div className="flex flex-row gap-3">
             <Link to="/account/enableauthenticator" className="btn btn-primary">
               Set up Authenticator app
             </Link>
