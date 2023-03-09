@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
+using System.Xml.Linq;
 
 namespace DPMGallery.Identity
 {
@@ -869,21 +870,49 @@ namespace DPMGallery.Identity
                 //Log Error
                 throw;
             }
-
-
         }
-		public async Task SetTokenAsync(User user, string loginProvider, string name, string value, CancellationToken cancellationToken = default)
+
+		//private async Task<UserToken> FindTokenAsync(int userId, string loginProvider, string name, CancellationToken cancellationToken)
+		//{
+		//	const string findTokensSql = $@"select * from {Constants.Database.TableNames.UserTokens} where 
+		//								  user_id = @userId 
+		//								  and login_provider = @loginProvider
+		//							      and name = @name";
+
+  //          return await _dbContext.QueryFirstOrDefaultAsync<UserToken>(findTokensSql, new { userId, loginProvider, name }, cancellationToken : cancellationToken);
+
+  //      }
+
+
+
+        public async Task SetTokenAsync(User user, string loginProvider, string name, string value, CancellationToken cancellationToken = default)
 		{
 			cancellationToken.ThrowIfCancellationRequested();
-			user.Tokens = user.Tokens ?? (await GetTokensForUserAsync(user.Id)).ToList();
 
-			user.Tokens.Add(new UserToken
-			{
-				UserId = user.Id,
-				LoginProvider = loginProvider,
-				Name = name,
-				Value = value
-			});
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+        //    var token = await FindTokenAsync(user.Id, loginProvider, name, cancellationToken).ConfigureAwait(false);
+            user.Tokens = user.Tokens ?? (await GetTokensForUserAsync(user.Id)).ToList();
+			var token = user.Tokens.FirstOrDefault(token => token.LoginProvider == loginProvider && token.Name == name );
+            if (token == null)
+            {
+                //user.Tokens = user.Tokens ?? (await GetTokensForUserAsync(user.Id)).ToList();
+
+                user.Tokens.Add(new UserToken
+                {
+                    UserId = user.Id,
+                    LoginProvider = loginProvider,
+                    Name = name,
+                    Value = value
+                });
+            }
+            else
+            {
+                token.Value = value;
+            }
 		}
 
 		public async Task RemoveTokenAsync(User user, string loginProvider, string name, CancellationToken cancellationToken = default)

@@ -33,17 +33,22 @@ const LoginPage = () => {
     try {
       const response = await axios.post(LOGIN_URL, { username: user, password: pwd });
       if (response?.data?.requires2fa) {
+        const currentUser: User = {
+          user: null,
+        };
+        setAuth(currentUser);
         navigate("/loginwith2fa", {
           state: {
-            returnUrl: from,
+            from: from,
             rememberMe: rememberMe,
           },
         });
+        return;
       }
       if (response?.data?.lockedOut) {
         navigate("/lockedout");
+        return;
       }
-
       const username = response?.data?.userName;
       const email = response?.data?.email;
       const emailConfirmed = response?.data?.emailConfirmed;
@@ -62,6 +67,8 @@ const LoginPage = () => {
       setAuth(currentUser);
       navigate(from, { replace: true });
     } catch (err: any) {
+      console.log("error during login");
+      console.log(err);
       if (!err?.response) {
         setErrMsg("No Server Response");
       } else if (err.response?.status === 400) {
@@ -130,7 +137,7 @@ const LoginPage = () => {
                       id="remember"
                       aria-describedby="remember"
                       type="checkbox"
-                      onChange={(e) => setRememberMe(e.target.value === "checked")}
+                      onChange={(e) => setRememberMe(e.target.checked)}
                       value={rememberMe ? "checked" : "unchecked"}
                       className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"></input>
                   </div>

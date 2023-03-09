@@ -18,26 +18,43 @@ const TwoFactorAuthenticationPage = () => {
   const [errMsg, setErrorMessage] = useState("");
 
   useEffect(() => {
-    //
     const fetchConfig = async () => {
-      const response = await axiosPrivate.get("/ui/account/2fa-config");
-      if (response?.status == 200) {
+      try {
+        const response = await axiosPrivate.get("/ui/account/2fa-config");
         setErrorMessage("");
         setTwoFaConfig(response.data);
-      } else {
-        if (response?.data) {
-          setErrorMessage(response?.data);
+        //  console.log(response.data);
+      } catch (err: any) {
+        if (err?.data) {
+          setErrorMessage(err?.data);
         } else {
-          setErrorMessage("An unkown error occured while fetching 2fa config : " + response?.status.toString());
+          setErrorMessage("An unkown error occured while fetching 2fa config : " + err?.status?.toString());
         }
       }
     };
     fetchConfig();
   }, []);
 
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    //console.log("forgetting machine");
+    try {
+      const response = await axiosPrivate.post("/ui/account/2fa-forget");
+      setErrorMessage("");
+      setTwoFaConfig(response.data);
+      //console.log(response.data);
+    } catch (err: any) {
+      if (err?.data) {
+        setErrorMessage(err?.data);
+      } else {
+        setErrorMessage("An unkown error occured while fetching 2fa config : " + err?.status.toString());
+      }
+    }
+  };
+
   return (
     <PageContainer>
-      <h1>Two-factor authentication (2FA)</h1>
+      <h3>Two-factor authentication (2FA)</h3>
       {errMsg !== "" && <h2>{errMsg}</h2>}
       {twofaConfig?.twoFactorEnabled && (
         <div>
@@ -45,12 +62,12 @@ const TwoFactorAuthenticationPage = () => {
             <div>
               <strong>You have no recovery codes left.</strong>
               <p>
-                You must <Link to="/account/generateRecoveryCodes">generate a new set of recovery codes</Link> before you can log in with a recovery
+                You must <Link to="/account/generaterecoverycodes">generate a new set of recovery codes</Link> before you can log in with a recovery
                 code.
               </p>
             </div>
           )}
-          {twofaConfig.recoveryCodesLeft < 3 && (
+          {twofaConfig?.recoveryCodesLeft < 3 && (
             <div>
               <strong>You have `${twofaConfig.recoveryCodesLeft}` recovery code left.</strong>
               <p>
@@ -58,23 +75,24 @@ const TwoFactorAuthenticationPage = () => {
               </p>
             </div>
           )}
-          {twofaConfig.isMachineRemembered && (
-            <form method="post" className="inline-block">
+          {twofaConfig?.isMachineRemembered && (
+            <form className="inline-block" onSubmit={handleSubmit}>
               <button type="submit" className="btn btn-primary">
                 Forget this browser
               </button>
             </form>
           )}
-          <Link to="/account/disable2fa" className="btn btn-primary">
-            Disable 2FA
-          </Link>
-          <Link to="/account/generateRecoveryCodes" className="btn btn-primary">
-            Reset recovery codes
-          </Link>
+          <div className="flex flex-row gap-3 pt-2">
+            <Link to="/account/disable2fa" className="btn btn-primary">
+              Disable 2FA
+            </Link>
+            <Link to="/account/generaterecoverycodes" className="btn btn-primary">
+              Reset recovery codes
+            </Link>
+          </div>
         </div>
       )}
-
-      <h4>Authenticator app</h4>
+      <h4 className="mt-2">Authenticator app</h4>
       <div className="pt-2">
         {!twofaConfig?.hasAuthenticator && (
           <Link to="/account/enableauthenticator" className="btn btn-primary">

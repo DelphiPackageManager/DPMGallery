@@ -1,10 +1,10 @@
 import PageContainer from "../pageContainer";
-const APIKeysPage = () => {
+const ExternalLoginsPage = () => {
   return (
     <PageContainer>
-      <h3>API Keys</h3>
+      <h3>External Logins</h3>
     </PageContainer>
   );
 };
 
-export default APIKeysPage;
+export default ExternalLoginsPage;

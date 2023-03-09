@@ -256,8 +256,12 @@ namespace DPMGallery.DBMigration.Conventions
 			Create.ForeignKey($"fk_{T.OrganisationMember}_{T.Users}_org_id").FromTable(T.OrganisationMember).ForeignColumn("org_id").ToTable(T.Users).PrimaryColumn("id");
 			Create.ForeignKey($"fk_{T.OrganisationMember}_{T.Users}_member_id").FromTable(T.OrganisationMember).ForeignColumn("member_id").ToTable(T.Users).PrimaryColumn("id");
 
+			Create.Table(T.OrganisationSettings)
+				.WithColumn("org_id").AsInt32().ForeignKey(T.Users, "id").PrimaryKey().NotNullable()
+				.WithColumn("allow_contact").AsBoolean().WithDefaultValue(true).NotNullable()
+                .WithColumn("notify_on_publish").AsBoolean().WithDefaultValue(false).NotNullable();
 
-			Create.Table(T.ApiKey)
+            Create.Table(T.ApiKey)
 				.WithIntPrimaryKeyColumn().Identity()
 				.WithColumn("user_id").AsInt32().NotNullable()
 				.WithColumn("name").AsString(FL.Long, DB.Collation).NotNullable()

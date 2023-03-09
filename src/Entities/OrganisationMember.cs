@@ -4,7 +4,7 @@ using System;
 
 namespace DPMGallery.Entities
 {
-    [Table(Constants.Database.TableNames.OrganisationMember)]
+    [Table(Constants.Database.TableNames.OrganisationMembers)]
     public class OrganisationMember
     {
         [Column("org_id")]

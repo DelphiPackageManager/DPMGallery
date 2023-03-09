@@ -17,6 +17,7 @@ using System.Linq;
 using DPMGallery.Extensions;
 using System.Threading;
 using Microsoft.AspNetCore.Http.HttpResults;
+using DPMGallery.Models.Identity;
 
 namespace DPMGallery.Controllers.UI
 {
@@ -207,8 +208,9 @@ namespace DPMGallery.Controllers.UI
         }
 
         [HttpPost]
+        [AllowAnonymous]
         [Route("login-2fa")]
-        public async Task<IActionResult> LoginWith2fa([FromBody] string code,[FromBody] bool rememberMachine, [FromBody] bool rememberMe)
+        public async Task<IActionResult> LoginWith2fa([FromBody] LogonWith2faRequestModel model)
         {
             var user = await _signInManager.GetTwoFactorAuthenticationUserAsync();
             if (user == null)
@@ -216,13 +218,13 @@ namespace DPMGallery.Controllers.UI
                 return BadRequest("Unable to load two-factor authentication user.");
             }
 
-            var authenticatorCode = code.Replace(" ", string.Empty).Replace("-", string.Empty);
+            var authenticatorCode = model.Code.Replace(" ", string.Empty).Replace("-", string.Empty);
 
-            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, rememberMe, rememberMachine);
+            var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe, model.RememberMachine);
 
           if (result.Succeeded)
             {
-                var jwt = await GenerateJWT(user, rememberMe);
+                var jwt = await GenerateJWT(user, model.RememberMe);
                 return Ok(jwt.Item1);
             }
             else if (result.IsLockedOut)
@@ -237,6 +239,7 @@ namespace DPMGallery.Controllers.UI
                 return BadRequest("Invalid authenticator code.");
             }
         }
+
 
 
         [HttpPost]

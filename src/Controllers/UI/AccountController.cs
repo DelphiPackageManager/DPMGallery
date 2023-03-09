@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using NuGet.Protocol.Plugins;
 using Org.BouncyCastle.Utilities;
 using System;
 using System.Globalization;
@@ -30,6 +31,37 @@ namespace DPMGallery.Controllers.UI
             _signInManager = signInManager;
             _urlEncoder = urlEncoder;
         }
+
+        [HttpPost]
+        [Route("2fa-generatecodes")]
+        public async Task<IActionResult> GenerateRecoveryCodes()
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{user.Id}'.");
+            }
+            var isTwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user);
+            if (!isTwoFactorEnabled)
+            {
+                throw new InvalidOperationException($"Cannot generate recovery codes for user as they do not have 2FA enabled.");
+            }
+
+            var recoveryCodes = await _userManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+            var recoveryCodesString = String.Join(",", recoveryCodes.ToArray());
+            return Ok(new
+            {
+                codes = recoveryCodesString,
+            });
+
+        }
+
 
         [HttpPost]
         [Route("2fa-verify")]
@@ -70,22 +102,45 @@ namespace DPMGallery.Controllers.UI
 
                 var recoveryCodesString = String.Join(",", recoveryCodes.ToArray());
 
-                //NOTE : Cannot send redirects as axios uses XMLHttpRequest which follows redirects automatically - which
-                //doesn't work for us.
-
                 return Ok(new
                 {
                     codes = recoveryCodesString,
                 });
 
-                //TODO : find a cleaner way to return the codes.
-                //return Redirect($"/account/showrecoverycodes?recoverycodes={recoveryCodesString}");
             }
             else
             {
                 return Ok();
             }           
         }
+
+        [HttpPost]
+        [Route("2fa-forget")]
+        public async Task<IActionResult> Forget2faClient()
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null) //shouldn't happne
+            {
+                return BadRequest();
+            }
+            await _signInManager.ForgetTwoFactorClientAsync();
+            user = await _userManager.FindByNameAsync(userName); //need to refresh the user for the values below to be correct
+            var model = new TwoFactorConfigModel()
+            {
+                TwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user),
+                HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
+                IsMachineRemembered = false, // this seems to lag behind await _signInManager.IsTwoFactorClientRememberedAsync(user),
+                RecoveryCodesLeft = await _userManager.CountRecoveryCodesAsync(user)
+            };
+            return Ok(model);
+        }
+
 
         [HttpPost]
         [Route("2fa-reset")]

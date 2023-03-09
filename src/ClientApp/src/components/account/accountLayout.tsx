@@ -5,11 +5,17 @@ const AccountLayout = () => {
   const activeClassName = "active";
   return (
     <PageContainer className="pt-2">
+      <h1 className="">Manage your account</h1>
+
+      <hr />
       <div className="flex flex-row flex-wrap md:flex-nowrap gap-2 ">
         <div className="sidebar">
           <ul className="list-none w-full">
             <li>
               <NavLink to="/account/settings">Settings</NavLink>
+            </li>
+            <li>
+              <NavLink to="/account/externallogins">External Logins</NavLink>
             </li>
             <li>
               <NavLink to="/account/twofactorauth">Two-factor authentication</NavLink>

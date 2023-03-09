@@ -48,8 +48,8 @@ const fetchData = async () => {
   }
 };
 
+console.log("calling init");
 const user = await fetchData();
-
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <AuthProvider user={user}>

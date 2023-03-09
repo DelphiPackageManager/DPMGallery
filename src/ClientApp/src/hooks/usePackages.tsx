@@ -16,10 +16,9 @@ const usePackages = () => {
   const [packages, setPackages] = useState<PackageSearchResult | null>(null);
 
   const getPackages = async (params: SearchParams, controller: AbortController) => {
+    setError(null);
+    setLoading(true);
     try {
-      setError(null);
-      setLoading(true);
-
       const queryParams = new URLSearchParams();
       if (params.query) {
         queryParams.append("q", params.query);

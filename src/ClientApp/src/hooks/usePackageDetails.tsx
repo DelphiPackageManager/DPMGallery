@@ -13,9 +13,10 @@ const usePackageDetails = () => {
   const [packageInfo, setPackageInfo] = useState<PackageDetailsModel | null>(null);
 
   const getPackageInfo = async ({ packageId, packageVersion }: InfoParams, controller: AbortController) => {
+    setError(null);
+    setLoading(true);
+
     try {
-      setError(null);
-      setLoading(true);
       const url = `/ui/packagedetails/${packageId}/${packageVersion}/`;
       const response = await axios.get(url, {
         signal: controller.signal,

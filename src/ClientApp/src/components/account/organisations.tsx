@@ -2,7 +2,7 @@ import PageContainer from "../pageContainer";
 const OrganisationsPage = () => {
   return (
     <PageContainer>
-      <h1>Manage Organisations</h1>
+      <h3>Manage Organisations</h3>
     </PageContainer>
   );
 };

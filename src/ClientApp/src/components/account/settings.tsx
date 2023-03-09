@@ -9,7 +9,7 @@ const UserSettingsPage = () => {
 
   return (
     <PageContainer>
-      <h1>User Settings</h1>
+      <h3>User Settings</h3>
       <div className="mt-4">
         <Tab.Group>
           <Tab.List className=" border-t border-l border-r border-gray-200 dark:border-gray-700 text-base bg-gray-100 dark:bg-gray-800 ">

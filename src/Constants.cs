@@ -43,7 +43,8 @@ namespace DPMGallery
                 public const string RoleClaims = "asp_net_role_claims";
 
                 public const string ApiKey = "api_key";
-                public const string OrganisationMember = "organisation_member";
+                public const string OrganisationMembers = "organisation_member";
+                public const string OrganisationSettings = "organisation_settings";
                 public const string Package = "package";
                 public const string PackageTargetPlatform = "package_targetplatform";
                 public const string PackageOwner = "package_owner";

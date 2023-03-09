@@ -34,11 +34,15 @@ export const createAxiosInitial = () => {
       //all the examples I found say 403, however aspnet returns 401
       if (error?.response?.status === 401 && !prevRequest?.sent) {
         prevRequest.sent = true;
-        const refreshResponse = await refresh();
-        if (refreshResponse.status !== 200) {
-          return Promise.reject(refreshResponse.statusText);
-        }
-        return axiosPrivate(prevRequest);
+
+        try {
+          const refreshResponse = await refresh();
+          if (refreshResponse.status !== 200) {
+            return Promise.reject(refreshResponse.statusText);
+          }
+        } catch (error) {}
+
+        return axiosInit(prevRequest);
       }
       return Promise.reject(error);
     }

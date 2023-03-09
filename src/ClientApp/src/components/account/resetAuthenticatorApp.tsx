@@ -28,6 +28,7 @@ const ResetAuthenticatorAppPage = () => {
 
   return (
     <PageContainer className="">
+      <h3>Reset authenticator key</h3>
       <div className="alert alert-warning" role="alert">
         <p className="mb-2">
           <span className="glyphicon glyphicon-warning-sign"></span>

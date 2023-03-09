@@ -1,3 +1,4 @@
+import { AxiosError } from "axios";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -15,23 +16,24 @@ const EnableAuthenticatorPage = () => {
   const [config, setConFig] = useState<AuthenticatorDetailsModel>(null);
   const [code, setCode] = useState("");
   const navigate = useNavigate();
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    axiosPrivate
-      .post("/ui/account/2fa-verify", { code: code })
-      .then((response) => {
-        //
-        if (response.data?.codes) {
-          const url = `/account/showrecoverycodes?recoverycodes="${response.data.codes}`;
-          navigate(url);
-        } else {
-          navigate("/account/twofactorauth");
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setErrorMessage(err?.response?.data);
-      });
+    try {
+      const response = await axiosPrivate.post("/ui/account/2fa-verify", { code: code });
+      if (response.data?.codes) {
+        navigate("/account/showrecoverycodes", {
+          state: {
+            codes: response.data.codes,
+            message: "Your authenticator app has been verified.",
+          },
+        });
+      } else {
+        navigate("/account/twofactorauth");
+      }
+    } catch (err: any) {
+      console.log(err);
+      setErrorMessage(err?.response?.data);
+    }
   };
 
   const onInput = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,16 +43,16 @@ const EnableAuthenticatorPage = () => {
 
   useEffect(() => {
     const fetchConfig = async () => {
-      const response = await axiosPrivate.get("/ui/account/2fa-keyinfo");
-      if (response?.status == 200) {
+      try {
+        const response = await axiosPrivate.get("/ui/account/2fa-keyinfo");
         setErrorMessage("");
         console.log(response.data);
         setConFig(response.data);
-      } else {
-        if (response?.data) {
-          setErrorMessage(response?.data);
+      } catch (err: any) {
+        if (err?.data) {
+          setErrorMessage(err?.data);
         } else {
-          setErrorMessage("An unkown error occured while fetching 2fa config : " + response?.status.toString());
+          setErrorMessage("An unkown error occured while fetching 2fa config : " + err?.status?.toString());
         }
       }
     };
@@ -59,7 +61,7 @@ const EnableAuthenticatorPage = () => {
 
   return (
     <PageContainer className="text-gray-800 dark:text-gray-100">
-      <h1>Configure Authenticator app</h1>
+      <h3>Configure Authenticator app</h3>
       <div className="ml-2 px-2 mt-2 text-base font-light">
         <h3 className="py-2">To use an authenticator app go through the following steps:</h3>
         <ol className="list-disc">

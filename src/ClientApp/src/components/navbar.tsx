@@ -31,18 +31,18 @@ export default function NavBar() {
     const navigate = useNavigate();
     const axiosPrivate = useAxiosPrivate();
     const { setAuth } = useAuth();
-    const handlClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const handlClick = async (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
       //post to logout endpoint and then redirect to home.
-      axiosPrivate
-        .post("/ui/auth/logout")
-        .then((response) => {
-          setAuth({
-            user: null,
-          });
-          navigate("/");
-        })
-        .catch();
+      try {
+        await axiosPrivate.post("/ui/auth/logout");
+        setAuth({
+          user: null,
+        });
+        navigate("/");
+      } catch (err: any) {
+        //not much we can do here.
+      }
     };
 
     if (!isLoggedIn) {

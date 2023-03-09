@@ -5,6 +5,8 @@ import DownloadsPage from "./downloadsPage";
 import AccountLayout from "./account/accountLayout";
 import APIKeysPage from "./account/apiKeys";
 import EnableAuthenticatorPage from "./account/enableauthenticator";
+import ExternalLoginsPage from "./account/externalLogins";
+import GenerateRecoveryCodesPage from "./account/generateRecoveryCodes";
 import MyPackagesPage from "./account/myPackages";
 import OrganisationsPage from "./account/organisations";
 import ResetAuthenticatorAppPage from "./account/resetAuthenticatorApp";
@@ -36,21 +38,6 @@ const App = () => {
         <Route index element={<HomePage />} />
         <Route path="/packages" element={<PackagesPage />} />
         <Route path="/packages/:packageId/:packageVersion/" element={<PackagePage />} />
-
-        <Route element={<RequireAuthRoute allowedRoles={["RegisteredUser", "Administrator"]} />}>
-          <Route path="/upload" element={<UploadPage />} />
-          <Route path="/account" element={<AccountLayout />}>
-            <Route path="/account/settings" element={<UserSettingsPage />} />
-            <Route path="/account/apikeys" element={<APIKeysPage />} />
-            <Route path="/account/packages" element={<MyPackagesPage />} />
-            <Route path="/account/twofactorauth" element={<TwoFactorAuthenticationPage />} />
-            <Route path="/account/enableauthenticator" element={<EnableAuthenticatorPage />} />
-            <Route path="/account/resetauthenticator" element={<ResetAuthenticatorAppPage />} />
-            <Route path="/account/showrecoverycodes" element={<ShowRecoveryCodesPage />} />
-            <Route path="/account/organisations" element={<OrganisationsPage />} />
-          </Route>
-        </Route>
-
         <Route path="/downloads" element={<DownloadsPage />} />
 
         <Route path="/login" element={<LoginPage />} />
@@ -65,6 +52,23 @@ const App = () => {
         <Route path="/policies/package" element={<PackagePoliciesPage />} />
 
         <Route path="/profiles/:userName" element={<ProfilePage />} />
+
+        <Route element={<RequireAuthRoute allowedRoles={["RegisteredUser", "Administrator"]} />}>
+          <Route path="/upload" element={<UploadPage />} />
+          <Route path="/account" element={<AccountLayout />}>
+            <Route path="/account/settings" element={<UserSettingsPage />} />
+            <Route path="/account/apikeys" element={<APIKeysPage />} />
+            <Route path="/account/packages" element={<MyPackagesPage />} />
+            <Route path="/account/externallogins" element={<ExternalLoginsPage />} />
+            <Route path="/account/twofactorauth" element={<TwoFactorAuthenticationPage />} />
+            <Route path="/account/enableauthenticator" element={<EnableAuthenticatorPage />} />
+            <Route path="/account/resetauthenticator" element={<ResetAuthenticatorAppPage />} />
+            <Route path="/account/showrecoverycodes" element={<ShowRecoveryCodesPage />} />
+            <Route path="/account/generaterecoverycodes" element={<GenerateRecoveryCodesPage />} />
+            <Route path="/account/organisations" element={<OrganisationsPage />} />
+          </Route>
+        </Route>
+
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     )

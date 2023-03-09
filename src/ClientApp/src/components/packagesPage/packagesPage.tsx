@@ -79,7 +79,7 @@ const PackagesPage = () => {
               </h1>
             ) : (
               <h1 role="alert" className="">
-                {packages?.totalPackages.toString()} packages returned for "{packages?.query}"
+                {packages?.totalPackages.toString()} packages found for "{packages?.query}"
               </h1>
             )}
           </div>
