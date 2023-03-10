@@ -248,13 +248,13 @@ namespace DPMGallery.DBMigration.Conventions
 			Create.Index("ix_roles_claims_role_id").OnTable(T.RoleClaims).OnColumn("role_id").Ascending();
 			Create.ForeignKey($"fk_{T.RoleClaims}_{T.Roles}_role_id").FromTable(T.RoleClaims).ForeignColumn("role_id").ToTable(T.Roles).PrimaryColumn("id");
 
-			Create.Table(T.OrganisationMember)
+			Create.Table(T.OrganisationMembers)
 				.WithColumn("org_id").AsInt32().PrimaryKey().NotNullable()
 				.WithColumn("member_id").AsInt32().PrimaryKey().NotNullable()
 				.WithColumn("role").AsInt32().WithDefaultValue(0).NotNullable();
 
-			Create.ForeignKey($"fk_{T.OrganisationMember}_{T.Users}_org_id").FromTable(T.OrganisationMember).ForeignColumn("org_id").ToTable(T.Users).PrimaryColumn("id");
-			Create.ForeignKey($"fk_{T.OrganisationMember}_{T.Users}_member_id").FromTable(T.OrganisationMember).ForeignColumn("member_id").ToTable(T.Users).PrimaryColumn("id");
+			Create.ForeignKey($"fk_{T.OrganisationMembers}_{T.Users}_org_id").FromTable(T.OrganisationMembers).ForeignColumn("org_id").ToTable(T.Users).PrimaryColumn("id");
+			Create.ForeignKey($"fk_{T.OrganisationMembers}_{T.Users}_member_id").FromTable(T.OrganisationMembers).ForeignColumn("member_id").ToTable(T.Users).PrimaryColumn("id");
 
 			Create.Table(T.OrganisationSettings)
 				.WithColumn("org_id").AsInt32().ForeignKey(T.Users, "id").PrimaryKey().NotNullable()

@@ -14,6 +14,7 @@ import UserSettingsPage from "./account/settings";
 import ShowRecoveryCodesPage from "./account/showRecoveryCodes";
 import TwoFactorAuthenticationPage from "./account/twoFactorAuthentication";
 import ErrorPage from "./errorPage";
+import ExternalLoginPage from "./externalLogin";
 import ForgotPasswordPage from "./forgotPasswordPage";
 import HomePage from "./homePage";
 import Layout, { LayoutLoader } from "./layout";
@@ -43,6 +44,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/loginwith2fa" element={<LoginWith2faPage />} />
         <Route path="/lockedout" element={<LockedOutPage />} />
+        <Route path="/externallogin" element={<ExternalLoginPage />} />
         <Route path="/createaccount" element={<RegisterPage />} />
         <Route path="/confirmemail" element={<ConfirmEmailPage />} />
         <Route path="/forgotpassword" element={<ForgotPasswordPage />} />

@@ -8,7 +8,7 @@ const AccountLayout = () => {
       <h1 className="">Manage your account</h1>
 
       <hr />
-      <div className="flex flex-row flex-wrap md:flex-nowrap gap-2 ">
+      <div className="flex flex-row flex-wrap md:flex-nowrap gap-2 mt-2 ">
         <div className="sidebar">
           <ul className="list-none w-full">
             <li>

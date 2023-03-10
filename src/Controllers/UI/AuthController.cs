@@ -18,6 +18,7 @@ using DPMGallery.Extensions;
 using System.Threading;
 using Microsoft.AspNetCore.Http.HttpResults;
 using DPMGallery.Models.Identity;
+using Microsoft.AspNetCore.Authentication;
 
 namespace DPMGallery.Controllers.UI
 {
@@ -320,6 +321,10 @@ namespace DPMGallery.Controllers.UI
         [AllowAnonymous]
         public async Task<IActionResult> ExternalCallback(string returnUrl = null, string remoteError = null)
         {
+            //callback initiated via the manage external logins page.
+            if (returnUrl == "/account/externallogins")
+                return await OnGetLinkLoginCallbackAsync(returnUrl);
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
             //no info from the oauth server - shouldn't happen
@@ -376,6 +381,38 @@ namespace DPMGallery.Controllers.UI
             }
 
             return LocalRedirect("/login");
+        }
+
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> OnGetLinkLoginCallbackAsync(string returnUrl)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            var info = await _signInManager.GetExternalLoginInfoAsync(user.Id.ToString());
+            if (info == null)
+            {
+                throw new InvalidOperationException($"Unexpected error occurred loading external login info.");
+            }
+
+            var result = await _userManager.AddLoginAsync(user, info);
+            if (!result.Succeeded)
+            {
+                //StatusMessage = "The external login was not added. External logins can only be associated with one account.";
+                return BadRequest("The external login was not added. External logins can only be associated with one account.");
+            }
+
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+            return LocalRedirect(returnUrl);
+
         }
 
 

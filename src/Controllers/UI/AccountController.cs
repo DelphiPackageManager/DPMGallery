@@ -1,5 +1,7 @@
 ﻿using DPMGallery.Entities;
+using DPMGallery.Identity;
 using DPMGallery.Models.Identity;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -25,11 +27,13 @@ namespace DPMGallery.Controllers.UI
         private readonly UrlEncoder _urlEncoder;
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, UrlEncoder urlEncoder)
+        private readonly IUserStore<User> _userStore;
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, UrlEncoder urlEncoder, IUserStore<User> userStore)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _urlEncoder = urlEncoder;
+            _userStore = userStore;
         }
 
         [HttpPost]
@@ -278,8 +282,8 @@ namespace DPMGallery.Controllers.UI
             return Ok(new
             {
                 Username = user.UserName,
-                Email = user.Email,
-                EmailConfirmed = user.EmailConfirmed,
+                user.Email,
+                user.EmailConfirmed,
                 ExternalLogins = logins.Select(login => login.ProviderDisplayName).ToList(),
                 TwoFactorEnabled = await _userManager.GetTwoFactorEnabledAsync(user),
                 HasAuthenticator = await _userManager.GetAuthenticatorKeyAsync(user) != null,
@@ -288,5 +292,85 @@ namespace DPMGallery.Controllers.UI
             });
         }
 
+        [HttpGet]
+        [Route("external-logins")]
+        public async Task<IActionResult> GetExternalLoginInfo()
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+
+            var currentLogins = await _userManager.GetLoginsAsync(user);
+            var otherLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())
+                .Where(auth => currentLogins.All(ul => auth.Name != ul.LoginProvider))
+                .ToList();
+           
+
+            string passwordHash = user.PasswordHash;
+            //if (_userStore is IUserPasswordStore<IdentityUser> userPasswordStore)
+            //{
+            //    passwordHash = await userPasswordStore.GetPasswordHashAsync(user, HttpContext.RequestAborted);
+            //}
+
+            var showRemoveButton = passwordHash != null || currentLogins.Count > 1;
+
+            return Ok(new
+            {
+                currentLogins = currentLogins.Select(x=> new ExternalLoginModel(x.LoginProvider, x.ProviderKey, x.ProviderDisplayName)).ToArray(),
+                otherLogins = otherLogins.Select(x => new AuthenticationSchemeModel(x.Name, x.DisplayName)).ToArray(),
+                showRemoveButton
+            });
+        }
+
+        [HttpPost]
+        [Route("remove-login")]
+        public async Task<IActionResult> RemoveLoginAsync(string loginProvider, string providerKey)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("link-login")]
+        public async Task<IActionResult> LinkLoginAsync([FromForm] string provider)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return BadRequest();
+            }
+            // Clear the existing external cookie to ensure a clean login process
+            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
+
+            // Request a redirect to the external login provider to link a login for the current user
+            var redirectUrl = $"/ui/auth/external-register?returnUrl=/account/externallogins";
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, user.Id.ToString());
+            properties.AllowRefresh = true;
+            return new ChallengeResult(provider, properties);
+        }
     }
 }

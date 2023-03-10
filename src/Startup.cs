@@ -155,7 +155,7 @@ namespace DPMGallery
                 options.ClientSecret = serverConfig.Authentication.Google.ClientSecret;//  googleAuthNSection["ClientSecret"];
                 options.Scope.Add("profile");
                 options.CallbackPath = new PathString("/oauth-google");
-                //              options.SignInScheme = IdentityConstants.ExternalScheme;
+                options.SignInScheme = IdentityConstants.ExternalScheme;
 
             })
             .AddGitHub(options =>
@@ -169,7 +169,7 @@ namespace DPMGallery
                 options.ClaimActions.MapJsonKey("urn:github:login", "email");
                 options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
                 options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
-//                options.SignInScheme = IdentityConstants.ApplicationScheme;
+                options.SignInScheme = IdentityConstants.ApplicationScheme;
             });
 
 

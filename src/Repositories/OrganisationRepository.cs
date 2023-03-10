@@ -30,14 +30,14 @@ namespace DPMGallery.Repositories
             if (ids.Length == 0)
                 return false;
 
-            string sql = $@"select * from {T.OrganisationMember} where user_id = @userId and org_id in ({string.Join(",", ids)})";
+            string sql = $@"select * from {T.OrganisationMembers} where user_id = @userId and org_id in ({string.Join(",", ids)})";
             var member = await Context.QueryFirstOrDefaultAsync<OrganisationMember>(sql, new { userId }, cancellationToken: cancellationToken); ;
             return member != null;
         }
 
         public async Task<OrganisationMember> GetIsMemberAsync(int userId, int orgId, CancellationToken cancellationToken)
         {
-            string sql = $"select * from {T.OrganisationMember} where user_id = @userId and org_id = @orgId";
+            string sql = $"select * from {T.OrganisationMembers} where user_id = @userId and org_id = @orgId";
             return await Context.QueryFirstOrDefaultAsync<OrganisationMember>(sql, new { userId, orgId }, cancellationToken: cancellationToken); ;
         }
     }
