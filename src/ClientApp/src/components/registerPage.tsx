@@ -1,16 +1,26 @@
-import * as React from "react";
+import { useRef, useState } from "react";
 import PageContainer from "./pageContainer";
 
 import { NavLink } from "react-router-dom";
 
 const RegisterPage = () => {
+  const errRef = useRef<HTMLParagraphElement>(null);
+  const [errMsg, setErrorMessage] = useState("");
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
   };
 
   return (
-    <PageContainer className="text-center">
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto  lg:py-0">
+    <PageContainer className="">
+      <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
+        {errMsg}
+      </p>
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-4">
+        <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-800 dark:text-white">
+          <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo"></img>DPM
+        </a>
+
         <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">Create an account</h1>

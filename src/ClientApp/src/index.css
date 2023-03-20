@@ -103,3 +103,7 @@
 .alert-warning {
   @apply bg-orange-300 text-orange-800;
 }
+
+.offscree {
+  @apply -translate-x-[2000px];
+}

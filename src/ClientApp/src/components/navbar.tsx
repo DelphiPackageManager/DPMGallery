@@ -9,7 +9,8 @@ import DarkModeToggle from "./darkModeToggle";
 export default function NavBar() {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const { auth } = useAuth();
-  let location = useLocation();
+  //let location = useLocation();
+  let { state } = useLocation();
   const { width, height } = useWindowSize();
 
   const buttonHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -50,7 +51,7 @@ export default function NavBar() {
         <Link
           className="focus:ring-4 font-medium rounded-lg text-sm py-2 mx-1 hover:opacity-80"
           to="/login"
-          state={{ from: location.pathname }}
+          state={state}
           title="Login In or Create an account">
           Log In
         </Link>

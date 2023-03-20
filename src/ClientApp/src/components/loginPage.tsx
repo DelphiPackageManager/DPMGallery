@@ -27,6 +27,9 @@ const LoginPage = () => {
 
   const LOGIN_URL = "/ui/auth/login";
 
+  const EXTERNAL_LOGIN = `/ui/auth/external?returnurl=${from}`;
+  console.log(EXTERNAL_LOGIN);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -91,11 +94,11 @@ const LoginPage = () => {
   };
 
   return (
-    <PageContainer className="text-center">
+    <PageContainer className="">
       <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
         {errMsg}
       </p>
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-4">
+      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-4 ">
         <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-800 dark:text-white">
           <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo"></img>DPM
         </a>
@@ -170,7 +173,7 @@ const LoginPage = () => {
             <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
           </div>
 
-          <form action="/ui/auth/external" method="POST">
+          <form action={EXTERNAL_LOGIN} method="POST">
             <div className="flex items-center justify-center gap-4 py-4">
               <button className="btn btn-outline" name="provider" value="Google">
                 <svg className="w-4 h-4" fill="currentColor">

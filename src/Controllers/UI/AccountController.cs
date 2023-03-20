@@ -367,7 +367,7 @@ namespace DPMGallery.Controllers.UI
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             // Request a redirect to the external login provider to link a login for the current user
-            var redirectUrl = $"/ui/auth/external-register?returnUrl=/account/externallogins";
+            var redirectUrl = $"/ui/auth/external-callback?returnUrl=/account/externallogins";
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, user.Id.ToString());
             properties.AllowRefresh = true;
             return new ChallengeResult(provider, properties);

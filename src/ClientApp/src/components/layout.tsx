@@ -1,7 +1,6 @@
-import { useEffect } from "react";
-import { Outlet, useLocation, useNavigationType } from "react-router-dom";
+//import { useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import { User } from "../context/AuthProvider";
-import useAsync from "../hooks/useAsync";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 //import useAxiosPrivate from "../hooks/useAxiosPrivate";
@@ -16,15 +15,6 @@ export const LayoutLoader = async () => {
 const Layout = () => {
   const { auth, setAuth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
-
-  // const location = useLocation();
-  // const navigationType = useNavigationType(); // "POP" | "PUSH" | "REPLACE"
-
-  // useEffect(() => {
-  //   console.log("The current URL is", { ...location });
-  //   console.log("The last navigation action was", navigationType);
-  // }, [location, navigationType]);
-
   const PROFILE_URL = "/ui/auth/profile";
 
   const fetchData = async () => {

@@ -19,6 +19,11 @@ using System.Threading;
 using Microsoft.AspNetCore.Http.HttpResults;
 using DPMGallery.Models.Identity;
 using Microsoft.AspNetCore.Authentication;
+using System.Web;
+using FluentMigrator.Infrastructure;
+using Microsoft.AspNetCore.WebUtilities;
+using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace DPMGallery.Controllers.UI
 {
@@ -49,6 +54,13 @@ namespace DPMGallery.Controllers.UI
         public string RefreshToken { get; set; }
     }
 
+    public class ExternalAccountModel
+    {
+        public string UserName { get; set; }
+        public string Email { get; set; }
+    
+    }
+
     [Route("ui/auth")]
     [ApiController]
     public class AuthController : Controller
@@ -60,13 +72,15 @@ namespace DPMGallery.Controllers.UI
         private readonly ServerConfig _serverConfig;
         private readonly IUserStore<User> _userStore;
         private readonly IUserEmailStore<User> _emailStore;
-        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IUserStore<User> userStore, IUserEmailStore<User> emailStore,  ServerConfig serverConfig)
+        private readonly IEmailSender _emailSender;
+        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IUserStore<User> userStore, IUserEmailStore<User> emailStore,  ServerConfig serverConfig, IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _serverConfig = serverConfig;
             _userStore = userStore;
             _emailStore = emailStore;
+            _emailSender = emailSender;
         }
 
         private async Task<Tuple<object,List<Claim>>> GenerateProfileObject(User user)
@@ -303,12 +317,11 @@ namespace DPMGallery.Controllers.UI
         /// </summary>
         /// <param name="provider"></param>
         /// <returns></returns>
-
         [HttpPost]
         [Route("external")]
         public IActionResult External([FromForm] string provider, string returnUrl)
         {
-            var redirectUrl = $"/ui/auth/external-register?returnUrl={returnUrl}";
+            var redirectUrl = $"/ui/auth/external-callback?returnUrl={returnUrl}";
 
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             properties.AllowRefresh = true;
@@ -316,8 +329,107 @@ namespace DPMGallery.Controllers.UI
         }
 
 
+        /// <summary>
+        /// Used by the ExternalLoginPage client page to get the email. 
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        [Route("external-register")]
+        [AllowAnonymous]
+        [Route("external-details")]
+        public async Task<IActionResult> ExternalDetails()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+
+            return Ok(new
+            {
+                email,
+                info.ProviderDisplayName
+            });
+        }
+        [HttpGet]
+        [Route("confirm-email")]
+
+        public async Task<IActionResult> ConfirmEmail(string code)
+        {
+
+            return Ok();
+        }
+        /// <summary>
+        /// Called from the ExternalLoginPage when user prompted to create local account.
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("external-create-account")]
+        public async Task<IActionResult> ExternalCreateAccount([FromBody] ExternalAccountModel model)
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return BadRequest("Error loading external login information during confirmation.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Username and Email are required.");
+            }
+
+            var externalEmail = info.Principal.FindFirstValue(ClaimTypes.Email);
+            bool mustConfirm = !model.Email.Equals(externalEmail);
+
+            //TODO : validate email and username, check for existing username
+            var newUser = new User()
+            {
+                Email = model.Email,
+                UserName = model.UserName,
+                EmailConfirmed = !mustConfirm
+            };
+
+            var createResult = await _userManager.CreateAsync(newUser);
+            if (createResult.Succeeded)
+            {
+                createResult = await _userManager.AddLoginAsync(newUser, info);
+                if (createResult.Succeeded && mustConfirm)
+                {
+                    var userId = await _userManager.GetUserIdAsync(newUser);
+                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                    var callbackUrl = "/account/confirmemail";
+                    var parameters = HttpUtility.ParseQueryString(string.Empty);
+                    parameters["userId"] = userId;
+                    parameters["code"] = code;
+                    callbackUrl += parameters.ToString();
+                    await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    return Ok(new
+                    {
+                        confirmEmail = true
+                    });
+
+                } else if (createResult.Succeeded)
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Adding login failed.");
+                }
+            }
+            else
+            {
+                return BadRequest(createResult.Errors.ToString());
+            }
+        }
+
+        /// <summary>
+        /// This is where we land after authenticating with the external provider
+        /// </summary>
+        /// <param name="returnUrl"></param>
+        /// <param name="remoteError"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("external-callback")]
         [AllowAnonymous]
         public async Task<IActionResult> ExternalCallback(string returnUrl = null, string remoteError = null)
         {
@@ -325,62 +437,52 @@ namespace DPMGallery.Controllers.UI
             if (returnUrl == "/account/externallogins")
                 return await OnGetLinkLoginCallbackAsync(returnUrl);
 
+            if (remoteError != null)
+            {
+                var uriBuilder = new UriBuilder("/login");
+                var parameters = HttpUtility.ParseQueryString(string.Empty);
+                parameters["errorMessage"] = remoteError;
+                Uri finalUrl = uriBuilder.Uri;
+                return LocalRedirect(finalUrl.ToString());
+            }
+
+            string redirectTo = String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl;
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
             //no info from the oauth server - shouldn't happen
             if (info == null)
-                return Unauthorized();
+                return LocalRedirect("/login");
 
-            string redirectTo = String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl;
-
+            User user;
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-            //this may return null
-            var user = await _userManager.FindByEmailAsync(email);
-            if (user != null)
-            {
-                //see if the user already has an external login associated with an account here.
-                var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
-                if (result.Succeeded)
-                {
-                    await GenerateJWT(user, false);
-                    return LocalRedirect(redirectTo);
-                }
-            }
-            //no existing external login - but perhaps there is an account.
-            if (user != null)
-            {
-                await _userManager.AddLoginAsync(user, info);
-                //mark the user's email as confirmed since the external provider has likely already confirmed it.
-                user.EmailConfirmed = true;
-                await _userStore.UpdateAsync(user, CancellationToken.None);
 
-                await _signInManager.SignInAsync(user, isPersistent: false);
+            // Sign in the user with this external login provider if the user already has a login.
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            if (result.Succeeded)
+            {
+               
+                user = await _userManager.FindByEmailAsync(email);
                 await GenerateJWT(user, false);
                 return LocalRedirect(redirectTo);
-            }
-            //no account or externalLogin so create one
-            var name = info.Principal.FindFirstValue(ClaimTypes.Name);
-            string userName = name.Replace(' ', '-').ToLower(); //TODO Find best option for creating username
-            var newUser = new User()
-            {
-                Email = email,
-//                SecurityStamp = Guid.NewGuid().ToString(),
-                UserName = userName,
-                EmailConfirmed = true //since the external provider has already confirmed it
-            };
-            var createResult = await _userManager.CreateAsync(newUser);
-            if (createResult.Succeeded)
-            {
-                createResult = await _userManager.AddLoginAsync(newUser, info);
-                if (createResult.Succeeded)
-                {
-                    await _signInManager.SignInAsync(newUser, isPersistent: false);
-                    await GenerateJWT(user, false);
-                    return LocalRedirect(redirectTo);
-                }
-            }
 
-            return LocalRedirect("/login");
+            } else if (result.IsLockedOut)
+            {
+                return LocalRedirect("/lockedout");
+
+            } else
+            {
+                // If the user does not have an account, then ask the user to create an account.
+                //var uriBuilder = new UriBuilder("/externallogin");
+                var parameters = HttpUtility.ParseQueryString(string.Empty);
+                parameters["returnUrl"] = redirectTo;
+                if (!string.IsNullOrEmpty(email))
+                {
+                    parameters["email"] = email;
+                }
+                //need to create an account so direct user to a page asking them to do that.
+                return LocalRedirect("/externallogin?" + parameters.ToString());
+            }
         }
 
 
