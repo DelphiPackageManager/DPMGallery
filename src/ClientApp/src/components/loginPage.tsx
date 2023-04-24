@@ -27,7 +27,7 @@ const LoginPage = () => {
 
   const LOGIN_URL = "/ui/auth/login";
 
-  const EXTERNAL_LOGIN = `/ui/auth/external?returnurl=${from}`;
+  const EXTERNAL_LOGIN = `/ui/auth/external-login?returnurl=${from}`;
   console.log(EXTERNAL_LOGIN);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

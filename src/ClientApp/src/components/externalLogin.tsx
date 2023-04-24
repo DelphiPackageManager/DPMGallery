@@ -51,7 +51,7 @@ const ExternalLoginPage = () => {
       userName,
     };
     try {
-      const response = await axios.post("/ui/auth/create-external-account", model);
+      const response = await axios.post("/ui/auth/external-create-account", model);
       if (response?.status == 200) {
         if (response?.data?.confirmEmail) {
           navigate("/account/confirmemail");

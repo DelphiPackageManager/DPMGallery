@@ -318,13 +318,13 @@ namespace DPMGallery.Controllers.UI
         /// <param name="provider"></param>
         /// <returns></returns>
         [HttpPost]
-        [Route("external")]
-        public IActionResult External([FromForm] string provider, string returnUrl)
+        [Route("external-login")]
+        public IActionResult ExternalLoginAsync([FromForm] string provider, string returnUrl)
         {
             var redirectUrl = $"/ui/auth/external-callback?returnUrl={returnUrl}";
 
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-            properties.AllowRefresh = true;
+            //properties.AllowRefresh = true;
             return new ChallengeResult(provider, properties);
         }
 
@@ -339,6 +339,8 @@ namespace DPMGallery.Controllers.UI
         public async Task<IActionResult> ExternalDetails()
         {
             var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+                return BadRequest();
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
 
             return Ok(new
@@ -350,17 +352,18 @@ namespace DPMGallery.Controllers.UI
         [HttpGet]
         [Route("confirm-email")]
 
-        public async Task<IActionResult> ConfirmEmail(string code)
-        {
+        //public async Task<IActionResult> ConfirmEmail(string code)
+        //{
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
         /// <summary>
         /// Called from the ExternalLoginPage when user prompted to create local account.
         /// </summary>
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
+       // [AllowAnonymous]
         [Route("external-create-account")]
         public async Task<IActionResult> ExternalCreateAccount([FromBody] ExternalAccountModel model)
         {
@@ -446,7 +449,6 @@ namespace DPMGallery.Controllers.UI
                 return LocalRedirect(finalUrl.ToString());
             }
 
-            string redirectTo = String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl;
 
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
@@ -454,11 +456,18 @@ namespace DPMGallery.Controllers.UI
             if (info == null)
                 return LocalRedirect("/login");
 
+
             User user;
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
 
+            
+            //TODO : get username if available (iterator is for github)
+
+            string redirectTo = String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl;
+
             // Sign in the user with this external login provider if the user already has a login.
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
             if (result.Succeeded)
             {
                

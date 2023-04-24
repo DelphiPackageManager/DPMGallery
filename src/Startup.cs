@@ -167,9 +167,9 @@ namespace DPMGallery
                 options.Scope.Add("user:login");
                 options.ClaimActions.MapJsonKey("urn:github:login", "login");
                 options.ClaimActions.MapJsonKey("urn:github:login", "email");
-                options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
-                options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
-                options.SignInScheme = IdentityConstants.ApplicationScheme;
+                //options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
+                //options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
+               // options.SignInScheme = IdentityConstants.ApplicationScheme;
             });
 
 

@@ -11,7 +11,7 @@ const fetchData = async () => {
   const IDENTITY_URL = "/ui/auth/identity";
   const axiosInitial = createAxiosInitial();
   try {
-    //using axios private so we get the new refresh token.
+    //using axios initial so we get the new refresh token.
     const response = await axiosInitial.post(
       IDENTITY_URL,
       {},
@@ -49,11 +49,14 @@ const fetchData = async () => {
 };
 
 console.log("calling init");
-const user = await fetchData();
-ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <React.StrictMode>
-    <AuthProvider user={user}>
-      <App />
-    </AuthProvider>
-  </React.StrictMode>
-);
+//can't call async from top level functions so wrap as an expression and invoke it.
+(async function () {
+  let user = await fetchData();
+  ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
+    <React.StrictMode>
+      <AuthProvider user={user}>
+        <App />
+      </AuthProvider>
+    </React.StrictMode>
+  );
+})();
