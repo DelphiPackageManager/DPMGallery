@@ -243,17 +243,18 @@ namespace DPMGallery
 
 
             //app.UseCookiePolicy();
-            app.UseSerilogRequestLogging();
+            //app.UseSerilogRequestLogging();
             app.UseApiKeyAuthMiddleware();
             app.UseOperationCancelledMiddleware();
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseHttpLogging();
+            //app.UseHttpLogging();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
                 endpoints.MapApiRoutes();
+                
                 endpoints.MapFallbackToFile("/index.html");
                 
             });

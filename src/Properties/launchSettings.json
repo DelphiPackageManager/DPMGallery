@@ -1,12 +1,4 @@
 {
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:56047",
-      "sslPort": 44311
-    }
-  },
   "profiles": {
     "DPMGallery": {
       "commandName": "Project",
@@ -14,6 +6,15 @@
       "launchUrl": "packages",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:5021;https://localhost:5002"
+    },
+    "DPMGalleryRelease": {
+      "commandName": "Project",
+      "commandLineArgs": "run",
+      "launchUrl": "packages",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Release"
       },
       "applicationUrl": "http://localhost:5021;https://localhost:5002"
     },
