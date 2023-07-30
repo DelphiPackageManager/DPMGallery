@@ -30,38 +30,37 @@
 	<ItemGroup>
 		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.2" />
 		<PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
-		<PackageReference Include="AWSSDK.S3" Version="3.7.104.2" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.101.52" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.201.4" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.201.2" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
-		<PackageReference Include="Dapper" Version="2.0.123" />
+		<PackageReference Include="Dapper" Version="2.0.143" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
 		<PackageReference Include="FluentMigrator" Version="3.3.2" />
 		<PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
 		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="3.3.2" />
-		<PackageReference Include="Google.Cloud.Storage.V1" Version="4.5.0" />
+		<PackageReference Include="Google.Cloud.Storage.V1" Version="4.6.0" />
 		<PackageReference Include="HtmlSanitizer" Version="8.0.645" />
-		<PackageReference Include="MailKit" Version="4.0.0" />
+		<PackageReference Include="MailKit" Version="4.1.0" />
 		<PackageReference Include="Markdig" Version="0.31.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.OAuth" Version="2.2.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.5" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="7.0.9" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="7.0.9" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="7.0.0" />
-		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.0.4">
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.1.5">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.6" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.8" />
 		<PackageReference Include="nClam" Version="7.0.0" />
-		<PackageReference Include="Npgsql" Version="7.0.2" />
-		<PackageReference Include="NuGet.Versioning" Version="6.5.0" />
-		<PackageReference Include="Serilog.AspNetCore" Version="6.1.0" />
+		<PackageReference Include="Npgsql" Version="7.0.4" />
+		<PackageReference Include="NuGet.Versioning" Version="6.6.1" />
+		<PackageReference Include="Serilog.AspNetCore" Version="7.0.0" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="1.1.1-dev-00944" />
 	</ItemGroup>
 
