@@ -236,6 +236,10 @@ namespace DPMGallery
                         // Make sure you have started the frontend with npm run dev
                         spa.UseProxyToSpaDevelopmentServer("http://localhost:3175");
                     }
+                    else
+                    {
+                        spa.Options.SourcePath = "wwwroot";
+                    }
                 });
             });
 
