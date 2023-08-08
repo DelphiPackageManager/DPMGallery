@@ -150,6 +150,7 @@ namespace DPMGallery.Controllers.Api
 
                 return Redirect(packageUrl);
             }
+            //we only get here if we are using the filesystem for storage, which is dev only.
             string fileExt = "";
             if (downloadFileType == DownloadFileType.icon)
             {

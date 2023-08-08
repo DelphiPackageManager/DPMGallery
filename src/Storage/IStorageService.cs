@@ -35,7 +35,7 @@ namespace DPMGallery.Services
         bool IsCDN(); 
         Task<Stream> GetAsync(string path, CancellationToken cancellationToken = default);
 
-        Task<Uri> GetDownloadUriAsync(string path, CancellationToken cancellationToken = default);
+        //Task<Uri> GetDownloadUriAsync(string path, CancellationToken cancellationToken = default);
 
         Task<StoragePutResult> PutAsync(
             string path,
@@ -43,10 +43,10 @@ namespace DPMGallery.Services
             string contentType,
             CancellationToken cancellationToken = default);
 
-        Task DeleteAsync(string path, CancellationToken cancellationToken = default);
+  //      Task DeleteAsync(string path, CancellationToken cancellationToken = default);
 
-        Task CleanFiles(string path, string filter, CancellationToken cancellationToken = default);
+    //    Task CleanFiles(string path, string filter, CancellationToken cancellationToken = default);
 
-        Task DeleteFolderAsync(string folder, CancellationToken cancellationToken = default);
+      //  Task DeleteFolderAsync(string folder, CancellationToken cancellationToken = default);
     }
 }

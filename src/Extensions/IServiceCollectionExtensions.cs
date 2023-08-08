@@ -6,6 +6,7 @@ using DPMGallery.Repositories;
 using DPMGallery.Services;
 using DPMGallery.Storage;
 using DPMGallery.Storage.Amazon;
+using DPMGallery.Storage.BunnyCDN;
 using DPMGallery.Storage.Google;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -58,6 +59,7 @@ namespace DPMGallery.Extensions
 
             services.AddS3StorageService();
             services.AddGoogleCloudStorageService();
+            services.AddBunnyCDNStorageService();
 
             services.AddTransient<IStorageService>(provider =>
             {
@@ -68,6 +70,7 @@ namespace DPMGallery.Extensions
                     StorageType.FileSystem => provider.GetRequiredService<FileStorageService>(),
                     StorageType.AwsS3 => provider.GetRequiredService<S3StorageService>(),
                     StorageType.GoogleCloudStorage => provider.GetRequiredService<GoogleCloudStorageService>(),
+                    StorageType.BunnyCDN => provider.GetRequiredService<BunnyCDNStorageService>(),
                     _ => throw new InvalidOperationException($"Unsupported storage service: {config.Storage.StorageType}"),
                 };
             });

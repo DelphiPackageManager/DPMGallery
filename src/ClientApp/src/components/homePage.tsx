@@ -18,43 +18,7 @@ const HomePage = () => {
       </div>
       <PageContainer className="px-2">
         <h1>Coming Soon</h1>
-        <p>
-          We're working hard to get this service going - this is here only for testing for now xxxxxxxxxxxxxxxxxxxxxxxxxxxxx ssssssssssssssssssssssss
-          sdsd sda sdasdas.
-        </p>
-        <br />
-        <br />
-        <br />
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
-        <p>Foo bar...</p>
+        <p>We're working hard to get this service going - this is here only for testing for now.</p>
       </PageContainer>
     </>
   );

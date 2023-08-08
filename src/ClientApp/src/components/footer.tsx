@@ -71,7 +71,9 @@ const Footer = () => {
         </div>
         <hr className="my-3 sm:mx-auto border-primary-700 lg:my-4" />
         <div className="sm:flex sm:items-center sm:justify-between">
-          <span className="text-xs sm:text-center text-white text-opacity-60  ">© 2023 Vincent Parrett &amp; contributors. All Rights Reserved.</span>
+          <span className="text-xs sm:text-center text-white text-opacity-60  ">
+            Copyright © {new Date().getFullYear()} Vincent Parrett & Contributors. All Rights Reserved.
+          </span>
           <div className="flex mt-4 space-x-6 sm:justify-center sm:mt-0">
             <a href="https://twitter.com/delphipm" target="_blank" className="text-white text-opacity-60 hover:text-opacity-100">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">

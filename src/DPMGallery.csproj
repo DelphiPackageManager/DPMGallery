@@ -33,6 +33,7 @@
 		<PackageReference Include="AWSSDK.S3" Version="3.7.201.8" />
 		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.201.6" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
+		<PackageReference Include="BunnyCDN.Net.Storage" Version="1.0.4" />
 		<PackageReference Include="Dapper" Version="2.0.143" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
 		<PackageReference Include="FluentMigrator" Version="3.3.2" />
@@ -70,7 +71,6 @@
 		<Folder Include="Search\" />
 		<Folder Include="Statistics\" />
 		<Folder Include="Serialization\" />
-		<Folder Include="Storage\FTP\" />
 		<Folder Include="Views\Packages\" />
 		<Folder Include="wwwroot\" />
 	</ItemGroup>

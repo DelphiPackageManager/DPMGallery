@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DPMGallery.Configuration.Storage;
+using System;
 
 namespace DPMGallery.Configuration
 {
@@ -6,7 +7,8 @@ namespace DPMGallery.Configuration
     {
         FileSystem = 0,
         AwsS3 = 1,
-        GoogleCloudStorage = 2
+        GoogleCloudStorage = 2,
+        BunnyCDN = 3,
     }
 
     public class StorageConfig
@@ -19,7 +21,8 @@ namespace DPMGallery.Configuration
 
         public GoogleCloudStorageConfig GoogleCloudStorage { get; set; } = new GoogleCloudStorageConfig();
 
-        public string CDNBaseUri { get; set; } = "https://packages.delphipm.org";
+        public BunnyCDNStorageConfig BunnyCDNStorage { get; set; }  = new BunnyCDNStorageConfig();
+        public string CDNBaseUri { get; set; } = "https://packages.delphi.dev";
 
         public int MaxRetries { get; set; } = 3;
     }
