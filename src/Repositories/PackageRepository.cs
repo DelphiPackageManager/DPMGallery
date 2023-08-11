@@ -47,6 +47,19 @@ namespace DPMGallery.Repositories
 
             return package;
         }
+        public async Task MakePackageActive(int id, CancellationToken cancellationToken)
+        {
+            string sql = @$"UPDATE {T.Package} SET active = true
+                           WHERE id = @id";
+            try
+            {
+                await Context.ExecuteAsync(sql, new { id }, cancellationToken: cancellationToken);
+            } catch (Exception ex)
+            {
+                _logger.Error(ex, "[PackageRepository] MakePackageActive failed for id {id}");
+                throw;
+            }
+        }
 
         public async Task UpdateDownloads(string packageid, CancellationToken cancellationToken)
         {

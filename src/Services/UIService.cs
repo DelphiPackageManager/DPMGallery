@@ -45,7 +45,7 @@ namespace DPMGallery.Services
 
         private string GetDownloadUrl(string packageId, string packageVersion, string compilerVersion, string platform, string fileType)
         {
-            return $"/api/v1/package/{packageId.ToLower()}/{compilerVersion.ToLower()}/{platform.ToLower()}/{packageVersion.ToLower()}/{fileType}";
+            return $"/api/v1/package/{packageId}/{compilerVersion}/{platform}/{packageVersion}/{fileType}".ToLower();
         }
 
         public async Task<PackageDetailsModel> UIGetPackageDetails(string packageId, string packageVersion, CancellationToken cancellationToken = default)

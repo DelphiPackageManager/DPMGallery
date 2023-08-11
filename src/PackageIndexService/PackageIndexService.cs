@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Security.Cryptography;
 using NuGet.Versioning;
 using DPMGallery.Types;
+using Microsoft.VisualBasic;
 
 namespace DPMGallery.Services
 {
@@ -291,8 +292,8 @@ namespace DPMGallery.Services
 
                     
                     //don't rely on the filename of the upload - construct from metadata
-                    string fileNameBase = $"{thePackage.PackageId}-{theTargetPlatform.FileName}-{thePackageVersion.Version}";
-
+                    string fileNameBase = $"{thePackage.PackageId}-{theTargetPlatform.FileName}-{thePackageVersion.Version}".ToLower();
+                    _logger.Information("[PackageIndexService] processing file : {fileNameBase}", fileNameBase);
                     PackageVersionProcess pvp = new()
                     {
                         PackageVersionId = thePackageVersion.Id,

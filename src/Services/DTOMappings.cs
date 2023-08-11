@@ -45,6 +45,7 @@ namespace DPMGallery.Services
                 dto.ReadMe = r.ReadMe;
                 dto.ReleaseNotes = r.ReleaseNotes;
                 dto.License = r.License;
+                dto.Listed = r.Listed;
                 dto.ProjectUrl = r.ProjectUrl;
                 dto.RepositoryUrl = r.RepositoryUrl;
                 dto.RepositoryType = r.RepositoryType;

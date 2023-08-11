@@ -47,7 +47,6 @@ namespace DPMGallery.BackgroundServices
             await Task.Delay(5000, stoppingToken);
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.Information("[{category}] Starting processing.", "PackageIndexBackgroundService");
                 try
                 {
                     using (var scope = _serviceProvider.CreateScope())
@@ -61,9 +60,12 @@ namespace DPMGallery.BackgroundServices
 
                         if (toBeProcessed.Any())
                         {
+                            _logger.Information("[{category}] Starting processing.", "PackageIndexBackgroundService");
                             foreach (var item in toBeProcessed)
                             {
                                 await DoProcess(scope, item, stoppingToken);
+                                if (stoppingToken.IsCancellationRequested) 
+                                    return;
                             }
                         }
                         _logger.Information("[{category}] Done processing.", "PackageIndexBackgroundService");
@@ -75,7 +77,7 @@ namespace DPMGallery.BackgroundServices
                     _logger.Error(ex, "[{category}] Error occurred during processing.", "PackageIndexBackgroundService");
                 }
 
-                //waiting 30s before checking again. 
+                //waiting before checking again. 
                 //TODO : make this configurable
                 await Task.Delay(10000, stoppingToken);
             }
@@ -95,7 +97,7 @@ namespace DPMGallery.BackgroundServices
             CopyResult result = CopyResult.Failed;
             string folderName = Path.Combine(targetPlatform.SantisedCompilerVersion, targetPlatform.Platform.ToString(), package.PackageId);
 
-            string localFile = Path.Combine(_serverConfig.ProcessingFolder, item.PackageFileName); 
+            string localFile = Path.Combine(_serverConfig.ProcessingFolder, item.PackageFileName.ToLower()); 
             //lowercase the directory always!
             string remotePath = Path.Combine(folderName.ToLower(),item.PackageFileName);
             _logger.Information("[{processing}] Copying to filesystem : {localFile} to : {remotePath}", "PackageIndexBackgroundService", localFile, remotePath);
@@ -179,7 +181,11 @@ namespace DPMGallery.BackgroundServices
 
         private async Task<AVScanResult> DoVirusScan(IServiceScope scope, PackageVersionProcess item, CancellationToken cancellationToken)
         {
-            var filePath = Path.Combine(_serverConfig.ProcessingFolder, item.PackageFileName);
+
+            var filePath = Path.Combine(_serverConfig.ProcessingFolder, item.PackageFileName).ToLower();
+
+            _logger.Information("[{category}] Scanning file : {filePath}", "Antivirus", filePath);
+
 
             var avServices = scope.ServiceProvider.GetServices<IAntivirusService>().Where(x => x.Enabled == true).OrderBy(x => x.Order).ToList();
             AVScanResult aVScanResult = new()
@@ -197,7 +203,7 @@ namespace DPMGallery.BackgroundServices
                 aVScanResult = await service.Scan(filePath, cancellationToken);
                 if (!aVScanResult.Result)
                 {
-                    _logger.Warning("[{category}] {service} Scanning on : {filePath} failed.", "Antivirus", service.ServiceName, filePath);
+                    _logger.Warning("[{category}] {service} Scanning on : {filePath} failed. {message}", "Antivirus", service.ServiceName, filePath, aVScanResult.Message);
                     return aVScanResult; //don't bother doing the next one.
                 }
             }
@@ -286,6 +292,7 @@ namespace DPMGallery.BackgroundServices
             var targetPlatformRepository = scope.ServiceProvider.GetRequiredService<TargetPlatformRepository>();
             var packageRepository = scope.ServiceProvider.GetRequiredService<PackageRepository>();
             var packageVersionProcessRepository = scope.ServiceProvider.GetRequiredService<PackageVersionProcessRepository>();
+            
             //var storageService = scope.ServiceProvider.GetRequiredService<IStorageService>();
             var packageVersion = await packageVersionRepository.GetById(item.PackageVersionId, cancellationToken);
 
@@ -367,6 +374,7 @@ namespace DPMGallery.BackgroundServices
                             packageVersion.Status = PackageStatus.Passed;
                             packageVersion.StatusMessage = "Ok";
                             packageVersion.Listed = true;
+                            package.Active = true;
                             break;
                     }
 
@@ -387,6 +395,7 @@ namespace DPMGallery.BackgroundServices
 
                     await packageVersionRepository.UpdateAsyncStatus(packageVersion, cancellationToken);
                     await packageVersionProcessRepository.UpdatePartialAsync(item, cancellationToken);
+                    await packageRepository.MakePackageActive(package.Id, cancellationToken);
                     unitOfWork.Commit();
 
                     if (packageVersion.Status == PackageStatus.Passed)

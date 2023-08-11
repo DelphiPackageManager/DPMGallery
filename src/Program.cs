@@ -54,7 +54,8 @@ namespace DPMGallery
                .Enrich.FromLogContext()
                .WriteTo.Console()
                .CreateLogger();
-
+            var storageType = serverConfig.Storage.StorageType.ToString();
+            Log.Logger.Information("Storage configured to : {storageType}", storageType);
 
             var host = CreateHostBuilder(args)
                 .UseSystemd() // run as a service on linix
