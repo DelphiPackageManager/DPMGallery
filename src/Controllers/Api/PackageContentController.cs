@@ -145,9 +145,8 @@ namespace DPMGallery.Controllers.Api
                     packageUrl = packageUrl.TrimEnd('/');
                 //add path elements
 
-                //make sure the path to the file is lowercase
-                packageUrl = $"{packageUrl}/{compilerVersion.ToLower()}/{platform.ToLower()}/{id.ToLower()}/{id}-{compilerVersion}-{platform}-{version}.{fileType}";
-
+                //make sure the path to the file is lowercase to avoid issues with linux filesystems
+                packageUrl = $"{packageUrl}/{compilerVersion}/{platform}/{id}/{id}-{compilerVersion}-{platform}-{version}.{fileType}".ToLower();
                 return Redirect(packageUrl);
             }
             //we only get here if we are using the filesystem for storage, which is dev only.
@@ -156,12 +155,12 @@ namespace DPMGallery.Controllers.Api
             {
                 fileExt = await _packageContentService.GetPackageIconFileExtAsync(id, compiler, thePlatform, version, cancellationToken);
             }
-             var packageStream = await _packageContentService.GetPackageStreamAsync(downloadFileType, id, compiler, thePlatform, version, cancellationToken);
+            var packageStream = await _packageContentService.GetPackageStreamAsync(downloadFileType, id, compiler, thePlatform, version, cancellationToken);
             if (packageStream == null)
             {
                 return NotFound();
             }
-            string fileName = $"{id}-{compiler.Sanitise()}-{platform}-{version}.";
+            string fileName = $"{id}-{compiler.Sanitise()}-{platform}-{version}.".ToLower();
 
             //TODO : how do we deal with different icon file types? perhaps just stick to png?
             if (downloadFileType == DownloadFileType.icon)
