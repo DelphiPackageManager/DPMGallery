@@ -84,10 +84,10 @@ namespace DPMGallery.BackgroundServices
 
         }
 
-        private const string PackageContentType = "binary/octet-stream";
-        private const string DspecContentType = "application/json";
-        private const string ReadmeContentType = "text/markdown";
-        private const string IconContentType = "image/xyz";
+        private const string cPackageContentType = "binary/octet-stream";
+        private const string cDspecContentType = "application/json";
+        private const string cReadmeContentType = "text/markdown";
+        private const string cIconContentType = "image/xyz";
 
 
         private async Task<CopyResult> DoCopyToFileSystem(IServiceScope scope, Package package,  PackageVersion packageVersion, PackageVersionProcess item, PackageTargetPlatform targetPlatform, CancellationToken cancellationToken)
@@ -108,17 +108,17 @@ namespace DPMGallery.BackgroundServices
             {
                 using (var stream = File.OpenRead(localFile))
                 {
-                    var putResult = await storageService.PutAsync(remotePath, stream, PackageContentType, cancellationToken);
+                    var putResult = await storageService.PutAsync(remotePath, stream, cPackageContentType, cancellationToken);
                     if (putResult != StoragePutResult.Success)
-                       throw new Exception("Uploading package file failed");
+                        throw new Exception("Uploading package file failed");
+                    stream.Seek(0, SeekOrigin.Begin);
 
-                    stream.Seek(0, SeekOrigin.Begin); //not sure if this is needed
                     using (var reader = new PackageArchiveReader(stream))
                     {
                         using var dspecStream = reader.GetDspec();
 
                         remotePath = Path.ChangeExtension(remotePath, ".dspec");
-                        putResult = await storageService.PutAsync(remotePath, dspecStream, DspecContentType, cancellationToken);
+                        putResult = await storageService.PutAsync(remotePath, dspecStream, cDspecContentType, cancellationToken);
                         if (putResult != StoragePutResult.Success)
                             throw new Exception("Uploadin dspec failed");
                         if (packageVersion.HasIcon)
@@ -127,7 +127,7 @@ namespace DPMGallery.BackgroundServices
                                 remotePath = Path.ChangeExtension(remotePath, Path.GetExtension(packageVersion.Icon));
                                 _logger.Information("[{processing}] Copying icon to filesystem", "Copy to CDN - file : {remotePath}", remotePath);
                                 using var iconStream = reader.GetStream(packageVersion.Icon);
-                                putResult = await storageService.PutAsync(remotePath, iconStream, IconContentType, cancellationToken);
+                                putResult = await storageService.PutAsync(remotePath, iconStream, cIconContentType, cancellationToken);
                                 if (putResult != StoragePutResult.Success)
                                     throw new Exception("Uploadin icon failed");
                                 }
@@ -145,7 +145,7 @@ namespace DPMGallery.BackgroundServices
                                 _logger.Information("[{processing}] Copying readme to filesystem", "Copy to CDN - file : {remotePath}", remotePath);
                                 using var readmeStream = reader.GetStream(packageVersion.ReadMe);
 
-                                putResult = await storageService.PutAsync(remotePath, readmeStream, ReadmeContentType, cancellationToken);
+                                putResult = await storageService.PutAsync(remotePath, readmeStream, cReadmeContentType, cancellationToken);
                                 if (putResult != StoragePutResult.Success)
                                     throw new Exception("Uploadin readme failed");
                             }
@@ -154,9 +154,9 @@ namespace DPMGallery.BackgroundServices
                                 _logger.Warning(ex, $"Package {item.PackageFileName} metadata says it has a readme, but the readme wasn't found in the package!");
                             }
                         }
-                        result = CopyResult.Ok;
                     }
 
+                    result = CopyResult.Ok;
                 }
                
             }
