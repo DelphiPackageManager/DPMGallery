@@ -1,11 +1,11 @@
 ﻿using DPMGallery.Configuration;
+using Microsoft.AspNetCore.RateLimiting;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using AspNetCoreRateLimit;
 
 namespace DPMGallery
 {
@@ -96,8 +96,6 @@ namespace DPMGallery
 
         public string ProcessingFolder { get; set; } = _defaultProcessingFolder;
 
-        public IpRateLimitOptions IpRateLimitOptions { get; set; } = new IpRateLimitOptions();
-
-        public IpRateLimitPolicies IpRateLimitPolicies { get; set; } = new IpRateLimitPolicies();
+        public RateLimitingOptions RateLimiting { get; set; } = new RateLimitingOptions();
     }
 }

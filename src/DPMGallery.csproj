@@ -29,7 +29,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.3" />
-		<PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
 		<PackageReference Include="AWSSDK.S3" Version="3.7.201.14" />
 		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.201.12" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
@@ -66,7 +65,6 @@
 
 
 	<ItemGroup>
-		<Folder Include="Configuration\RateLimiting\" />
 		<Folder Include="Search\" />
 		<Folder Include="Statistics\" />
 		<Folder Include="Serialization\" />

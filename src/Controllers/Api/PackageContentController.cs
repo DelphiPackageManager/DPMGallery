@@ -10,6 +10,9 @@ using DPMGallery.Services;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Versioning;
 using DPMGallery.Utils;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace DPMGallery.Controllers.Api
 {
@@ -17,6 +20,8 @@ namespace DPMGallery.Controllers.Api
     /// The Package Content resource, used to download content from packages.
     /// See: https://docs.microsoft.com/en-us/nuget/api/package-base-address-resource
     /// </summary>
+    [ApiController]
+    [AllowAnonymous]
     public class PackageContentController : Controller
     {
         private readonly IPackageContentService _packageContentService;
@@ -34,6 +39,7 @@ namespace DPMGallery.Controllers.Api
 
         [HttpGet]
         [Route(Constants.RoutePatterns.PackageVersionsWithDeps)]
+        [OutputCache(Duration = 30, VaryByRouteValueNames = new[] { "*" })]
         public async Task<ActionResult<PackageVersionsWithDependenciesResponseDTO>> GetPackageVersionsWithDependenciesAsync([FromRoute] string id, [FromRoute] string compilerVersion, [FromRoute] string platform, [FromQuery] string versionRange, [FromQuery(Name = "prerel")] bool includePrerelease, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
@@ -57,7 +63,8 @@ namespace DPMGallery.Controllers.Api
 
         [HttpGet]
         [Route(Constants.RoutePatterns.PackageVersions)]
-        public async Task<ActionResult<PackageVersionsResponseDTO>> GetPackageVersionsAsync(string id, string compilerVersion, string platform, [FromQuery] bool includePrerelease = true, CancellationToken cancellationToken = default)
+        [OutputCache(Duration = 30, VaryByRouteValueNames = new[] { "*" })]
+        public async Task<ActionResult<PackageVersionsResponseDTO>> GetPackageVersionsAsync(string id, string compilerVersion, string platform, [FromQuery(Name = "prerel")] bool includePrerelease = false, CancellationToken cancellationToken = default)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();
             if (compiler == CompilerVersion.UnknownVersion)
@@ -78,6 +85,7 @@ namespace DPMGallery.Controllers.Api
 
         [HttpGet]
         [Route(Constants.RoutePatterns.PackageInfo)]
+        [OutputCache(Duration = 30, VaryByRouteValueNames = new[] {"*"})]
         public async Task<ActionResult<SearchResultDTO>> GetPackageInfo(string id, string compilerVersion, string platform, string version, CancellationToken cancellationToken)
         {
             CompilerVersion compiler = compilerVersion.ToCompilerVersion();

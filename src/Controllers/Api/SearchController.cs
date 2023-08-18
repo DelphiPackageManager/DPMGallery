@@ -6,10 +6,15 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace DPMGallery.Controllers
 {
     [ApiController]
+    [AllowAnonymous]
+    [EnableRateLimiting("Api")]
     public class SearchController : Controller
     {
 
@@ -93,6 +98,8 @@ namespace DPMGallery.Controllers
 
         [HttpGet]
         [Route(Constants.RoutePatterns.PackageSearch)]
+        [OutputCache(Duration = 30, VaryByQueryKeys = new string[] { "compiler", "platform", "q", "exact", "skip", "take", "prerel", "commercial", "istrial" })]
+        //TODO : caching isn't working because it doesn't like null values. 
         public async Task<ActionResult<SearchResponseDTO>> SearchAsync(CancellationToken cancellationToken,
             [FromQuery] string compiler,
             [FromQuery] string platform,
@@ -125,6 +132,7 @@ namespace DPMGallery.Controllers
 
         [HttpGet]
         [Route(Constants.RoutePatterns.PackageFind)]
+        [OutputCache(Duration = 30, VaryByQueryKeys = new string[] { "id", "compiler", "platform", "version", "prerel"})]
         public async Task<ActionResult<FindResponseDTO>> FindAsync(CancellationToken cancellationToken,
             [FromQuery] string id,
             [FromQuery] string compiler,

@@ -1,7 +1,6 @@
 ﻿using DPMGallery.Entities;
 using DPMGallery.Models;
 using DPMGallery.Extensions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;

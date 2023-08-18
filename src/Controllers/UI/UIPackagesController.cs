@@ -7,11 +7,17 @@ using System;
 using DPMGallery.Services;
 using Serilog;
 using Ganss.Xss;
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace DPMGallery.Controllers.UI
 {
+
     [ApiController]
+    [AllowAnonymous]
     [Route("ui")]
+    [DisableRateLimiting]
     public class UIPackagesController : Controller
     {
         private readonly ILogger _logger;
@@ -24,8 +30,10 @@ namespace DPMGallery.Controllers.UI
         }
 
 
+        [AllowAnonymous]
         [HttpGet]
         [Route("packages")]
+        [OutputCache(PolicyName ="UIQuery")]
         public async Task<IActionResult> Index(
             [FromQuery] string compiler,
             [FromQuery] string platform,
@@ -92,8 +100,10 @@ namespace DPMGallery.Controllers.UI
             return Json(model);
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [Route("packagedetails/{packageId}/{packageVersion}")]
+        [OutputCache(Duration = 10, VaryByRouteValueNames = new string[] { "*" })]
         public async Task<IActionResult> PackageDetails([FromRoute] string packageId, [FromRoute] string packageVersion, CancellationToken cancellationToken = default) 
         {
 

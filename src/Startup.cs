@@ -15,12 +15,14 @@ using System.Text.Json.Serialization;
 using DPMGallery.Services;
 using Serilog;
 using DPMGallery.Models;
-using AspNetCoreRateLimit;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace DPMGallery
 {
@@ -55,17 +57,48 @@ namespace DPMGallery
                 options.KnownProxies.Clear();
             });
 
+            services.AddRateLimiter(options =>
+            {
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                {
+                    return RateLimitPartition.GetFixedWindowLimiter(partitionKey: httpContext.Request.Headers.Host.ToString(), partition =>
+                        new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = serverConfig.RateLimiting.PermitLimit,
+                            AutoReplenishment = true,
+                            Window = TimeSpan.FromSeconds(serverConfig.RateLimiting.Window)
+                        });
+                });
+                options.OnRejected = async (context, token) =>
+                {
+                    context.HttpContext.Response.StatusCode = 429;
+                    if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+                    {
+                        await context.HttpContext.Response.WriteAsync(
+                            $"Too many requests. Please try again after {retryAfter.TotalMinutes} minute(s). " +
+                            $"Read more about our rate limits at https://docs.delphi.dev/ratelimiting.", cancellationToken: token);
+                    }
+                    else
+                    {
+                        await context.HttpContext.Response.WriteAsync(
+                            "Too many requests. Please try again later. " +
+                            "Read more about our rate limits at https://docs.delphi.dev/ratelimiting.", cancellationToken: token);
+                    }
+                };
+
+            });
+
+            //used in uiservice
+            services.AddMemoryCache();
 
             //TODO: Replace with built in rate limiting when we upgrade to netcore 7.0
-            // needed to store rate limit counters and ip rules
-            services.AddMemoryCache();
-            ////load general configuration from appsettings.json
-            services.Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimitOptions"));
-            ////load ip rules from appsettings.json
-            services.Configure<IpRateLimitPolicies>(_configuration.GetSection("IpRateLimitPolicies"));
+            //////load general configuration from appsettings.json
+            //services.Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimitOptions"));
+            //////load ip rules from appsettings.json
+            //services.Configure<IpRateLimitPolicies>(_configuration.GetSection("IpRateLimitPolicies"));
 
             // inject counter and rules stores
-            services.AddInMemoryRateLimiting();
+            //services.AddInMemoryRateLimiting();
 
             services.AddDPMServices(serverConfig);
 
@@ -94,6 +127,16 @@ namespace DPMGallery
             //    // requires using Microsoft.AspNetCore.Http;
             //    options.MinimumSameSitePolicy = SameSiteMode.Strict;
             //});
+
+            services.AddOutputCache(x =>
+            {
+                x.AddPolicy("UIQuery", builder => {
+                    builder.Cache()
+                    .Expire(TimeSpan.FromSeconds(10))
+                    .SetVaryByQuery(new string[] { "*" })
+                    .With(c => c.HttpContext.Request.Path.StartsWithSegments("/ui"));
+                }, excludeDefaultPolicy: true);
+            });
 
             services.AddAuthentication(options =>
             {
@@ -186,6 +229,9 @@ namespace DPMGallery
             services.AddCors();
 
 
+
+
+
             //services.AddHttpLogging(logging =>
             //{
             //    // Customize HTTP logging here.
@@ -195,17 +241,41 @@ namespace DPMGallery
             //    logging.RequestBodyLogLimit = 4096;
             //    logging.ResponseBodyLogLimit = 4096;
             //});
-            
+
             DTOMappings.Configure();
             ModelMappings.Configure();
             // configuration (resolvers, counter key builders)
-            services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
+            //services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
+        }
+
+        private Func<HttpContext, Func<Task>, Task> RemoveCacheControlHeadersForNon200s()
+        {
+            return async (context, next) =>
+            {
+                context.Response.OnStarting(() =>
+                {
+                    var headers = context.Response.GetTypedHeaders();
+                    if (context.Response.StatusCode != StatusCodes.Status200OK &&
+                        headers.CacheControl?.NoCache == false)
+                    {
+                        headers.CacheControl.NoCache = true;
+                        //headers.CacheControl = new CacheControlHeaderValue
+                        //{
+                        //    NoCache = true
+                        //};
+                    }
+
+                    return Task.FromResult(0);
+                });
+                await next();
+            };
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+
             if (env.IsDevelopment())
             {
                 app.UseCors(config =>
@@ -224,9 +294,9 @@ namespace DPMGallery
             app.UseHttpsRedirection();
             app.UseStaticFiles();
 
+
             string[] nonSpaUrls = { "/api", "/ui", "/oauth-" };
 
-            //app.MapWhen(x => !(x.Request.Path.Value.StartsWith("/api") | x.Request.Path.Value.StartsWith("/ui") | x.Request.Path.Value.StartsWith("/signin-")), builder =>
             app.MapWhen(x => !nonSpaUrls.Any(y => x.Request.Path.Value.StartsWith(y)), builder =>
             {
                 builder.UseSpa(spa =>
@@ -244,13 +314,15 @@ namespace DPMGallery
             });
 
 
-
+            app.UseRateLimiter();
 
             //app.UseCookiePolicy();
             //app.UseSerilogRequestLogging();
             app.UseApiKeyAuthMiddleware();
             app.UseOperationCancelledMiddleware();
             app.UseRouting();
+            app.UseOutputCache();
+
             app.UseAuthentication();
             app.UseAuthorization();
             //app.UseHttpLogging();
@@ -258,10 +330,10 @@ namespace DPMGallery
             {
                 endpoints.MapControllers();
                 endpoints.MapApiRoutes();
-                
                 endpoints.MapFallbackToFile("/index.html");
                 
             });
+            app.Use(RemoveCacheControlHeadersForNon200s());
 
         }
     }
