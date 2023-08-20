@@ -1,7 +1,9 @@
-﻿using DPMGallery.Data;
+﻿using AngleSharp.Io;
+using DPMGallery.Data;
 using DPMGallery.Entities;
 using Serilog;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using T = DPMGallery.Constants.Database.TableNames;
@@ -61,6 +63,14 @@ namespace DPMGallery.Repositories
             }
         }
 
+        public async Task IncrementDownloads(Package package, int inc, CancellationToken cancellationToken)
+        {
+            string sql = @$"UPDATE {T.Package} SET downloads = downloads + @inc
+                           WHERE id = @id";
+            await Context.ExecuteAsync(sql, new { id = package.Id, inc }, cancellationToken: cancellationToken);
+        }
+
+        //todo : remove this
         public async Task UpdateDownloads(string packageid, CancellationToken cancellationToken)
         {
             Package package = await GetPackageByPackageIdAsync(packageid, cancellationToken);
@@ -99,6 +109,9 @@ namespace DPMGallery.Repositories
                 throw;
             }
         }
+
+
+
     }
         
 }

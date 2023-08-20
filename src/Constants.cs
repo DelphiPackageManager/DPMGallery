@@ -5,7 +5,7 @@ namespace DPMGallery
 {
     public partial class Constants
     {
-        public const string DefaultSiteUrl = "https://delphipm.org";
+        public const string DefaultSiteUrl = "https://delphi.dev";
         public static class Claims
         {
             public const string UserName = "claim.username";

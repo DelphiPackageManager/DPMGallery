@@ -13,6 +13,7 @@ using DPMGallery.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.OutputCaching;
+using DPMGallery.Statistics;
 
 namespace DPMGallery.Controllers.Api
 {
@@ -28,13 +29,16 @@ namespace DPMGallery.Controllers.Api
         private readonly ISearchService _searchService;
         private readonly IStorageService _storageService;
         private readonly ServerConfig _serverConfig;
-        
-        public PackageContentController(ServerConfig serverConfig, IPackageContentService packageContentService, ISearchService searchService, IStorageService storageService)
+        private readonly DownloadsRecordQueue _downloadsRecordQueue;
+
+        public PackageContentController(ServerConfig serverConfig, IPackageContentService packageContentService, ISearchService searchService, 
+                                        IStorageService storageService, DownloadsRecordQueue downloadsRecordQueue)
         {
             _serverConfig = serverConfig;
             _packageContentService = packageContentService;
             _searchService = searchService;
             _storageService = storageService;
+            _downloadsRecordQueue = downloadsRecordQueue;
         }
 
         [HttpGet]
@@ -141,6 +145,7 @@ namespace DPMGallery.Controllers.Api
             }
 
             //if the storage is a cdn (ie aws or google cloud) then redirect to the cdn url for the package file.
+            //note we are returning a 302 temporary redirect as we still want downloads to come here so we can count them
             if (_storageService.IsCDN())
             {
                 if (string.IsNullOrEmpty(_serverConfig.Storage.CDNBaseUri))
@@ -148,9 +153,17 @@ namespace DPMGallery.Controllers.Api
                     return Problem("CDN Is not configured for storage provider", statusCode: 503);
                 }
 
+                if (downloadFileType == DownloadFileType.dpkg)
+                {
+                    _downloadsRecordQueue.RecordDownload(id, thePlatform, compiler, version);                
+                }
+
+
                 string packageUrl = _serverConfig.Storage.CDNBaseUri?.ToLower();
                 if (packageUrl.EndsWith('/'))
                     packageUrl = packageUrl.TrimEnd('/');
+
+
                 //add path elements
 
                 //make sure the path to the file is lowercase to avoid issues with linux filesystems

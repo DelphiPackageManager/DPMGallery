@@ -266,7 +266,7 @@ namespace DPMGallery.Services
 
                     if (!isNew) //skip this if we created a new Package, there won't be any versions
                     {
-                         thePackageVersion = await _packageVersionRepository.GetByIdAndVersion(theTargetPlatform.Id , packageVersion.Version, cancellationToken);
+                         thePackageVersion = await _packageVersionRepository.GetByIdAndVersionAsync(theTargetPlatform.Id , packageVersion.Version, cancellationToken);
                          if (thePackageVersion != null)
                             return new PackageIndexingResult()
                             {

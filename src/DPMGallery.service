@@ -1,5 +1,7 @@
 ﻿[Unit]
-Description=DPM Gallery 
+Description=DPM Gallery
+After=network.target
+Requires=postgresql.service
 
 [Service]
 Type=notify
@@ -7,7 +9,7 @@ Type=notify
 WorkingDirectory=/srv/dpmgallery
 # systemd will run this executable to start the service
 ExecStart=/usr/bin/dotnet /srv/dpmgallery/DPMGallery.dll --urls http://127.0.0.1:5000
-# to query logs using journalctl, set a logical name here  
+# to query logs using journalctl, set a logical name here
 SyslogIdentifier=dpmserver
 KillSignal=SIGINT
 
@@ -19,7 +21,7 @@ User=vincent
 
 # ensure the service restarts after crashing
 Restart=always
-# amount of time to wait before restarting the service              
+# amount of time to wait before restarting the service
 RestartSec=5
 
 [Install]

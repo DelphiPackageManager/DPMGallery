@@ -27,7 +27,7 @@ namespace DPMGallery.Repositories
             return await Context.QueryFirstOrDefaultAsync<PackageVersion>(q, new { id }, cancellationToken: cancellationToken);
         }
 
-        public async Task<PackageVersion> GetByIdAndVersion(int targetPlatformId, string version, CancellationToken cancellationToken)
+        public async Task<PackageVersion> GetByIdAndVersionAsync(int targetPlatformId, string version, CancellationToken cancellationToken)
         {
             string q = @$"select * from {T.PackageVersion} where (targetplatform_id = @targetPlatformId) and (version = @version)";
             return await Context.QueryFirstOrDefaultAsync<PackageVersion>(q, new { targetPlatformId, version }, cancellationToken: cancellationToken);
@@ -238,12 +238,12 @@ namespace DPMGallery.Repositories
             return result;
         }
 
-        public async Task<int> IncrementDownloads(PackageVersion packageVersion, CancellationToken cancellationToken)
+        public async Task<int> IncrementDownloads(PackageVersion packageVersion, int inc,  CancellationToken cancellationToken)
         {
-            string sql = $@"UPDATE {T.PackageVersion} SET downloads = downloads + 1
+            string sql = $@"UPDATE {T.PackageVersion} SET downloads = downloads + @inc
                             WHERE id = @id
                             RETURNING ID";
-            return await Context.ExecuteScalarAsync<int>(sql, new { id = packageVersion.Id }, cancellationToken: cancellationToken);
+            return await Context.ExecuteScalarAsync<int>(sql, new { id = packageVersion.Id, inc }, cancellationToken: cancellationToken);
         }
     }
 }

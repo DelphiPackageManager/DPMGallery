@@ -4,6 +4,7 @@ using DPMGallery.Configuration;
 using DPMGallery.Data;
 using DPMGallery.Repositories;
 using DPMGallery.Services;
+using DPMGallery.Statistics;
 using DPMGallery.Storage;
 using DPMGallery.Storage.Amazon;
 using DPMGallery.Storage.BunnyCDN;
@@ -34,7 +35,7 @@ namespace DPMGallery.Extensions
                 return s.GetRequiredService<IDbContext>() as IUnitOfWork;
             });
 
-            //
+            //repositories
             services.AddScoped<ApiKeyRepository>();
             services.AddScoped<PackageRepository>();
             services.AddScoped<TargetPlatformRepository>();
@@ -44,6 +45,7 @@ namespace DPMGallery.Extensions
             services.AddScoped<ReservedPrefixRepository>();
             services.AddScoped<OrganisationRepository>();
             services.AddScoped<SearchRepository>();
+            services.AddScoped<StatsRepository>();
 
 
             services.AddScoped<IAntivirusService, ClamAVService>();
@@ -75,7 +77,13 @@ namespace DPMGallery.Extensions
                 };
             });
 
+            services.AddSingleton(DownloadsRecordQueue.Instance);
+            services.AddSingleton(StatisticsData.Instance);
+
+            //background services
             services.AddHostedService<PackageIndexBackgroundService>();
+            services.AddHostedService<DownloadsCountUpdaterBackgroundService>();
+            services.AddHostedService<StatisticsUpateBackgroundService>();
 
 
             return services;

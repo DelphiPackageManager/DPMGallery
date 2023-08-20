@@ -1,6 +1,7 @@
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom";
 import ConfirmEmailPage from "./confirmEmailPage";
 import DownloadsPage from "./downloadsPage";
+import StatsPage from "./statsPage";
 
 import AccountLayout from "./account/accountLayout";
 import APIKeysPage from "./account/apiKeys";
@@ -39,7 +40,9 @@ const App = () => {
         <Route index element={<HomePage />} />
         <Route path="/packages" element={<PackagesPage />} />
         <Route path="/packages/:packageId/:packageVersion/" element={<PackagePage />} />
+        <Route path="/packages/:packageId/" element={<PackagePage />} />
         <Route path="/downloads" element={<DownloadsPage />} />
+        <Route path="/stats" element={<StatsPage />} />
 
         <Route path="/login" element={<LoginPage />} />
         <Route path="/loginwith2fa" element={<LoginWith2faPage />} />

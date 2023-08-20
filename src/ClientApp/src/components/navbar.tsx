@@ -154,6 +154,11 @@ export default function NavBar() {
               </NavLink>
             </li>
             <li>
+              <NavLink to="/stats" className={navStyle} aria-current="page">
+                Statistics
+              </NavLink>
+            </li>
+            <li>
               <NavLink to="/upload" className={navStyle} aria-current="page">
                 Upload
               </NavLink>

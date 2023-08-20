@@ -75,46 +75,46 @@ namespace DPMGallery.Services
 					{
 						ResourceType = Constants.ResourceNames.PackageVersionsWithDeps,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageVersionsWithDeps),
-						Comment = $"Get a list of package versions with dependencies in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageVersionsWithDeps} (GET)"
+						Comment = $"Get a list of package versions with dependencies in the format {GenerateInternalUrl(Constants.RouteTemplates.PackageVersionsWithDeps)} (GET)"
 					},
 					new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageVersions,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageVersions),
-						Comment = $"Get a list of package versions in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageVersions} (GET)"
+						Comment = $"Get a list of package versions in the format {GenerateInternalUrl(Constants.RouteTemplates.PackageVersions)} (GET)"
 					},
 
 					new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageDownload,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageDownload),
-						Comment = $"Base url of where DPM package files are stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageDownload} (GET)"
+						Comment = $"Base url of where DPM package files are stored, in the format {GenerateInternalUrl(Constants.RouteTemplates.PackageDownload)} (GET)"
 					},
 					new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageMetadata,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageMetadata),
-						Comment = $"Base URL of where DPM package metadata is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageMetadata} (GET)"
+						Comment = $"Base URL of where DPM package metadata is stored, in the format {GenerateInternalUrl(Constants.RouteTemplates.PackageMetadata)} (GET)"
 
 					},
 					new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageReadMe,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageReadme),
-						Comment = $"Base URL of where DPM package readme is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageReadme} (GET)"
+						Comment = $"Base URL of where DPM package readme is stored, in the format {GenerateInternalUrl(Constants.RouteTemplates.PackageReadme)} (GET)"
 
 					},
 					new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageIcon,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageIcon),
-						Comment = $"Base URL of where DPM package icon is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageIcon} (GET)"
+						Comment = $"Base URL of where DPM package icon is stored, in the format {GenerateInternalUrl(Constants.RouteTemplates.PackageIcon)} (GET)"
 					},
 					new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageInfo,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageInfo),
-						Comment = $"Base URL of where DPM package info is stored, in the format {Constants.DefaultSiteUrl}/{Constants.RouteTemplates.PackageInfo} (GET)"
+						Comment = $"Base URL of where DPM package info is stored, in the format {GenerateInternalUrl(Constants.RouteTemplates.PackageInfo)} (GET)"
 					},
 				}
 			};
