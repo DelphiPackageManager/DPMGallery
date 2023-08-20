@@ -58,6 +58,20 @@ namespace DPMGallery.Repositories
             return await Context.ExecuteScalarAsync<int>(sql, cancellationToken: cancellationToken);
         }
 
-
+        public async Task<int> GetTotalPackageVersions(CancellationToken cancellationToken)
+        {
+            string sql = $@"select count(*) from  (
+                            select p.packageid, pv.version from 
+                            package p
+                            left join package_targetplatform tp on
+                            p.id = tp.package_id
+                            left join package_version pv on
+                            pv.targetplatform_id = tp.id
+                            where  p.active = true
+                            group by p.packageid, pv.version
+                            )
+                            as packageversions";
+            return await Context.ExecuteScalarAsync<int>(sql, cancellationToken: cancellationToken);
+        }
     }
 }

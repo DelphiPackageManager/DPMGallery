@@ -49,6 +49,7 @@ namespace DPMGallery.BackgroundServices
                         statsData.TopVersionDownloads.AddRange(versionDownloads);
 
                         statsData.UniquePackages = await statsRepository.GetUniquePackagesCount(stoppingToken);
+                        statsData.PackageVersions = await statsRepository.GetTotalPackageVersions(stoppingToken);
 
                         statsData.LastUpdated = DateTime.UtcNow;
                     }
