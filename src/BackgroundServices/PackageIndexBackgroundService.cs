@@ -45,6 +45,7 @@ namespace DPMGallery.BackgroundServices
         {
             //wait 5 seconds on startup before doing anything!
             await Task.Delay(5000, stoppingToken);
+            _logger.Information("[{category}] Started.", "PackageIndexBackgroundService");
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
@@ -67,8 +68,9 @@ namespace DPMGallery.BackgroundServices
                                 if (stoppingToken.IsCancellationRequested) 
                                     return;
                             }
+                            _logger.Information("[{category}] Done processing.", "PackageIndexBackgroundService");
                         }
-                        _logger.Information("[{category}] Done processing.", "PackageIndexBackgroundService");
+                        
                         //                    throw new Exception("foobar!!!!");
                     }
                 }

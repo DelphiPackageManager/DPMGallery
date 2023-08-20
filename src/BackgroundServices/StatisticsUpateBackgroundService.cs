@@ -26,11 +26,12 @@ namespace DPMGallery.BackgroundServices
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            //wait 5 seconds on startup before doing anything!
-            await Task.Delay(5000, stoppingToken);
+            //wait 1 second on startup before doing anything!
+            await Task.Delay(1000, stoppingToken);
+            _logger.Information("[{category}] Started.", "StatisticsUpateBackgroundService");
             while (!stoppingToken.IsCancellationRequested)
             {
-                _logger.Information("[{category}] Updating Statistics.", "StatisticsUpateBackgroundService");
+                //_logger.Information("[{category}] Updating Statistics.", "StatisticsUpateBackgroundService");
                 try
                 {
                     using (var scope = _serviceProvider.CreateScope())
@@ -64,7 +65,7 @@ namespace DPMGallery.BackgroundServices
 #if DEBUG
                 await Task.Delay(TimeSpan.FromMinutes(1), stoppingToken); 
 #else
-                await Task.Delay(TimeSpan.FromMinutes(10), stoppingToken); 
+                await Task.Delay(TimeSpan.FromMinutes(30), stoppingToken); 
 #endif
             }
         }

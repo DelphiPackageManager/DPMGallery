@@ -21,10 +21,9 @@ namespace DPMGallery.Controllers.UI
         [AllowAnonymous]
         [HttpGet]
         [Route("stats")]
-        //[OutputCache(Duration = 30)]
+        [OutputCache(Duration = 30)]
         public IActionResult Index()
         {
-
             return Json(_statisticsData);
         }
     }

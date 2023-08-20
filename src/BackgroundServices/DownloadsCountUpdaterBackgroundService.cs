@@ -49,18 +49,18 @@ namespace DPMGallery.BackgroundServices
                             var package = await packageRepository.GetPackageByPackageIdAsync(item.packageId, stoppingToken);
                             if (package == null) 
                                 continue;
+
                             var targetPlatform = await targetPlatformRepository.GetByIdCompilerPlatformAsync(package.Id, item.compilerVersion, item.platform, stoppingToken);
                             if (targetPlatform == null)
                                 continue;
 
                             var packageVersion = await packageVersionRepository.GetByIdAndVersionAsync(targetPlatform.Id, item.packageVersion, stoppingToken);
-
                             if (packageVersion != null)
                             {
                                 await packageVersionRepository.IncrementDownloads(packageVersion, item.downloads, stoppingToken);
+                                await packageRepository.IncrementDownloads(package, item.downloads, stoppingToken);
+                                workDone = true;
                             }
-                            await packageRepository.IncrementDownloads(package, item.downloads, stoppingToken);
-                            workDone = true;
                             item = _downloadsRecordQueue.Dequeue();
                         }
                         if (workDone) {
@@ -75,7 +75,7 @@ namespace DPMGallery.BackgroundServices
 
                 //waiting before checking again. 
                 //TODO : make this configurable
-                await Task.Delay(10000, stoppingToken);
+                await Task.Delay(60000, stoppingToken);
             }
         }
     }
