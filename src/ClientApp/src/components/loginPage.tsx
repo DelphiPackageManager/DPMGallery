@@ -100,7 +100,7 @@ const LoginPage = () => {
       </p>
       <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-4 ">
         <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-800 dark:text-white">
-          <img className="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo"></img>DPM
+          <img className="w-8 h-8 mr-2" src="/img/dpm32.png" alt="logo"></img>DPM
         </a>
         <div className="w-full bg-white rounded-lg shadow-md dark:shadow-none shadow-gray-200 dark:shadow-gray-800 border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
           <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
