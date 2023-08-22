@@ -18,7 +18,9 @@
 }
 
 .errmsg {
-  @apply text-red-800;
+  @apply text-red-600;
+  @apply dark:text-red-800;
+  @apply text-center;
 }
 
 .dropdown {

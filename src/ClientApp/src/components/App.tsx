@@ -31,6 +31,8 @@ import TermsPage from "./policies/termsPage";
 import ProfilePage from "./profilePage";
 import RegisterPage from "./registerPage";
 import RequireAuthRoute from "./requireAuth";
+import ResetPasswordPage from "./resetPasswordPage";
+import RickRoll from "./rickRoll";
 import UploadPage from "./uploadPage";
 
 const App = () => {
@@ -51,12 +53,17 @@ const App = () => {
         <Route path="/createaccount" element={<RegisterPage />} />
         <Route path="/confirmemail" element={<ConfirmEmailPage />} />
         <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
+        <Route path="/resetpassword" element={<ResetPasswordPage />} />
 
         <Route path="/policies/terms" element={<TermsPage />} />
         <Route path="/policies/privacy" element={<PrivacyPage />} />
         <Route path="/policies/package" element={<PackagePoliciesPage />} />
-
         <Route path="/profiles/:userName" element={<ProfilePage />} />
+
+        <Route path="/wp-login" element={<RickRoll />} />
+        <Route path="/wp-login.php" element={<RickRoll />} />
+        <Route path="/owa/auth.owa" element={<RickRoll />} />
+        <Route path="/.git/config" element={<RickRoll />} />
 
         <Route element={<RequireAuthRoute allowedRoles={["RegisteredUser", "Administrator"]} />}>
           <Route path="/upload" element={<UploadPage />} />

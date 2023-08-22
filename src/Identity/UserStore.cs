@@ -48,7 +48,8 @@ namespace DPMGallery.Identity
 							 IUserPhoneNumberStore<User>,
 							 IUserAuthenticatorKeyStore<User>,
 							 IUserTwoFactorRecoveryCodeStore<User>,
-							 IUserStore<User>
+							 IUserStore<User>,
+							 IProtectedUserStore<User>
 							 
 
 	{

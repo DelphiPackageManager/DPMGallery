@@ -61,6 +61,29 @@ namespace DPMGallery.Controllers.UI
     
     }
 
+    public class ConfirmEmailModel
+    {
+        public string UserId { get; set; }
+
+        public string Code { get; set; }
+    }
+
+    public class ForgotPasswordModel
+    {
+        public string Email { get; set; }
+    }
+
+    public class ResetPasswordModel
+    {
+        [Required]
+        public string Email{ get; set; }
+        [Required]
+        public string Code { get; set; }
+        [Required]
+        public string Password { get; set; }
+    }
+
+
     [Route("ui/auth")]
     [ApiController]
     public class AuthController : Controller
@@ -73,7 +96,7 @@ namespace DPMGallery.Controllers.UI
         private readonly IUserStore<User> _userStore;
         private readonly IUserEmailStore<User> _emailStore;
         private readonly IEmailSender _emailSender;
-        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IUserStore<User> userStore, IUserEmailStore<User> emailStore,  ServerConfig serverConfig, IEmailSender emailSender)
+        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IUserStore<User> userStore, IUserEmailStore<User> emailStore, ServerConfig serverConfig, IEmailSender emailSender)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -83,7 +106,7 @@ namespace DPMGallery.Controllers.UI
             _emailSender = emailSender;
         }
 
-        private async Task<Tuple<object,List<Claim>>> GenerateProfileObject(User user)
+        private async Task<Tuple<object, List<Claim>>> GenerateProfileObject(User user)
         {
             var userRoles = await _userManager.GetRolesAsync(user);
 
@@ -110,7 +133,7 @@ namespace DPMGallery.Controllers.UI
                 userName = user.UserName,
                 avatarUrl = $"https://www.gravatar.com/avatar/{hash}",
                 roles = userRoles.ToArray()
-            }; 
+            };
 
             return new Tuple<object, List<Claim>>(userProfile, authClaims);
         }
@@ -191,6 +214,11 @@ namespace DPMGallery.Controllers.UI
             var user = await _userManager.FindByNameAsync(requestDTO.Username);
             if (user == null)
             {
+                //allow login by username or email
+                user = await _userManager.FindByEmailAsync(requestDTO.Username);
+            }
+            if (user == null)
+            {
                 return Unauthorized("Invalid username or password.");
             }
             if (user.IsOrganisation)
@@ -209,7 +237,7 @@ namespace DPMGallery.Controllers.UI
                     {
                         requires2fa = true,
                     });
-                
+
             }
             if (result.IsLockedOut)
             {
@@ -218,7 +246,7 @@ namespace DPMGallery.Controllers.UI
                     lockedOut = true,
                 });
             }
-            
+
             return Unauthorized("Invalid username or password.");
         }
 
@@ -237,7 +265,7 @@ namespace DPMGallery.Controllers.UI
 
             var result = await _signInManager.TwoFactorAuthenticatorSignInAsync(authenticatorCode, model.RememberMe, model.RememberMachine);
 
-          if (result.Succeeded)
+            if (result.Succeeded)
             {
                 var jwt = await GenerateJWT(user, model.RememberMe);
                 return Ok(jwt.Item1);
@@ -264,7 +292,11 @@ namespace DPMGallery.Controllers.UI
         {
             var userExists = await _userManager.FindByNameAsync(model.Username);
             if (userExists != null)
-                return StatusCode(StatusCodes.Status409Conflict, new ResponseModel { Status = "Error", Message = "Username already in use!" });
+                return StatusCode(StatusCodes.Status409Conflict, new ResponseModel { Status = "Error", Message = "An account for the username or email already exists, use the forgot password link on the login page." });
+
+            userExists = await _userManager.FindByEmailAsync(model.Email);
+            if (userExists != null)
+                return StatusCode(StatusCodes.Status409Conflict, new ResponseModel { Status = "Error", Message = "An account for the username or email already exists, use the forgot password link on the login page." });
 
             User user = new()
             {
@@ -275,7 +307,21 @@ namespace DPMGallery.Controllers.UI
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
-            return Ok(new ResponseModel { Status = "Success", Message = "User created successfully!" });
+            var userId = await _userManager.GetUserIdAsync(user);
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = _serverConfig.SiteBaseUrl + "/confirmemail";
+            var parameters = HttpUtility.ParseQueryString(string.Empty);
+            parameters["userId"] = userId;
+            parameters["code"] = code;
+            callbackUrl += "?" + parameters.ToString();
+            await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
+                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+            var jwt = await GenerateJWT(user, true);
+            return Ok(jwt.Item1);
+
+            //return Ok(new ResponseModel { Status = "Success", Message = "User created successfully!" });
         }
 
         [HttpPost]
@@ -286,7 +332,7 @@ namespace DPMGallery.Controllers.UI
             string refreshToken = Request.Cookies.FirstOrDefault(x => x.Key == "X-Refresh-Token").Value;
             string rememberMe = Request.Cookies.FirstOrDefault(x => x.Key == "X-Remember-Me").Value;
             if (string.IsNullOrEmpty(oldAccessToken) || string.IsNullOrEmpty(refreshToken))
-                   return Unauthorized();
+                return Unauthorized();
 
             var principal = GetPrincipalFromExpiredToken(oldAccessToken);
             if (principal == null)
@@ -295,7 +341,7 @@ namespace DPMGallery.Controllers.UI
             }
 
             string username = principal.Identity?.Name;
-            if(string.IsNullOrEmpty(username))
+            if (string.IsNullOrEmpty(username))
             {
                 return BadRequest("Invalid access token");
             }
@@ -307,7 +353,7 @@ namespace DPMGallery.Controllers.UI
                 return Unauthorized();
             }
 
-            await GenerateJWT(user,!string.IsNullOrEmpty(rememberMe));
+            await GenerateJWT(user, !string.IsNullOrEmpty(rememberMe));
             //should we return profile here?
             return Ok();
         }
@@ -349,14 +395,99 @@ namespace DPMGallery.Controllers.UI
                 info.ProviderDisplayName
             });
         }
-        [HttpGet]
+
+        [HttpPost]
+        [Route("forgotpassword")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordModel model)
+        {
+            // Don't reveal that the user does not exist or is not confirmed 
+            if (!ModelState.IsValid)
+                return Ok();
+
+            if (string.IsNullOrEmpty(model.Email))
+                return Ok();
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null || !(await _userManager.IsEmailConfirmedAsync(user)))
+            {
+                // Don't reveal that the user does not exist or is not confirmed
+                return Ok();
+            }
+
+            // For more information on how to enable account confirmation and password reset please
+            // visit https://go.microsoft.com/fwlink/?LinkID=532713
+            var code = await _userManager.GeneratePasswordResetTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = _serverConfig.SiteBaseUrl + "/resetpassword";
+            var parameters = HttpUtility.ParseQueryString(string.Empty);
+            parameters["code"] = code;
+            //parameters["email"] = model.Email; //seems like a small security issue to do this, make the user type it in again
+            callbackUrl += "?" + parameters.ToString();
+
+            await _emailSender.SendEmailAsync(
+                model.Email,
+                "DPM Gallery - Reset Password",
+                $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+            return Ok();
+
+        }
+
+
+        [HttpPost]
+        [Route("resetpassword")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordModel model)
+        {
+            //missing fields
+            if (!ModelState.IsValid)
+                return BadRequest("Not enough info");
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user does not exist
+                return Ok();
+            }
+
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Code));
+
+            var result = await _userManager.ResetPasswordAsync(user, code, model.Password); ;
+            //should we just return ok here? if someone tries to spoof it with an email address and code then
+            //should we just pretend all is ok?
+            return Ok();
+            //return BadRequest(result.ToString());
+
+        }
+
+
+        [HttpPost]
         [Route("confirm-email")]
+        [AllowAnonymous] //user might click on email when not logged in
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailModel model)
+        {
+            if (model.UserId == null || model.Code == null)
+            {
+                return RedirectToPage("/Index");
+            }
 
-        //public async Task<IActionResult> ConfirmEmail(string code)
-        //{
+            var user = await _userManager.FindByIdAsync(model.UserId);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with ID '{model.UserId}'.");
+            }
 
-        //    return Ok();
-        //}
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Code));
+            var result = await _userManager.ConfirmEmailAsync(user, code);
+            string StatusMessage = result.Succeeded ? "Thank you for confirming your email." : "Error confirming your email.";
+            if (result.Succeeded) {
+                return Ok(StatusMessage);
+            }
+            {
+                return BadRequest(StatusMessage);
+            }
+        }
         /// <summary>
         /// Called from the ExternalLoginPage when user prompted to create local account.
         /// </summary>
@@ -398,11 +529,11 @@ namespace DPMGallery.Controllers.UI
                     var userId = await _userManager.GetUserIdAsync(newUser);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = "/account/confirmemail";
+                    var callbackUrl = _serverConfig.SiteBaseUrl + "/confirmemail";
                     var parameters = HttpUtility.ParseQueryString(string.Empty);
                     parameters["userId"] = userId;
                     parameters["code"] = code;
-                    callbackUrl += parameters.ToString();
+                    callbackUrl += "?" + parameters.ToString();
                     await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                     return Ok(new
@@ -470,8 +601,9 @@ namespace DPMGallery.Controllers.UI
 
             if (result.Succeeded)
             {
-               
                 user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                    return LocalRedirect("/login");
                 await GenerateJWT(user, false);
                 return LocalRedirect(redirectTo);
 

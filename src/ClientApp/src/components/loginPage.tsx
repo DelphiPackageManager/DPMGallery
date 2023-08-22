@@ -18,17 +18,16 @@ const LoginPage = () => {
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [errMsg, setErrMsg] = useState("");
+  const [errMsg, setErrorMessage] = useState("");
 
   //clear the error when ever the user or pwd changes
   useEffect(() => {
-    setErrMsg("");
+    setErrorMessage("");
   }, [user, pwd]);
 
   const LOGIN_URL = "/ui/auth/login";
 
   const EXTERNAL_LOGIN = `/ui/auth/external-login?returnurl=${from}`;
-  console.log(EXTERNAL_LOGIN);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -73,17 +72,17 @@ const LoginPage = () => {
       console.log("error during login");
       console.log(err);
       if (!err?.response) {
-        setErrMsg("No Server Response");
+        setErrorMessage("No Server Response");
       } else if (err.response?.status === 400) {
-        setErrMsg("Missing Username or Password");
+        setErrorMessage("Missing Username or Password");
       } else if (err.response?.status === 401) {
         if (err.response?.data) {
-          setErrMsg(err.response?.data);
+          setErrorMessage(err.response?.data);
         } else {
-          setErrMsg("Invalid username or password");
+          setErrorMessage("Invalid username or password");
         }
       } else {
-        setErrMsg("Login Failed : Error code :  " + `${err?.response?.status}`);
+        setErrorMessage("Login Failed : Error code :  " + `${err?.response?.status}`);
       }
       const currentUser: User = {
         user: null,
@@ -108,7 +107,7 @@ const LoginPage = () => {
             <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
               <div>
                 <label htmlFor="userName" className="block mb-2 text-sm font-medium text-gray-800 dark:text-white">
-                  UserName
+                  UserName or Email Address
                 </label>
                 <input
                   type="text"

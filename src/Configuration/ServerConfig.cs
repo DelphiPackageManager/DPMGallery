@@ -84,6 +84,8 @@ namespace DPMGallery
             return Current;
         }
 
+        public string SiteBaseUrl { get; set; } = "https://delphi.dev";
+
         public EmailConfig Email { get; set; } = new EmailConfig();
 
         public DatabaseConfig Database { get; set; } = new DatabaseConfig();

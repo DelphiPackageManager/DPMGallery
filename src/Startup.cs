@@ -107,6 +107,7 @@ namespace DPMGallery
             {
                 options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
+                //options.Stores.
 
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;

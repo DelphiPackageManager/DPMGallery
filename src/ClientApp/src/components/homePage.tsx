@@ -6,14 +6,6 @@ const HomePage = () => {
     <>
       {/* This can't be in the page container due to sticky position */}
       <div className="bg-primary  dark:bg-primary-900 w-full sticky top-[3.5rem] ">
-        <div className="container text-white pb-1 mx-auto center-text">
-          {/* 
-          <div className="flex flex-col justify-center items-center">
-            <h1 className="text-xl md:text-2xl">DPM</h1>
-            <h2 className="text-sm md:text-lg ">The Package Manager for Delphi</h2>
-          </div>
-          */}
-        </div>
         <div className="container mx-auto flex flex-row items-center justify-center py-2 pt-1 mt-0 ">
           <PackageSearchBar doNavigateOnClear={false} value={""} />
         </div>
@@ -30,28 +22,28 @@ const HomePage = () => {
         </div>
         <div className="flex flex-row flex-1 gap-4">
           <div className="bg-primary-700 text-gray-100 p-4 rounded-md w-1/2 ">
-            <a href="#">
+            <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
               <div className="flex flex-row h-full">
                 <div className="text-left h-12 w-12 mb-2">
                   <img src="/img/dpm32.png" />
                 </div>
-                <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
+                <div>
                   <h3>Get Started</h3>
                   <p>Get started using DPM with your projects.</p>
-                </a>
+                </div>
               </div>
             </a>
           </div>
           <div className=" bg-primary-700 text-gray-100 p-4 rounded-md w-1/2">
-            <a href="#">
+            <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
               <div className="flex flex-row h-full">
                 <div className="text-left h-12 w-12 mb-2">
                   <img src="/img/dpm32.png" />
                 </div>
-                <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
+                <div>
                   <h3>Publish Packages</h3>
                   <p>Learn how to author and publish packages.</p>
-                </a>
+                </div>
               </div>
             </a>
           </div>

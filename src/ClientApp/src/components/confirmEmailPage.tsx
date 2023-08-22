@@ -1,46 +1,40 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import PageContainer from "./pageContainer";
 
-type ConfirmEmailModel = {
-  userId: string | undefined;
-  code: string | undefined;
-  returnUrl: string | undefined;
-};
-
 const ConfirmEmailPage = () => {
-  const [errMsg, setErrorMessage] = useState("");
   const axios = useAxiosPrivate();
-  let emailConfirmed = false;
-
-  let { returnUrl, userId, code } = useParams();
-  const model: ConfirmEmailModel = {
-    userId,
-    code,
-    returnUrl,
-  };
-
+  let navigate = useNavigate();
+  let [searchParams] = useSearchParams();
+  let userId = searchParams.get("userId");
+  let code = searchParams.get("code");
+  let returnUrl = searchParams.get("returnUrl") || "/";
+  let [statusMessage, setStatusMessage] = useState("");
+  let [errMsg, SetErrorMessage] = useState<string | null>(null);
   const postConfirmation = async () => {
     try {
-      const response = await axios.post("/ui/auth/confirmemail", model);
+      const response = await axios.post("/ui/auth/confirm-email", { userId, code, returnUrl });
       if (response?.status == 200) {
-        emailConfirmed = true;
+        setStatusMessage("Thank you for confirming your email address.");
+        setTimeout(() => {
+          navigate(returnUrl);
+        }, 5000);
       }
     } catch (err: any) {
       if (err?.response) {
         if (err.response.statusMessage) {
-          setErrorMessage(err.response.statusMessage);
+          SetErrorMessage(err.response.statusMessage);
         } else {
-          setErrorMessage("Error fetching external login details - Error :  " + err.response.status.toString());
+          SetErrorMessage("Error confirming email  :  " + err.response.status.toString());
         }
       }
     }
   };
 
   useEffect(() => {
-    if (!model.code || !model.userId) {
-      setErrorMessage("invalid userid or code");
+    if (!code || !userId) {
+      SetErrorMessage("missing userid or code");
       return;
     }
     postConfirmation();
@@ -49,10 +43,12 @@ const ConfirmEmailPage = () => {
   return (
     <PageContainer className="text-center">
       <h1>Confirm Email</h1>
-      <p className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
+      <h2 className={errMsg ? "" : "offscreen"} aria-live="assertive">
+        {statusMessage}
+      </h2>
+      <h2 className={errMsg ? "" : "offscreen"} aria-live="assertive">
         {errMsg}
-      </p>
-      {emailConfirmed && <p>Email confirmed.</p>}
+      </h2>
     </PageContainer>
   );
 };
