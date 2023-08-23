@@ -28,6 +28,11 @@ const ResetPasswordPage = () => {
       passwordRef?.current?.focus();
       return;
     }
+    if (password.length < 8 || password.length > 256) {
+      setErrorMessage("Passwords must be at least 8 characters (max 256)");
+      passwordRef?.current?.focus();
+      return;
+    }
     try {
       const response = await axios.post(RESETPWD_URL, { email: email, code: theCode, password: password });
       if (response?.status == 200) {

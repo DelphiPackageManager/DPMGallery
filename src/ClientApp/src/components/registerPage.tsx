@@ -37,6 +37,12 @@ const RegisterPage = () => {
       passwordRef?.current?.focus();
       return;
     }
+    if (password.length < 8 || password.length > 256) {
+      setErrorMessage("Passwords must be at least 8 characters (max 256)");
+      passwordRef?.current?.focus();
+      return;
+    }
+
     try {
       const response = await axios.post(REGISTER_URL, { username: user, email: email, password: password });
       const username = response?.data?.userName;
@@ -44,6 +50,7 @@ const RegisterPage = () => {
       const emailConfirmed = response?.data?.emailConfirmed;
       const roles = response?.data?.roles;
       const avatarUrl = response?.data?.avatarUrl;
+      const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
       const currentUser: User = {
         user: {
@@ -52,6 +59,7 @@ const RegisterPage = () => {
           emailConfirmed: emailConfirmed,
           roles: roles,
           avatarUrl: avatarUrl,
+          twoFactorEnabled: twoFactorEnabled,
         },
       };
       setAuth(currentUser);

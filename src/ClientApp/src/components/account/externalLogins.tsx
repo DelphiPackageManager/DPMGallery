@@ -23,30 +23,44 @@ const ExternalLoginsPage = () => {
   const axiosPrivate = useAxiosPrivate();
   const [logins, setLogins] = useState<LoginsModel>(null);
   const [errMsg, setErrorMessage] = useState("");
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     const fetchLogins = async () => {
-      //
+      setBusy(true);
       try {
         const reponse = await axiosPrivate.get<LoginsModel>("/ui/account/external-logins");
         if (reponse?.data) {
           setLogins(reponse.data);
           setErrorMessage("");
         }
+        setBusy(false);
       } catch (err: any) {
         if (err?.reponse) {
           setErrorMessage(err.reponse?.data);
         }
+        setBusy(false);
       }
     };
 
     fetchLogins();
   }, []);
 
-  const handleRemoveLogin = async (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleRemoveLogin = async (event: React.MouseEvent<HTMLButtonElement>, provider: string, providerKey: string) => {
     event.preventDefault();
-    console.log(event);
-    //.event.target.curren
+    setBusy(true);
+    try {
+      const reponse = await axiosPrivate.post("/ui/account/remove-login", { loginProvider: provider, providerKey: providerKey });
+      if (reponse?.data) {
+        setLogins(reponse.data);
+        setErrorMessage("");
+      }
+    } catch (err: any) {
+      if (err?.reponse) {
+        setErrorMessage(err.reponse?.data);
+      }
+    }
+    setBusy(false);
   };
 
   const CurrentLogins = () => {
@@ -62,14 +76,18 @@ const ExternalLoginsPage = () => {
           </div>
           <div className="flex justify-end">
             {logins.showRemoveButton && (
-              <button
-                type="submit"
-                className="btn btn-primary btn-small"
-                title={`Remove this ${item.providerDisplayName} login from your account`}
-                value={item.loginProvider}
-                onClick={(e) => handleRemoveLogin(e)}>
-                Remove
-              </button>
+              <div>
+                <input type="hidden" name="LoginProvider" value={item.providerKey} />
+                <button
+                  type="submit"
+                  className="btn btn-outline btn-small"
+                  title={`Remove this ${item.providerDisplayName} login from your account`}
+                  value={item.loginProvider}
+                  onClick={(e) => handleRemoveLogin(e, item.loginProvider, item.providerKey)}
+                  disabled={busy}>
+                  Remove
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -80,7 +98,7 @@ const ExternalLoginsPage = () => {
       <div className="mt-2 mb-4">
         <h4>Registered Logins</h4>
         <hr />
-        <div className="flex flex-row">{values}</div>
+        <div className="flex flex-col">{values}</div>
       </div>
     );
   };
@@ -88,7 +106,7 @@ const ExternalLoginsPage = () => {
   const OtherLogins = () => {
     const otherLogins = logins?.otherLogins;
 
-    if (!otherLogins) {
+    if (!otherLogins || otherLogins.length == 0) {
       return <></>;
     }
 
@@ -102,10 +120,11 @@ const ExternalLoginsPage = () => {
             <button
               id={item.name}
               type="submit"
-              className="btn btn-primary btn-small w-16"
+              className="btn btn-outline btn-small w-16"
               name="provider"
               value={item.name}
-              title={`"Log in using your ${item.displayName} account"`}>
+              title={`"Log in using your ${item.displayName} account"`}
+              disabled={busy}>
               Add
             </button>
           </div>
@@ -117,7 +136,7 @@ const ExternalLoginsPage = () => {
       <div className="mt-2">
         <h4>Add another service to log in.</h4>
         <hr className="border-t-gray-200 dark:border-t-gray-600" />
-        <div className="flex flex-col">{values}</div>
+        <div className="flex flex-row">{values}</div>
       </div>
     );
   };

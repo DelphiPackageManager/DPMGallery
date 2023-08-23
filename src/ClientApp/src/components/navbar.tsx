@@ -74,7 +74,7 @@ export default function NavBar() {
             </li>
             <li className="divider"></li>
             <li>
-              <Link to="/account/settings">Account Settings</Link>
+              <Link to="/account/email">Account Settings</Link>
             </li>
             <li>
               <Link to={`/profiles/${auth?.user?.userName}`}>My Profile</Link>

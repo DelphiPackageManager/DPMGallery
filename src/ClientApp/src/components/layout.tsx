@@ -15,11 +15,11 @@ export const LayoutLoader = async () => {
 const Layout = () => {
   const { auth, setAuth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
-  const PROFILE_URL = "/ui/auth/profile";
+  const PROFILE_URL = "/ui/auth/identity";
 
   const fetchData = async () => {
     try {
-      if (auth) return;
+      if (auth?.user) return;
 
       //using axios private so we get the new refresh token.
       const response = await axiosPrivate.post(
@@ -38,6 +38,7 @@ const Layout = () => {
       const emailConfirmed = response?.data?.emailConfirmed;
       const roles = response?.data?.roles;
       const avatarUrl = response?.data?.avatarUrl;
+      const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
       const currentUser: User = {
         user: {
@@ -46,10 +47,17 @@ const Layout = () => {
           emailConfirmed: emailConfirmed,
           roles: roles,
           avatarUrl: avatarUrl,
+          twoFactorEnabled: twoFactorEnabled,
         },
       };
       setAuth(currentUser);
-    } catch (err) {}
+    } catch (err) {
+      //console.log(err);
+      const currentUser: User = {
+        user: null,
+      };
+      setAuth(currentUser);
+    }
   };
 
   return (

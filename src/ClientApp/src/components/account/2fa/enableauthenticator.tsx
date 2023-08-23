@@ -2,8 +2,8 @@ import { AxiosError } from "axios";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import PageContainer from "../pageContainer";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import PageContainer from "../../pageContainer";
 
 type AuthenticatorDetailsModel = {
   sharedKey: string;

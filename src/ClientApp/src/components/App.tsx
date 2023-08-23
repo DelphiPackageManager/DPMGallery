@@ -3,17 +3,19 @@ import ConfirmEmailPage from "./confirmEmailPage";
 import DownloadsPage from "./downloadsPage";
 import StatsPage from "./statsPage";
 
+import DisableAuthenticatorPage from "./account/2fa/disable2fa";
+import EnableAuthenticatorPage from "./account/2fa/enableauthenticator";
+import GenerateRecoveryCodesPage from "./account/2fa/generateRecoveryCodes";
+import ResetAuthenticatorAppPage from "./account/2fa/resetAuthenticatorApp";
+import ShowRecoveryCodesPage from "./account/2fa/showRecoveryCodes";
+import TwoFactorAuthenticationPage from "./account/2fa/twoFactorAuthentication";
 import AccountLayout from "./account/accountLayout";
 import APIKeysPage from "./account/apiKeys";
-import EnableAuthenticatorPage from "./account/enableauthenticator";
+import EmailSettingsPage from "./account/email";
 import ExternalLoginsPage from "./account/externalLogins";
-import GenerateRecoveryCodesPage from "./account/generateRecoveryCodes";
 import MyPackagesPage from "./account/myPackages";
 import OrganisationsPage from "./account/organisations";
-import ResetAuthenticatorAppPage from "./account/resetAuthenticatorApp";
-import UserSettingsPage from "./account/settings";
-import ShowRecoveryCodesPage from "./account/showRecoveryCodes";
-import TwoFactorAuthenticationPage from "./account/twoFactorAuthentication";
+import PasswordSettingsPage from "./account/password";
 import ErrorPage from "./errorPage";
 import ExternalLoginPage from "./externalLogin";
 import ForgotPasswordPage from "./forgotPasswordPage";
@@ -68,12 +70,14 @@ const App = () => {
         <Route element={<RequireAuthRoute allowedRoles={["RegisteredUser", "Administrator"]} />}>
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/account" element={<AccountLayout />}>
-            <Route path="/account/settings" element={<UserSettingsPage />} />
+            <Route path="/account/email" element={<EmailSettingsPage />} />
+            <Route path="/account/password" element={<PasswordSettingsPage />} />
             <Route path="/account/apikeys" element={<APIKeysPage />} />
             <Route path="/account/packages" element={<MyPackagesPage />} />
             <Route path="/account/externallogins" element={<ExternalLoginsPage />} />
             <Route path="/account/twofactorauth" element={<TwoFactorAuthenticationPage />} />
             <Route path="/account/enableauthenticator" element={<EnableAuthenticatorPage />} />
+            <Route path="/account/disable2fa" element={<DisableAuthenticatorPage />} />
             <Route path="/account/resetauthenticator" element={<ResetAuthenticatorAppPage />} />
             <Route path="/account/showrecoverycodes" element={<ShowRecoveryCodesPage />} />
             <Route path="/account/generaterecoverycodes" element={<GenerateRecoveryCodesPage />} />

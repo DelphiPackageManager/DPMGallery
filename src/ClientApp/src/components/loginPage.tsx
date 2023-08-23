@@ -56,6 +56,7 @@ const LoginPage = () => {
       const emailConfirmed = response?.data?.emailConfirmed;
       const roles = response?.data?.roles;
       const avatarUrl = response?.data?.avatarUrl;
+      const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
       const currentUser: User = {
         user: {
@@ -64,6 +65,7 @@ const LoginPage = () => {
           emailConfirmed: emailConfirmed,
           roles: roles,
           avatarUrl: avatarUrl,
+          twoFactorEnabled: twoFactorEnabled,
         },
       };
       setAuth(currentUser);
@@ -173,6 +175,7 @@ const LoginPage = () => {
           </div>
 
           <form action={EXTERNAL_LOGIN} method="POST">
+            <input name="returnurl" className="hidden" value={from} />
             <div className="flex items-center justify-center gap-4 py-4">
               <button className="btn btn-outline" name="provider" value="Google">
                 <svg className="w-4 h-4" fill="currentColor">

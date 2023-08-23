@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../api/axios";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import PageContainer from "../pageContainer";
+import axios from "../../../api/axios";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import PageContainer from "../../pageContainer";
 
 const ResetAuthenticatorAppPage = () => {
   const navigate = useNavigate();

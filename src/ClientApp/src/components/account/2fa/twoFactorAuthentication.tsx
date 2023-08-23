@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import useAuth from "../../hooks/useAuth";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import PageContainer from "../pageContainer";
+//import useAuth from "../../hooks/useAuth";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import PageContainer from "../../pageContainer";
 
 type TwoFactorAuthModel = {
   twoFactorEnabled: boolean;
@@ -12,7 +12,7 @@ type TwoFactorAuthModel = {
 } | null;
 
 const TwoFactorAuthenticationPage = () => {
-  const { auth } = useAuth();
+  //const { auth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const [twofaConfig, setTwoFaConfig] = useState<TwoFactorAuthModel>(null);
   const [errMsg, setErrorMessage] = useState("");
@@ -35,7 +35,7 @@ const TwoFactorAuthenticationPage = () => {
     fetchConfig();
   }, []);
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleForgetBrowser = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     //console.log("forgetting machine");
     try {
@@ -76,17 +76,17 @@ const TwoFactorAuthenticationPage = () => {
             </div>
           )}
           {twofaConfig?.isMachineRemembered && (
-            <form className="inline-block" onSubmit={handleSubmit}>
-              <button type="submit" className="btn btn-primary">
+            <form className="inline-block" onSubmit={handleForgetBrowser}>
+              <button type="submit" className="btn btn-outline">
                 Forget this browser
               </button>
             </form>
           )}
           <div className="flex flex-row gap-3 pt-2">
-            <Link to="/account/disable2fa" className="btn btn-primary">
+            <Link to="/account/disable2fa" className="btn btn-outline">
               Disable 2FA
             </Link>
-            <Link to="/account/generaterecoverycodes" className="btn btn-primary">
+            <Link to="/account/generaterecoverycodes" className="btn btn-outline">
               Reset recovery codes
             </Link>
           </div>
@@ -95,13 +95,13 @@ const TwoFactorAuthenticationPage = () => {
       <h4 className="mt-2">Authenticator app</h4>
       <div className="pt-2">
         {!twofaConfig?.hasAuthenticator && (
-          <Link to="/account/enableauthenticator" className="btn btn-primary">
+          <Link to="/account/enableauthenticator" className="btn btn-outline">
             Add Authenticator app
           </Link>
         )}
         {twofaConfig?.hasAuthenticator && (
           <div className="flex flex-row gap-3">
-            <Link to="/account/enableauthenticator" className="btn btn-primary">
+            <Link to="/account/enableauthenticator" className="btn btn-outline btn-small">
               Set up Authenticator app
             </Link>
             <Link to="/account/resetauthenticator" className="btn btn-primary">

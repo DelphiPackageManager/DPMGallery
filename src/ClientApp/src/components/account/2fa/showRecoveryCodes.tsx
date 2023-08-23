@@ -1,5 +1,5 @@
 import { useLocation, useSearchParams } from "react-router-dom";
-import PageContainer from "../pageContainer";
+import PageContainer from "../../pageContainer";
 
 const ShowRecoveryCodesPage = () => {
   const location = useLocation();

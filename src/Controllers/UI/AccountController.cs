@@ -1,12 +1,15 @@
-﻿using DPMGallery.Entities;
+﻿using Amazon.Runtime.Internal;
+using DPMGallery.Entities;
 using DPMGallery.Identity;
 using DPMGallery.Models.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using Microsoft.AspNetCore.WebUtilities;
 using NuGet.Protocol.Plugins;
 using Org.BouncyCastle.Utilities;
 using System;
@@ -15,9 +18,27 @@ using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace DPMGallery.Controllers.UI
 {
+    public class RemoveLoginModel
+    {
+        public string LoginProvider { get; set; }
+        public string ProviderKey { get; set; }
+    }
+
+    public class ChangeEmailModel
+    {
+        public string NewEmail { get; set; }
+    }
+
+    public class ConfirmEmailChangeModel
+    {
+        public string Email { get; set; }
+        public string Code { get; set; }
+        public string UserId { get; set; }
+
     [ApiController]
     [Route("/ui/account")]
     [Authorize]
@@ -29,12 +50,16 @@ namespace DPMGallery.Controllers.UI
         private readonly UserManager<User> _userManager;
         private readonly SignInManager<User> _signInManager;
         private readonly IUserStore<User> _userStore;
-        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, UrlEncoder urlEncoder, IUserStore<User> userStore)
+        private readonly IEmailSender _emailSender;
+        private readonly ServerConfig _serverConfig;
+        public AccountController(UserManager<User> userManager, SignInManager<User> signInManager, UrlEncoder urlEncoder, IUserStore<User> userStore, IEmailSender emailSender, ServerConfig serverConfig)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _urlEncoder = urlEncoder;
             _userStore = userStore;
+            _emailSender = emailSender;
+            _serverConfig = serverConfig;
         }
 
         [HttpPost]
@@ -116,7 +141,7 @@ namespace DPMGallery.Controllers.UI
             else
             {
                 return Ok();
-            }           
+            }
         }
 
         [HttpPost]
@@ -146,6 +171,29 @@ namespace DPMGallery.Controllers.UI
             return Ok(model);
         }
 
+        [HttpPost]
+        [Route("2fa-disable")]
+        public async Task<IActionResult> DisableAuthenticator()
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null) //shouldn't happne
+            {
+                return BadRequest();
+            }
+            var disable2faResult = await _userManager.SetTwoFactorEnabledAsync(user, false);
+            if (!disable2faResult.Succeeded)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
 
         [HttpPost]
         [Route("2fa-reset")]
@@ -180,7 +228,7 @@ namespace DPMGallery.Controllers.UI
             if (userName == null)
             {
                 //just return nothing
-                return  Unauthorized();
+                return Unauthorized();
             }
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null) //shouldn't happen
@@ -255,7 +303,7 @@ namespace DPMGallery.Controllers.UI
             var AuthenticatorUri = GenerateQrCodeUri(email, unformattedKey);
             var model = new AuthenticatorDetailsModel()
             {
-                AuthenticatorUri =  AuthenticatorUri,
+                AuthenticatorUri = AuthenticatorUri,
                 SharedKey = SharedKey
             };
             return Ok(model);
@@ -309,31 +357,36 @@ namespace DPMGallery.Controllers.UI
                 return BadRequest();
             }
 
+            var logins = await GetLogins(user);
+
+            return Ok(logins);
+        }
+
+        private async Task<dynamic> GetLogins(User user)
+        {
             var currentLogins = await _userManager.GetLoginsAsync(user);
             var otherLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync())
                 .Where(auth => currentLogins.All(ul => auth.Name != ul.LoginProvider))
                 .ToList();
-           
+
 
             string passwordHash = user.PasswordHash;
-            //if (_userStore is IUserPasswordStore<IdentityUser> userPasswordStore)
-            //{
-            //    passwordHash = await userPasswordStore.GetPasswordHashAsync(user, HttpContext.RequestAborted);
-            //}
 
+            //only show remove buttons if the user has set a password on the account or there are > 1 external logins
             var showRemoveButton = passwordHash != null || currentLogins.Count > 1;
 
-            return Ok(new
+            return new
             {
-                currentLogins = currentLogins.Select(x=> new ExternalLoginModel(x.LoginProvider, x.ProviderKey, x.ProviderDisplayName)).ToArray(),
+                currentLogins = currentLogins.Select(x => new ExternalLoginModel(x.LoginProvider, x.ProviderKey, x.ProviderDisplayName)).ToArray(),
                 otherLogins = otherLogins.Select(x => new AuthenticationSchemeModel(x.Name, x.DisplayName)).ToArray(),
                 showRemoveButton
-            });
+            };
         }
+
 
         [HttpPost]
         [Route("remove-login")]
-        public async Task<IActionResult> RemoveLoginAsync(string loginProvider, string providerKey)
+        public async Task<IActionResult> RemoveLoginAsync([FromBody] RemoveLoginModel model)
         {
             string userName = HttpContext.User.Identity?.Name;
             if (userName == null)
@@ -344,9 +397,19 @@ namespace DPMGallery.Controllers.UI
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                return BadRequest();
+                return NotFound();
             }
-            return Ok();
+
+            var result = await _userManager.RemoveLoginAsync(user, model.LoginProvider, model.ProviderKey);
+            if (!result.Succeeded)
+            {
+                return Ok();
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            var logins = await GetLogins(user);
+            return Ok(logins);
+
         }
 
         [HttpPost]
@@ -362,7 +425,7 @@ namespace DPMGallery.Controllers.UI
             var user = await _userManager.FindByNameAsync(userName);
             if (user == null)
             {
-                return BadRequest();
+                return Unauthorized();
             }
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
@@ -373,5 +436,98 @@ namespace DPMGallery.Controllers.UI
             properties.AllowRefresh = true;
             return new ChallengeResult(provider, properties);
         }
-    }
+
+        [HttpPost]
+        [Route("send-verify-email")]
+        public async Task<IActionResult> SendVerificationEmailAsync()
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var userId = await _userManager.GetUserIdAsync(user);
+            var email = await _userManager.GetEmailAsync(user);
+            var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+            var qparams = HttpUtility.ParseQueryString(string.Empty);
+            qparams["userId"] = userId;
+            qparams["code"] = code;
+            var callbackUrl = _serverConfig.SiteBaseUrl +  "/confirmemail?" + qparams.ToString();
+
+            try
+            {
+
+                await _emailSender.SendEmailAsync(
+                   email,
+                   "DPM Gallery - Confirm your email",
+                   $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(503, "Unabled to send email : " + ex.Message);
+            }
+            return Ok("Verification email sent. Please check your email.");
+        }
+
+        [HttpPost]
+        [Route("change-email")]
+        public async Task<IActionResult> ChangeEmailAsync([FromBody] ChangeEmailModel model)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            if (model.NewEmail != user.Email)
+            {
+                var userId = await _userManager.GetUserIdAsync(user);
+                var code = await _userManager.GenerateChangeEmailTokenAsync(user, model.NewEmail);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+
+                var qparams = HttpUtility.ParseQueryString(string.Empty);
+                qparams["userId"] = userId;
+                qparams["email"] = model.NewEmail;
+                qparams["code"] = code;
+                var callbackUrl = _serverConfig.SiteBaseUrl + "/account/confirmemailchange?" + qparams.ToString();
+                try
+                {
+                    await _emailSender.SendEmailAsync(
+                     model.NewEmail,
+                     "DPM Gallery - Confirm your email",
+                     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                }
+                catch (Exception ex)
+                {
+                   return Problem(ex.Message);
+                }
+               return Ok("Confirmation link to change email sent. Please check your email.");
+            }
+
+
+            return Ok("Your email is unchanged.");
+        }
+
+        [HttpPost]
+        [Route("confirm-email-change")]
+        public async Task<IActionResult> ConfirmEmailChangeAsync([FromBody] ConfirmEmailChangeModel model)
+        {
+
+           return Ok();
+        }
 }

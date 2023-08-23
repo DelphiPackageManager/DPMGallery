@@ -30,6 +30,7 @@ const fetchData = async () => {
     const emailConfirmed = response?.data?.emailConfirmed;
     const roles = response?.data?.roles;
     const avatarUrl = response?.data?.avatarUrl;
+    const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
     const result = {
       user: {
@@ -38,6 +39,7 @@ const fetchData = async () => {
         emailConfirmed: emailConfirmed,
         roles: roles,
         avatarUrl: avatarUrl,
+        twoFactorEnabled: twoFactorEnabled,
       },
     };
     return result;
@@ -48,7 +50,6 @@ const fetchData = async () => {
   }
 };
 
-console.log("calling init");
 //can't call async from top level functions so wrap as an expression and invoke it.
 (async function () {
   let user = await fetchData();

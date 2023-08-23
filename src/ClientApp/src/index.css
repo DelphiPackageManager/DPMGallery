@@ -81,6 +81,10 @@
   @apply bg-gray-200 text-gray-700 dark:bg-gray-400 dark:text-gray-800 dark:border-gray-800;
 }
 
+.btn-link {
+  @apply underline text-primary-700 dark:text-primary-500;
+}
+
 .sidebar {
   @apply px-2 py-2 bg-gray-200 dark:bg-gray-800 text-gray-900 dark:text-white/80;
 }

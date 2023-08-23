@@ -36,6 +36,7 @@ const LoginWith2faPage = () => {
       const emailConfirmed = response?.data?.emailConfirmed;
       const roles = response?.data?.roles;
       const avatarUrl = response?.data?.avatarUrl;
+      const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
       const currentUser: User = {
         user: {
@@ -44,6 +45,7 @@ const LoginWith2faPage = () => {
           emailConfirmed: emailConfirmed,
           roles: roles,
           avatarUrl: avatarUrl,
+          twoFactorEnabled: twoFactorEnabled,
         },
       };
       setAuth(currentUser);

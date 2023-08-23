@@ -12,7 +12,10 @@ const AccountLayout = () => {
         <div className="sidebar">
           <ul className="list-none w-full">
             <li>
-              <NavLink to="/account/settings">Settings</NavLink>
+              <NavLink to="/account/email">Email</NavLink>
+            </li>
+            <li>
+              <NavLink to="/account/password">Password</NavLink>
             </li>
             <li>
               <NavLink to="/account/externallogins">External Logins</NavLink>
@@ -31,7 +34,7 @@ const AccountLayout = () => {
             </li>
           </ul>
         </div>
-        <div className="items-start">
+        <div className="items-start flex-grow">
           <Outlet />
         </div>
       </div>

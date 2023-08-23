@@ -132,7 +132,8 @@ namespace DPMGallery.Controllers.UI
                 emailConfirmed = user.EmailConfirmed,
                 userName = user.UserName,
                 avatarUrl = $"https://www.gravatar.com/avatar/{hash}",
-                roles = userRoles.ToArray()
+                roles = userRoles.ToArray(),
+                twoFactorEnabled = user.TwoFactorEnabled
             };
 
             return new Tuple<object, List<Claim>>(userProfile, authClaims);
@@ -315,8 +316,15 @@ namespace DPMGallery.Controllers.UI
             parameters["userId"] = userId;
             parameters["code"] = code;
             callbackUrl += "?" + parameters.ToString();
-            await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
-                $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            try
+            {
+                await _emailSender.SendEmailAsync(model.Email, "DPM Gallery - Confirm your email",
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+            }
+            catch
+            {
+                //TODO : log exception
+            }
 
             var jwt = await GenerateJWT(user, true);
             return Ok(jwt.Item1);
@@ -365,7 +373,7 @@ namespace DPMGallery.Controllers.UI
         /// <returns></returns>
         [HttpPost]
         [Route("external-login")]
-        public IActionResult ExternalLoginAsync([FromForm] string provider, string returnUrl)
+        public IActionResult ExternalLoginAsync([FromForm] string provider, [FromForm] string returnUrl)
         {
             var redirectUrl = $"/ui/auth/external-callback?returnUrl={returnUrl}";
 
@@ -469,7 +477,7 @@ namespace DPMGallery.Controllers.UI
         {
             if (model.UserId == null || model.Code == null)
             {
-                return RedirectToPage("/Index");
+                return BadRequest("No code or userid provided");
             }
 
             var user = await _userManager.FindByIdAsync(model.UserId);
@@ -523,27 +531,35 @@ namespace DPMGallery.Controllers.UI
             var createResult = await _userManager.CreateAsync(newUser);
             if (createResult.Succeeded)
             {
+                await _emailStore.SetEmailAsync(newUser, model.Email, CancellationToken.None);
                 createResult = await _userManager.AddLoginAsync(newUser, info);
-                if (createResult.Succeeded && mustConfirm)
-                {
-                    var userId = await _userManager.GetUserIdAsync(newUser);
-                    var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
-                    code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                    var callbackUrl = _serverConfig.SiteBaseUrl + "/confirmemail";
-                    var parameters = HttpUtility.ParseQueryString(string.Empty);
-                    parameters["userId"] = userId;
-                    parameters["code"] = code;
-                    callbackUrl += "?" + parameters.ToString();
-                    await _emailSender.SendEmailAsync(model.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
-                    return Ok(new
-                    {
-                        confirmEmail = true
-                    });
 
-                } else if (createResult.Succeeded)
+                if (createResult.Succeeded)
                 {
-                    return Ok();
+                    var jwt = await GenerateJWT(newUser, true);
+                    
+                    if (mustConfirm)
+                    {
+                        var userId = await _userManager.GetUserIdAsync(newUser);
+                        var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
+                        code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                        var callbackUrl = _serverConfig.SiteBaseUrl + "/confirmemail";
+                        var parameters = HttpUtility.ParseQueryString(string.Empty);
+                        parameters["userId"] = userId;
+                        parameters["code"] = code;
+                        callbackUrl += "?" + parameters.ToString();
+                        try
+                        {
+                            await _emailSender.SendEmailAsync(model.Email, "DPM Gallery - Confirm your email",
+                                $"Please confirm your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+
+                        } catch
+                        {
+                           //todo log error here
+                        }
+
+                    }
+                    return Ok(jwt.Item1);
                 }
                 else
                 {
@@ -573,13 +589,11 @@ namespace DPMGallery.Controllers.UI
 
             if (remoteError != null)
             {
-                var uriBuilder = new UriBuilder("/login");
-                var parameters = HttpUtility.ParseQueryString(string.Empty);
-                parameters["errorMessage"] = remoteError;
-                Uri finalUrl = uriBuilder.Uri;
-                return LocalRedirect(finalUrl.ToString());
+                var qparams = HttpUtility.ParseQueryString(string.Empty);
+                qparams["errorMessage"] = remoteError;
+                string finalUrl = "/login?" + qparams.ToString();
+                return LocalRedirect(finalUrl);
             }
-
 
             var info = await _signInManager.GetExternalLoginInfoAsync();
 
@@ -591,39 +605,38 @@ namespace DPMGallery.Controllers.UI
             User user;
             var email = info.Principal.FindFirstValue(ClaimTypes.Email);
 
-            
-            //TODO : get username if available (iterator is for github)
-
+                       
             string redirectTo = String.IsNullOrEmpty(returnUrl) ? "/" : returnUrl;
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: true, bypassTwoFactor: true);
 
             if (result.Succeeded)
             {
-                user = await _userManager.FindByEmailAsync(email);
-                if (user == null)
-                    return LocalRedirect("/login");
-                await GenerateJWT(user, false);
-                return LocalRedirect(redirectTo);
+                // need a way to find this user. the email may not match as they may have specified a different email when registering
+                user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);// FindByEmailAsync(email);
+                if (user != null)
+                {
+                    await GenerateJWT(user, false);//we do need this as it updates the user
+                    //should return to a page that will cause the identity check?
+                    return LocalRedirect(redirectTo);
+                }
 
             } else if (result.IsLockedOut)
             {
                 return LocalRedirect("/lockedout");
-
-            } else
+            };
+            
+            // If the user does not have an account, then ask the user to create an account.
+            //var uriBuilder = new UriBuilder("/externallogin");
+            var parameters = HttpUtility.ParseQueryString(string.Empty);
+            parameters["returnUrl"] = redirectTo;
+            if (!string.IsNullOrEmpty(email))
             {
-                // If the user does not have an account, then ask the user to create an account.
-                //var uriBuilder = new UriBuilder("/externallogin");
-                var parameters = HttpUtility.ParseQueryString(string.Empty);
-                parameters["returnUrl"] = redirectTo;
-                if (!string.IsNullOrEmpty(email))
-                {
-                    parameters["email"] = email;
-                }
-                //need to create an account so direct user to a page asking them to do that.
-                return LocalRedirect("/externallogin?" + parameters.ToString());
+                parameters["email"] = email;
             }
+            //need to create an account so direct user to a page asking them to do that.
+            return LocalRedirect("/externallogin?" + parameters.ToString());
         }
 
 
@@ -648,7 +661,8 @@ namespace DPMGallery.Controllers.UI
             if (!result.Succeeded)
             {
                 //StatusMessage = "The external login was not added. External logins can only be associated with one account.";
-                return BadRequest("The external login was not added. External logins can only be associated with one account.");
+                
+                return BadRequest("Error adding external login : " + result.ToString());
             }
 
             // Clear the existing external cookie to ensure a clean login process

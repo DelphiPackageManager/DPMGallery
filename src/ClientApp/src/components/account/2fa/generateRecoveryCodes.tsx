@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import PageContainer from "../pageContainer";
+import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
+import PageContainer from "../../pageContainer";
 
 const GenerateRecoveryCodesPage = () => {
   const axiosPrivate = useAxiosPrivate();

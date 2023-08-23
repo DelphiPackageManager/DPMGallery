@@ -69,6 +69,7 @@
 		<Folder Include="Serialization\" />
 		<Folder Include="Views\Packages\" />
 		<Folder Include="wwwroot\" />
+		<Folder Include="wwwroot\assets\" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Compile Remove="Controllers\AdminController.cs" />
