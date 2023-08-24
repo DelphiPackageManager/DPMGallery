@@ -15,7 +15,7 @@ const AccountLayout = () => {
               <NavLink to="/account/email">Email</NavLink>
             </li>
             <li>
-              <NavLink to="/account/password">Password</NavLink>
+              <NavLink to="/account/changepassword">Password</NavLink>
             </li>
             <li>
               <NavLink to="/account/externallogins">External Logins</NavLink>

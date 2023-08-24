@@ -6,6 +6,7 @@ import PageContainer from "./pageContainer";
 import { NavLink } from "react-router-dom";
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
+import { validateEmail } from "../utils";
 
 const RegisterPage = () => {
   const errRef = useRef<HTMLParagraphElement>(null);
@@ -21,12 +22,20 @@ const RegisterPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [email, setEmail] = useState("");
   const [disabled, setDisabled] = useState(true);
+  const [emailValid, setEmailValid] = useState(false);
   const { setAuth } = useAuth();
 
   //clear the error when ever the user or pwd changes
   useEffect(() => {
     setErrorMessage("");
   }, [user, password, confirmPassword, email]);
+
+  const handleEmailChanged = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    setEmail(event.target.value);
+    const isValid = validateEmail(event.target.value) !== null;
+    setEmailValid(isValid);
+  };
 
   const REGISTER_URL = "/ui/auth/register";
 
@@ -127,7 +136,7 @@ const RegisterPage = () => {
                   name="email"
                   id="email"
                   className="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={(e) => handleEmailChanged(e)}
                   placeholder="name@company.com"
                   required></input>
               </div>
@@ -139,6 +148,8 @@ const RegisterPage = () => {
                   type="password"
                   name="password"
                   id="password"
+                  minLength={8}
+                  maxLength={256}
                   ref={passwordRef}
                   className="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   onChange={(e) => setPassword(e.target.value)}
@@ -152,6 +163,8 @@ const RegisterPage = () => {
                   type="password"
                   name="confirm-password"
                   id="confirm-password"
+                  minLength={8}
+                  maxLength={256}
                   className="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required></input>
@@ -177,7 +190,7 @@ const RegisterPage = () => {
               </div>
               <button
                 type="submit"
-                disabled={disabled}
+                disabled={!emailValid || disabled}
                 className="w-full text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
                 Create an account
               </button>

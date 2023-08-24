@@ -48,6 +48,12 @@ const ExternalLoginsPage = () => {
 
   const handleRemoveLogin = async (event: React.MouseEvent<HTMLButtonElement>, provider: string, providerKey: string) => {
     event.preventDefault();
+    const ok = confirm(`Delete ${provider} external login?`);
+
+    if (!ok) {
+      return;
+    }
+
     setBusy(true);
     try {
       const reponse = await axiosPrivate.post("/ui/account/remove-login", { loginProvider: provider, providerKey: providerKey });
@@ -80,7 +86,7 @@ const ExternalLoginsPage = () => {
                 <input type="hidden" name="LoginProvider" value={item.providerKey} />
                 <button
                   type="submit"
-                  className="btn btn-outline btn-small"
+                  className="btn btn-danger btn-small"
                   title={`Remove this ${item.providerDisplayName} login from your account`}
                   value={item.loginProvider}
                   onClick={(e) => handleRemoveLogin(e, item.loginProvider, item.providerKey)}

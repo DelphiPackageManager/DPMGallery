@@ -38,7 +38,7 @@ namespace DPMGallery.Controllers.UI
         public string Email { get; set; }
         public string Code { get; set; }
         public string UserId { get; set; }
-
+    }
     [ApiController]
     [Route("/ui/account")]
     [Authorize]
@@ -461,15 +461,15 @@ namespace DPMGallery.Controllers.UI
             var qparams = HttpUtility.ParseQueryString(string.Empty);
             qparams["userId"] = userId;
             qparams["code"] = code;
-            var callbackUrl = _serverConfig.SiteBaseUrl +  "/confirmemail?" + qparams.ToString();
+            var callbackUrl = _serverConfig.SiteBaseUrl + "/confirmemail?" + qparams.ToString();
 
             try
             {
 
                 await _emailSender.SendEmailAsync(
-                   email,
-                   "DPM Gallery - Confirm your email",
-                   $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    email,
+                    "DPM Gallery - Confirm your email",
+                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
             }
             catch (Exception ex)
             {
@@ -508,15 +508,15 @@ namespace DPMGallery.Controllers.UI
                 try
                 {
                     await _emailSender.SendEmailAsync(
-                     model.NewEmail,
-                     "DPM Gallery - Confirm your email",
-                     $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        model.NewEmail,
+                        "DPM Gallery - Confirm your email",
+                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                 }
                 catch (Exception ex)
                 {
-                   return Problem(ex.Message);
+                    return Problem(ex.Message);
                 }
-               return Ok("Confirmation link to change email sent. Please check your email.");
+                return Ok("Confirmation link to change email sent. Please check your email.");
             }
 
 
@@ -527,7 +527,73 @@ namespace DPMGallery.Controllers.UI
         [Route("confirm-email-change")]
         public async Task<IActionResult> ConfirmEmailChangeAsync([FromBody] ConfirmEmailChangeModel model)
         {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+            var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Code));
+            var result = await _userManager.ChangeEmailAsync(user, model.Email, code);
+            if (!result.Succeeded)
+            {
+                BadRequest("Error changing email.");
+            }
+            await _signInManager.RefreshSignInAsync(user);
 
-           return Ok();
+            return Ok();
         }
+
+        [HttpGet]
+        [Route("haspassword")]
+        public async Task<IActionResult> GetHasPasswordAsync()
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user '{userName}'.");
+            }
+
+            var hasPassword = await _userManager.HasPasswordAsync(user);
+            if (!hasPassword)
+            {
+                return NotFound();
+            }
+
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("change-password")]
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] string newPassword)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user '{userName}'.");
+            }
+
+
+
+            return Ok();
+
+        }
+    }
 }

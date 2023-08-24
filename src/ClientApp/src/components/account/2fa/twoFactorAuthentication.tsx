@@ -101,10 +101,10 @@ const TwoFactorAuthenticationPage = () => {
         )}
         {twofaConfig?.hasAuthenticator && (
           <div className="flex flex-row gap-3">
-            <Link to="/account/enableauthenticator" className="btn btn-outline btn-small">
+            <Link to="/account/enableauthenticator" className="btn btn-primary">
               Set up Authenticator app
             </Link>
-            <Link to="/account/resetauthenticator" className="btn btn-primary">
+            <Link to="/account/resetauthenticator" className="btn btn-danger">
               Reset Authenticator app
             </Link>
           </div>

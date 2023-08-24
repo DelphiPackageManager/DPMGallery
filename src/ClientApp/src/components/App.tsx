@@ -11,11 +11,12 @@ import ShowRecoveryCodesPage from "./account/2fa/showRecoveryCodes";
 import TwoFactorAuthenticationPage from "./account/2fa/twoFactorAuthentication";
 import AccountLayout from "./account/accountLayout";
 import APIKeysPage from "./account/apiKeys";
+import { default as ChangePasswordPage, default as PasswordSettingsPage } from "./account/changePasswordPage";
+import ConfirmEmailChangePage from "./account/confirmEmailChange";
 import EmailSettingsPage from "./account/email";
 import ExternalLoginsPage from "./account/externalLogins";
 import MyPackagesPage from "./account/myPackages";
 import OrganisationsPage from "./account/organisations";
-import PasswordSettingsPage from "./account/password";
 import ErrorPage from "./errorPage";
 import ExternalLoginPage from "./externalLogin";
 import ForgotPasswordPage from "./forgotPasswordPage";
@@ -71,7 +72,7 @@ const App = () => {
           <Route path="/upload" element={<UploadPage />} />
           <Route path="/account" element={<AccountLayout />}>
             <Route path="/account/email" element={<EmailSettingsPage />} />
-            <Route path="/account/password" element={<PasswordSettingsPage />} />
+            <Route path="/account/changepassword" element={<ChangePasswordPage />} />
             <Route path="/account/apikeys" element={<APIKeysPage />} />
             <Route path="/account/packages" element={<MyPackagesPage />} />
             <Route path="/account/externallogins" element={<ExternalLoginsPage />} />
@@ -82,6 +83,7 @@ const App = () => {
             <Route path="/account/showrecoverycodes" element={<ShowRecoveryCodesPage />} />
             <Route path="/account/generaterecoverycodes" element={<GenerateRecoveryCodesPage />} />
             <Route path="/account/organisations" element={<OrganisationsPage />} />
+            <Route path="/account/confirmemailchange" element={<ConfirmEmailChangePage />} />
           </Route>
         </Route>
 

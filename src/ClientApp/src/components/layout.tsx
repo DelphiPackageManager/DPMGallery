@@ -1,9 +1,12 @@
 //import { useEffect } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 //import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { useEffect, useState } from "react";
+import fetchIdentity from "../fechIdentity";
+import usePageVisibility from "../hooks/usePageVisibility";
 import Footer from "./footer";
 import NavBar from "./navbar";
 
@@ -13,9 +16,40 @@ export const LayoutLoader = async () => {
 };
 
 const Layout = () => {
+  const [wasLoggedIn, setWasLoggedIn] = useState(false);
   const { auth, setAuth } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const PROFILE_URL = "/ui/auth/identity";
+  const navigate = useNavigate();
+  const isPageVisible = usePageVisibility();
+
+  useEffect(() => {
+    setWasLoggedIn(auth?.user !== null);
+  }, []);
+
+  //trigger when isPageVisible changes
+  useEffect(() => {
+    //fancy shite to call async from useeffect
+    (async () => {
+      // if isPageVisible, then the user activated the browser tab
+      // we don't know how long they were away so we need to check
+      // if they are still logged in.
+      // called twice in dev mode due to useffect strict mode design
+      if (isPageVisible) {
+        //updste the identity
+        let user = await fetchIdentity();
+        setAuth(user);
+        //if we were logged in but no longer are, then navigate to home
+        //just in case we were on an authenticated page.
+        if (!user.user && wasLoggedIn) {
+          setWasLoggedIn(false);
+          navigate("/");
+        }
+      } else {
+        setWasLoggedIn(auth?.user !== null);
+      }
+    })();
+  }, [isPageVisible]);
 
   const fetchData = async () => {
     try {

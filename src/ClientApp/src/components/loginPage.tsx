@@ -175,7 +175,7 @@ const LoginPage = () => {
           </div>
 
           <form action={EXTERNAL_LOGIN} method="POST">
-            <input name="returnurl" className="hidden" value={from} />
+            <input name="returnurl" className="hidden" defaultValue={from} />
             <div className="flex items-center justify-center gap-4 py-4">
               <button className="btn btn-outline" name="provider" value="Google">
                 <svg className="w-4 h-4" fill="currentColor">

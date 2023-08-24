@@ -16,6 +16,11 @@ const DisableAuthenticatorPage = () => {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const ok = confirm(`Disable Two-factor Authentication?`);
+    if (!ok) {
+      return;
+    }
+
     try {
       const response = await axiosPrivate.post("/ui/account/2fa-disable", {});
       if (response.status == 200) {
