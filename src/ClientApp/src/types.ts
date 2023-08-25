@@ -82,3 +82,7 @@ export function PlatformString(platform : Platform ) : string {
     }
 
 }
+
+export type ApiKey = {
+        
+}

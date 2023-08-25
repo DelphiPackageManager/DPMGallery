@@ -6,6 +6,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 //import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useEffect, useState } from "react";
 import fetchIdentity from "../fechIdentity";
+import { useDidMount } from "../hooks/useDidMount";
 import usePageVisibility from "../hooks/usePageVisibility";
 import Footer from "./footer";
 import NavBar from "./navbar";
@@ -17,18 +18,23 @@ export const LayoutLoader = async () => {
 
 const Layout = () => {
   const [wasLoggedIn, setWasLoggedIn] = useState(false);
-  const { auth, setAuth } = useAuth();
+  const { currentUser, login, logout } = useAuth();
   const axiosPrivate = useAxiosPrivate();
   const PROFILE_URL = "/ui/auth/identity";
   const navigate = useNavigate();
   const isPageVisible = usePageVisibility();
-
+  const didMount = useDidMount();
   useEffect(() => {
-    setWasLoggedIn(auth?.user !== null);
+    if (didMount) return;
+
+    setWasLoggedIn(currentUser !== null);
   }, []);
 
   //trigger when isPageVisible changes
   useEffect(() => {
+    //stop this running twice as it is causing issues
+    if (didMount) return;
+
     //fancy shite to call async from useeffect
     (async () => {
       // if isPageVisible, then the user activated the browser tab
@@ -36,24 +42,24 @@ const Layout = () => {
       // if they are still logged in.
       // called twice in dev mode due to useffect strict mode design
       if (isPageVisible) {
-        //updste the identity
+        //update the identity
         let user = await fetchIdentity();
-        setAuth(user);
+        login(user);
         //if we were logged in but no longer are, then navigate to home
         //just in case we were on an authenticated page.
-        if (!user.user && wasLoggedIn) {
+        if (!currentUser && wasLoggedIn) {
           setWasLoggedIn(false);
           navigate("/");
         }
       } else {
-        setWasLoggedIn(auth?.user !== null);
+        setWasLoggedIn(currentUser !== null);
       }
     })();
   }, [isPageVisible]);
 
   const fetchData = async () => {
     try {
-      if (auth?.user) return;
+      if (currentUser !== null) return;
 
       //using axios private so we get the new refresh token.
       const response = await axiosPrivate.post(
@@ -74,23 +80,17 @@ const Layout = () => {
       const avatarUrl = response?.data?.avatarUrl;
       const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
-      const currentUser: User = {
-        user: {
-          userName: username,
-          email: email,
-          emailConfirmed: emailConfirmed,
-          roles: roles,
-          avatarUrl: avatarUrl,
-          twoFactorEnabled: twoFactorEnabled,
-        },
+      const user: User = {
+        userName: username,
+        email: email,
+        emailConfirmed: emailConfirmed,
+        roles: roles,
+        avatarUrl: avatarUrl,
+        twoFactorEnabled: twoFactorEnabled,
       };
-      setAuth(currentUser);
+      login(user);
     } catch (err) {
-      //console.log(err);
-      const currentUser: User = {
-        user: null,
-      };
-      setAuth(currentUser);
+      logout();
     }
   };
 

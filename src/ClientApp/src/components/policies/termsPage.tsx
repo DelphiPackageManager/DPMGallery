@@ -1,13 +1,13 @@
-import * as React from 'react';
+import * as React from "react";
+import PageContainer from "../pageContainer";
 
-interface ITermsPageProps {
-}
+interface ITermsPageProps {}
 
 const TermsPage: React.FunctionComponent<ITermsPageProps> = (props) => {
   return (
-    <>
-        <h1>Terms go here</h1>
-    </>
+    <PageContainer>
+      <h1>Terms go here</h1>
+    </PageContainer>
   );
 };
 

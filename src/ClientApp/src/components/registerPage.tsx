@@ -23,7 +23,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [disabled, setDisabled] = useState(true);
   const [emailValid, setEmailValid] = useState(false);
-  const { setAuth } = useAuth();
+  const { login, logout } = useAuth();
 
   //clear the error when ever the user or pwd changes
   useEffect(() => {
@@ -61,17 +61,15 @@ const RegisterPage = () => {
       const avatarUrl = response?.data?.avatarUrl;
       const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
-      const currentUser: User = {
-        user: {
-          userName: username,
-          email: emailAddress,
-          emailConfirmed: emailConfirmed,
-          roles: roles,
-          avatarUrl: avatarUrl,
-          twoFactorEnabled: twoFactorEnabled,
-        },
+      const newUser: User = {
+        userName: username,
+        email: emailAddress,
+        emailConfirmed: emailConfirmed,
+        roles: roles,
+        avatarUrl: avatarUrl,
+        twoFactorEnabled: twoFactorEnabled,
       };
-      setAuth(currentUser);
+      login(newUser);
       navigate(from, { replace: true });
     } catch (err: any) {
       console.log("error during login");
@@ -91,10 +89,7 @@ const RegisterPage = () => {
       } else {
         setErrorMessage("Create Account Failed : Error code :  " + `${err?.response?.status}`);
       }
-      const currentUser: User = {
-        user: null,
-      };
-      setAuth(currentUser);
+      logout();
       errRef.current?.focus();
     }
   };

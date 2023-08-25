@@ -7,13 +7,11 @@ export type RequireAuthProps = {
 
 const RequireAuthRoute = (props: RequireAuthProps) => {
   const location = useLocation();
-  const { auth } = useAuth();
+  const { currentUser } = useAuth();
 
-  const user = auth?.user;
-
-  return user?.roles?.find((role) => props.allowedRoles?.includes(role)) ? (
+  return currentUser?.roles?.find((role) => props.allowedRoles?.includes(role)) ? (
     <Outlet />
-  ) : auth?.user ? (
+  ) : currentUser ? (
     <Navigate to="/unauthorized" state={{ from: location.pathname }} replace />
   ) : (
     <Navigate to="/login" state={{ from: location.pathname }} replace />

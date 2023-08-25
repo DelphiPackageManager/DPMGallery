@@ -1,34 +1,44 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "../../api/axios";
 import PageContainer from "../pageContainer";
 import SetPasswordPage from "./setPasswordPage";
 
 const CHECKPWDSTATUS_URL = "/ui/account/haspassword";
-const CHANGEPWD_URL = "/ui/account/"
+const CHANGEPWD_URL = "/ui/account/change-password";
 
 const ChangePasswordPage = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
   const [hasPassword, setHasPassword] = useState(false);
-  const [statusMessage, setStatusMessage] = useState("Checking password status....");
+  const [pageTitle, setPageTitle] = useState("Password");
+  const [statusMessage, setStatusMessage] = useState("");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [errMsg, setErrorMessage] = useState("");
+  const passwordRef = useRef<HTMLInputElement>(null);
+  const [disabled, setDisabled] = useState(false);
   useEffect(() => {
     (async () => {
+      setStatusMessage("Checking password status....");
       try {
         const response = await axios.get(CHECKPWDSTATUS_URL);
         if (response?.status == 200) {
           setLoading(false);
           setHasPassword(true);
           setStatusMessage("");
+          setPageTitle("Change Password");
         }
       } catch (err: any) {
-        if (err?.response?.status == 404) {
+        if (err?.response?.status == 401) {
+          navigate("/login", { state: location.pathname });
+        } else if (err?.response?.status == 404) {
           setHasPassword(false);
           setLoading(false);
           setStatusMessage("");
+          setPageTitle("Set Password");
         } else setStatusMessage(err?.message);
       }
     })();
@@ -38,33 +48,51 @@ const ChangePasswordPage = () => {
     //that will not be the case.
   }, []);
 
-
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const ok = confirm(`Change Email?`);
-    if (!ok) {
+
+    setErrorMessage("");
+    if (newPassword !== confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      passwordRef?.current?.focus();
+      return;
+    }
+    if (newPassword.length < 8 || newPassword.length > 256) {
+      setErrorMessage("Passwords must be at least 8 characters (max 256)");
+      passwordRef?.current?.focus();
       return;
     }
 
+    const ok = confirm(`Change Password?`);
+    if (!ok) {
+      return;
+    }
+    setDisabled(true);
     try {
-      const response = await axios.post(CHANGEPWD_URL, { newEmail: email });
+      const response = await axios.post(CHANGEPWD_URL, { oldPassword: currentPassword, newPassword: newPassword });
       if (response?.status == 200) {
         setStatusMessage(response?.data);
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
       }
     } catch (err: any) {
       setStatusMessage(err?.statusText);
+    } finally {
+      setDisabled(false);
     }
   };
 
-
   return (
     <PageContainer>
-      {statusMessage && <p>{statusMessage}</p>}
-
+      <h3>{pageTitle}</h3>
+      {statusMessage && <p className="mt-2">{statusMessage}</p>}
+      <p className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
+        {errMsg}
+      </p>
       {!loading && hasPassword && (
-        <form className="mt-4 w-full">
-          <h3>Password</h3>
-          <div className="">
+        <form className="mt-4 w-full" onSubmit={handleSubmit}>
+          <div className="mt-4">
             <label htmlFor="currentPassword" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Please enter your Current Password.
             </label>
@@ -77,7 +105,7 @@ const ChangePasswordPage = () => {
               maxLength={256}
               onChange={(e) => setCurrentPassword(e.target.value)}
               value={currentPassword}
-              className="border border-gray-300 text-gray-700 sm:text-sm rounded-lg  block p-2.5 bg-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 "
+              className=" "
               placeholder=""></input>
           </div>
           <div className="mt-4">
@@ -93,7 +121,8 @@ const ChangePasswordPage = () => {
               maxLength={256}
               onChange={(e) => setNewPassword(e.target.value)}
               value={newPassword}
-              className="border border-gray-300 text-gray-700 sm:text-sm rounded-lg  block p-2.5 bg-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 "
+              ref={passwordRef}
+              className=""
               placeholder=""></input>
           </div>
           <div className="mt-4">
@@ -109,18 +138,18 @@ const ChangePasswordPage = () => {
               maxLength={256}
               onChange={(e) => setConfirmPassword(e.target.value)}
               value={confirmPassword}
-              className="border border-gray-300 text-gray-700 sm:text-sm rounded-lg  block p-2.5 bg-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 "
+              className=""
               placeholder=""></input>
           </div>
           <div className="mt-4">
-            <button type="submit" className="btn btn-primary w-60">
+            <button type="submit" className="btn btn-primary w-60" disabled={disabled}>
               Update password
             </button>
           </div>
         </form>
       )}
 
-      {!loading && !hasPassword && <SetPasswordPage />}
+      {!loading && !hasPassword && <SetPasswordPage setHasPassword={setHasPassword} setPageTitle={setPageTitle} />}
     </PageContainer>
   );
 };

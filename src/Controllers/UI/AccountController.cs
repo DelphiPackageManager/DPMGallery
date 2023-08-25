@@ -39,6 +39,18 @@ namespace DPMGallery.Controllers.UI
         public string Code { get; set; }
         public string UserId { get; set; }
     }
+
+    public class ChangePasswordModel
+    {
+        public string OldPassword { get; set; }
+        public string NewPassword { get; set; }
+    }
+
+    public class SetPasswordModel
+    {
+        public string NewPassword { get; set; }
+    }
+
     [ApiController]
     [Route("/ui/account")]
     [Authorize]
@@ -576,7 +588,7 @@ namespace DPMGallery.Controllers.UI
 
         [HttpPost]
         [Route("change-password")]
-        public async Task<IActionResult> ChangePasswordAsync([FromBody] string newPassword)
+        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordModel model)
         {
             string userName = HttpContext.User.Identity?.Name;
             if (userName == null)
@@ -590,9 +602,45 @@ namespace DPMGallery.Controllers.UI
                 return NotFound($"Unable to load user '{userName}'.");
             }
 
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+            if (!changePasswordResult.Succeeded)
+            {
+                string error = changePasswordResult.Errors.FirstOrDefault()?.Description;
+                return BadRequest(error);
+            }
+            await _signInManager.RefreshSignInAsync(user);
+
+            return Ok("Your password has been changed.");
+
+        }
 
 
-            return Ok();
+        [HttpPost]
+        [Route("set-password")]
+        public async Task<IActionResult> SetPasswordAsync([FromBody] SetPasswordModel model)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user '{userName}'.");
+            }
+
+            var addPasswordResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
+            if (!addPasswordResult.Succeeded)
+            {
+                string error = addPasswordResult.Errors.FirstOrDefault()?.Description;
+                return BadRequest(error);
+            }
+
+            await _signInManager.RefreshSignInAsync(user);
+            return Ok("Your password has been set.");
+
 
         }
     }

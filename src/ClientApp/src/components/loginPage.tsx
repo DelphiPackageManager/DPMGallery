@@ -7,7 +7,7 @@ import useAuth from "../hooks/useAuth";
 import PageContainer from "./pageContainer";
 
 const LoginPage = () => {
-  const { setAuth } = useAuth();
+  const { login, logout } = useAuth();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -35,10 +35,7 @@ const LoginPage = () => {
     try {
       const response = await axios.post(LOGIN_URL, { username: user, password: pwd });
       if (response?.data?.requires2fa) {
-        const currentUser: User = {
-          user: null,
-        };
-        setAuth(currentUser);
+        logout(); //why?
         navigate("/loginwith2fa", {
           state: {
             from: from,
@@ -58,17 +55,15 @@ const LoginPage = () => {
       const avatarUrl = response?.data?.avatarUrl;
       const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
-      const currentUser: User = {
-        user: {
-          userName: username,
-          email: email,
-          emailConfirmed: emailConfirmed,
-          roles: roles,
-          avatarUrl: avatarUrl,
-          twoFactorEnabled: twoFactorEnabled,
-        },
+      const loginUser: User = {
+        userName: username,
+        email: email,
+        emailConfirmed: emailConfirmed,
+        roles: roles,
+        avatarUrl: avatarUrl,
+        twoFactorEnabled: twoFactorEnabled,
       };
-      setAuth(currentUser);
+      login(loginUser);
       navigate(from, { replace: true });
     } catch (err: any) {
       console.log("error during login");
@@ -86,112 +81,111 @@ const LoginPage = () => {
       } else {
         setErrorMessage("Login Failed : Error code :  " + `${err?.response?.status}`);
       }
-      const currentUser: User = {
-        user: null,
-      };
-      setAuth(currentUser);
+      logout();
       errRef.current?.focus();
     }
   };
 
   return (
     <PageContainer className="">
-      <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
-        {errMsg}
-      </p>
-      <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-4 ">
-        <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-800 dark:text-white">
-          <img className="w-8 h-8 mr-2" src="/img/dpm32.png" alt="logo"></img>DPM
-        </a>
-        <div className="w-full bg-white rounded-lg shadow-md dark:shadow-none shadow-gray-200 dark:shadow-gray-800 border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
-          <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">Log In to your account</h1>
-            <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="userName" className="block mb-2 text-sm font-medium text-gray-800 dark:text-white">
-                  UserName or Email Address
-                </label>
-                <input
-                  type="text"
-                  name="userName"
-                  id="userName"
-                  onChange={(e) => setUser(e.target.value)}
-                  value={user}
-                  className="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required
-                  autoFocus></input>
-              </div>
-              <div>
-                <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  name="password"
-                  id="password"
-                  onChange={(e) => setPwd(e.target.value)}
-                  value={pwd}
-                  className="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required></input>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-start">
-                  <div className="flex items-center h-5">
-                    <input
-                      id="remember"
-                      aria-describedby="remember"
-                      type="checkbox"
-                      onChange={(e) => setRememberMe(e.target.checked)}
-                      value={rememberMe ? "checked" : "unchecked"}
-                      className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"></input>
-                  </div>
-                  <div className="ml-3 text-sm">
-                    <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">
-                      Remember me
-                    </label>
-                  </div>
+      <div>
+        <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
+          {errMsg}
+        </p>
+        <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-4 ">
+          <a href="#" className="flex items-center mb-6 text-2xl font-semibold text-gray-800 dark:text-white">
+            <img className="w-8 h-8 mr-2" src="/img/dpm32.png" alt="logo"></img>DPM
+          </a>
+          <div className="w-full bg-white rounded-lg shadow-md dark:shadow-none shadow-gray-200 dark:shadow-gray-800 border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+              <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">Log In to your account</h1>
+              <form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
+                <div>
+                  <label htmlFor="userName" className="block mb-2 text-sm font-medium text-gray-800 dark:text-white">
+                    UserName or Email Address
+                  </label>
+                  <input
+                    type="text"
+                    name="userName"
+                    id="userName"
+                    onChange={(e) => setUser(e.target.value)}
+                    value={user}
+                    className="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    required
+                    autoFocus></input>
                 </div>
-                <Link to="/forgotpassword" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
-                  Forgot password?
-                </Link>
+                <div>
+                  <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    id="password"
+                    onChange={(e) => setPwd(e.target.value)}
+                    value={pwd}
+                    className="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                    required></input>
+                </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-start">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="remember"
+                        aria-describedby="remember"
+                        type="checkbox"
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        value={rememberMe ? "checked" : "unchecked"}
+                        className="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800"></input>
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label htmlFor="remember" className="text-gray-500 dark:text-gray-300">
+                        Remember me
+                      </label>
+                    </div>
+                  </div>
+                  <Link to="/forgotpassword" className="text-sm font-medium text-primary-600 hover:underline dark:text-primary-500">
+                    Forgot password?
+                  </Link>
+                </div>
+                <button type="submit" className="w-full btn btn-primary">
+                  Log In
+                </button>
+                <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                  Don’t have an account yet?{" "}
+                  <Link to="/createaccount" replace className="font-medium text-primary-600 hover:underline dark:text-primary-500">
+                    Create an Account
+                  </Link>
+                </p>
+              </form>
+            </div>
+          </div>
+          <div className="pt-3">
+            <div className="flex items-center">
+              <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
+              <div className="px-5 text-center text-gray-500 dark:text-gray-400">or</div>
+              <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
+            </div>
+
+            <form method="POST" action={EXTERNAL_LOGIN}>
+              <input name="returnurl" className="hidden" defaultValue={from} />
+              <div className="flex items-center justify-center gap-4 py-4">
+                <button className="btn btn-outline" name="provider" value="Google">
+                  <svg className="w-4 h-4" fill="currentColor">
+                    <use href="#google" />
+                  </svg>
+
+                  <span className="pl-2">Log In with Google</span>
+                </button>
+                <button className="btn btn-outline" name="provider" value="GitHub">
+                  <svg className="w-5 h-5">
+                    <use href="#github" />
+                  </svg>
+                  <span className="pl-2">Log In with GitHub</span>
+                </button>
               </div>
-              <button type="submit" className="w-full btn btn-primary">
-                Log In
-              </button>
-              <p className="text-sm font-light text-gray-500 dark:text-gray-400">
-                Don’t have an account yet?{" "}
-                <Link to="/createaccount" replace className="font-medium text-primary-600 hover:underline dark:text-primary-500">
-                  Create an Account
-                </Link>
-              </p>
             </form>
           </div>
-        </div>
-        <div className="pt-3">
-          <div className="flex items-center">
-            <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
-            <div className="px-5 text-center text-gray-500 dark:text-gray-400">or</div>
-            <div className="w-full h-0.5 bg-gray-200 dark:bg-gray-700"></div>
-          </div>
-
-          <form action={EXTERNAL_LOGIN} method="POST">
-            <input name="returnurl" className="hidden" defaultValue={from} />
-            <div className="flex items-center justify-center gap-4 py-4">
-              <button className="btn btn-outline" name="provider" value="Google">
-                <svg className="w-4 h-4" fill="currentColor">
-                  <use href="#google" />
-                </svg>
-
-                <span className="pl-2">Log In with Google</span>
-              </button>
-              <button className="btn btn-outline" name="provider" value="GitHub">
-                <svg className="w-5 h-5">
-                  <use href="#github" />
-                </svg>
-                <span className="pl-2">Log In with GitHub</span>
-              </button>
-            </div>
-          </form>
         </div>
       </div>
     </PageContainer>

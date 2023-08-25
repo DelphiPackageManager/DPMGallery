@@ -1,13 +1,13 @@
-import * as React from 'react';
+import * as React from "react";
+import PageContainer from "../pageContainer";
 
-interface IPrivacyPageProps {
-}
+interface IPrivacyPageProps {}
 
 const PrivacyPage: React.FunctionComponent<IPrivacyPageProps> = (props) => {
   return (
-    <>
-        <h1>Privacy stuff here</h1>
-    </>
+    <PageContainer>
+      <h1>Privacy stuff here</h1>
+    </PageContainer>
   );
 };
 

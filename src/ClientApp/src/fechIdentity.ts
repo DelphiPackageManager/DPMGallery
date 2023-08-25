@@ -1,6 +1,7 @@
 import { createAxiosInitial } from "./api/axios";
+import { User } from "./context/AuthProvider";
 
-const fetchIdentity = async () => {
+const fetchIdentity = async (): Promise<User | null> => {
   const IDENTITY_URL = "/ui/auth/identity";
   const axiosInitial = createAxiosInitial();
   try {
@@ -13,9 +14,7 @@ const fetchIdentity = async () => {
       }
     );
     if (!response.data) {
-      return {
-        user: null,
-      };
+      return null;
     }
 
     const username = response?.data?.userName;
@@ -25,21 +24,17 @@ const fetchIdentity = async () => {
     const avatarUrl = response?.data?.avatarUrl;
     const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
-    const result = {
-      user: {
-        userName: username,
-        email: email,
-        emailConfirmed: emailConfirmed,
-        roles: roles,
-        avatarUrl: avatarUrl,
-        twoFactorEnabled: twoFactorEnabled,
-      },
+    const result: User = {
+      userName: username,
+      email: email,
+      emailConfirmed: emailConfirmed,
+      roles: roles,
+      avatarUrl: avatarUrl,
+      twoFactorEnabled: twoFactorEnabled,
     };
     return result;
   } catch (err) {
-    return {
-      user: null,
-    };
+    return null;
   }
 };
 

@@ -12,12 +12,12 @@ const EmailSettingsPage = () => {
   const [currentEmail, setCurrentEmail] = useState("");
   const [emailConfirmed, setEmailConfirmed] = useState(false);
   const [changeEnabled, setChangeEnabled] = useState(false);
-  const { auth } = useAuth();
+  const { currentUser } = useAuth();
   const newEmailRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    setCurrentEmail(auth?.user?.email || "");
-    setEmailConfirmed(auth?.user?.emailConfirmed || false);
+    setCurrentEmail(currentUser?.email || "");
+    setEmailConfirmed(currentUser?.emailConfirmed || false);
     setChangeEnabled(false);
   }, []);
 

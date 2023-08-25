@@ -8,7 +8,7 @@ import DarkModeToggle from "./darkModeToggle";
 // import useAuth so we can tell if logged in
 export default function NavBar() {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
-  const { auth } = useAuth();
+  const { currentUser } = useAuth();
   //let location = useLocation();
   let { state } = useLocation();
   const { width, height } = useWindowSize();
@@ -26,20 +26,18 @@ export default function NavBar() {
   const navStyle =
     "block py-2 pr-4 pl-3 border-b border-primary-600 hover:bg-primary-900 dark:hover:bg-primary  md:hover:bg-inherit md:dark:hover:bg-inherit md:hover:opacity-80   md:border-0 md:p-0";
 
-  const isLoggedIn = auth?.user ? true : false;
+  const isLoggedIn = currentUser !== null ? true : false;
 
   const Profile = () => {
     const navigate = useNavigate();
     const axiosPrivate = useAxiosPrivate();
-    const { setAuth } = useAuth();
+    const { logout } = useAuth();
     const handlClick = async (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
       //post to logout endpoint and then redirect to home.
       try {
         await axiosPrivate.post("/ui/auth/logout");
-        setAuth({
-          user: null,
-        });
+        logout();
         navigate("/");
       } catch (err: any) {
         //not much we can do here.
@@ -59,16 +57,16 @@ export default function NavBar() {
     } else {
       return (
         <div className="dropdown dropdown-hover dropdown-end">
-          <label tabIndex={0} className="m-1 p-2">{`${auth?.user?.userName}`}</label>
+          <label tabIndex={0} className="m-1 p-2">{`${currentUser?.userName}`}</label>
           <ul tabIndex={0} className="dropdown-content w-72">
             <li className="dropdown-header">
               <div className="flex flex-row gap-3 items-center">
                 <div className="w-18 h-18">
-                  <img className=" rounded-md" src={`${auth?.user?.avatarUrl}`} alt="" />
+                  <img className=" rounded-md" src={`${currentUser?.avatarUrl}`} alt="" />
                 </div>
                 <div className="">
-                  <div>{`${auth?.user?.userName}`}</div>
-                  <div className="text-sm text-gray-400">{`${auth?.user?.email}`}</div>
+                  <div>{`${currentUser?.userName}`}</div>
+                  <div className="text-sm text-gray-400">{`${currentUser?.email}`}</div>
                 </div>
               </div>
             </li>
@@ -77,7 +75,7 @@ export default function NavBar() {
               <Link to="/account/email">Account Settings</Link>
             </li>
             <li>
-              <Link to={`/profiles/${auth?.user?.userName}`}>My Profile</Link>
+              <Link to={`/profiles/${currentUser?.userName}`}>My Profile</Link>
             </li>
             <li>
               <Link to="/account/apikeys">API Keys</Link>

@@ -5,13 +5,13 @@ import useAuth from "../../../hooks/useAuth";
 import PageContainer from "../../pageContainer";
 
 const DisableAuthenticatorPage = () => {
-  const { auth } = useAuth();
+  const { currentUser } = useAuth();
   const [twoFaEnabled, setTwoFAEnabled] = useState(false);
   const navigate = useNavigate();
   const [errMsg, setErrorMessage] = useState("");
   useEffect(() => {
-    console.log(auth);
-    setTwoFAEnabled(auth?.user?.twoFactorEnabled || false);
+    //console.log(currentUser);
+    setTwoFAEnabled(currentUser?.twoFactorEnabled || false);
   }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {

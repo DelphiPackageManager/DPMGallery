@@ -13,7 +13,7 @@ const LoginWith2faPage = () => {
   const [errMsg, setErrMsg] = useState("");
   const [code, setCode] = useState("");
   const [rememberMachine, setRememberMachine] = useState(true);
-  const { setAuth } = useAuth();
+  const { login, logout } = useAuth();
   const axiosPrivate = useAxiosPrivate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -38,17 +38,15 @@ const LoginWith2faPage = () => {
       const avatarUrl = response?.data?.avatarUrl;
       const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
-      const currentUser: User = {
-        user: {
-          userName: username,
-          email: email,
-          emailConfirmed: emailConfirmed,
-          roles: roles,
-          avatarUrl: avatarUrl,
-          twoFactorEnabled: twoFactorEnabled,
-        },
+      const loginUser: User = {
+        userName: username,
+        email: email,
+        emailConfirmed: emailConfirmed,
+        roles: roles,
+        avatarUrl: avatarUrl,
+        twoFactorEnabled: twoFactorEnabled,
       };
-      setAuth(currentUser);
+      login(loginUser);
       navigate(from, { replace: true });
       //
     } catch (err: any) {
@@ -69,10 +67,7 @@ const LoginWith2faPage = () => {
       } else {
         setErrMsg("Login Failed : Error code :  " + `${err?.response?.status}`);
       }
-      const currentUser: User = {
-        user: null,
-      };
-      setAuth(currentUser);
+      logout();
       // errRef.current?.focus();
     }
   };
@@ -120,7 +115,7 @@ const LoginWith2faPage = () => {
             </button>
           </div>
           {errMsg !== "" && (
-            <div className="text-danger" role="alert">
+            <div className="mt-2 errmsg" role="alert">
               {errMsg}
             </div>
           )}

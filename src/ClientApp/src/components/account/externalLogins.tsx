@@ -48,7 +48,7 @@ const ExternalLoginsPage = () => {
 
   const handleRemoveLogin = async (event: React.MouseEvent<HTMLButtonElement>, provider: string, providerKey: string) => {
     event.preventDefault();
-    const ok = confirm(`Delete ${provider} external login?`);
+    const ok = confirm(`Remove ${provider} external login?`);
 
     if (!ok) {
       return;
@@ -76,11 +76,11 @@ const ExternalLoginsPage = () => {
     }
     const values = currentLogins.map((item, index) => {
       return (
-        <div className="flex flex-row items-center gap-4 w-full my-2" key={index}>
-          <div className="flex flex-grow" key={item.providerKey}>
+        <div className="flex flex-row items-center gap-4 my-2" key={index}>
+          <div className="flex-grow" key={item.providerKey}>
             {item.providerDisplayName}
           </div>
-          <div className="flex justify-end">
+          <div className="justify-end">
             {logins.showRemoveButton && (
               <div>
                 <input type="hidden" name="LoginProvider" value={item.providerKey} />
@@ -118,8 +118,8 @@ const ExternalLoginsPage = () => {
 
     const values = otherLogins.map((item, index) => {
       return (
-        <form className="flex flex-row items-center gap-4 w-full my-2" method="POST" action="/ui/account/link-login" key={index}>
-          <div className="flex flex-grow" key={item.name}>
+        <form className="flex flex-row my-2" method="POST" action="/ui/account/link-login" key={index}>
+          <div className="flex-grow" key={item.name}>
             {item.displayName}
           </div>
           <div className="flex justify-end">
@@ -142,7 +142,7 @@ const ExternalLoginsPage = () => {
       <div className="mt-2">
         <h4>Add another service to log in.</h4>
         <hr className="border-t-gray-200 dark:border-t-gray-600" />
-        <div className="flex flex-row">{values}</div>
+        <div className="flex flex-col">{values}</div>
       </div>
     );
   };
@@ -151,8 +151,12 @@ const ExternalLoginsPage = () => {
     <PageContainer>
       <h3>Manage your external logins</h3>
       {errMsg && <p>{errMsg}</p>}
-      <CurrentLogins />
-      <OtherLogins />
+      <div className="flex flex-col w-full">
+        <CurrentLogins />
+      </div>
+      <div className="flex flex-col w-full">
+        <OtherLogins />
+      </div>
     </PageContainer>
   );
 };

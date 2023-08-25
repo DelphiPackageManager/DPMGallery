@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import PageContainer from "../pageContainer";
 
 const ConfirmEmailChangePage = () => {
-  const axios = useAxiosPrivate();
-  const { auth, setAuth } = useAuth();
+  const location = useLocation();
   let navigate = useNavigate();
+  const axios = useAxiosPrivate();
+  const { currentUser, login } = useAuth();
   const [searchParams] = useSearchParams();
   let [statusMessage, setStatusMessage] = useState("");
   let [errMsg, SetErrorMessage] = useState<string | null>(null);
@@ -21,10 +22,11 @@ const ConfirmEmailChangePage = () => {
       const response = await axios.post("/ui/account/confirm-email-change", { userId, code, email });
       if (response?.status == 200) {
         setStatusMessage("Thank you for confirming your email change.");
-        let user = auth?.user;
+        //update the auth context
+        let user = currentUser;
         if (user) {
           user.email = email;
-          setAuth({ user: user });
+          login(user);
         }
 
         setTimeout(() => {
@@ -33,6 +35,10 @@ const ConfirmEmailChangePage = () => {
       }
     } catch (err: any) {
       if (err?.response) {
+        if (err?.response?.status == 401) {
+          navigate("/login", { state: location.pathname });
+        }
+
         if (err.response.statusMessage) {
           SetErrorMessage(err.response.statusMessage);
         } else {

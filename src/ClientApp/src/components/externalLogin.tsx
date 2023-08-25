@@ -16,7 +16,7 @@ type ExternalLoginModel = {
 } | null;
 
 const ExternalLoginPage = () => {
-  const { setAuth } = useAuth();
+  const { login } = useAuth();
   const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [details, setDetails] = useState<ExternalDetails>(null);
@@ -68,17 +68,15 @@ const ExternalLoginPage = () => {
         const avatarUrl = response?.data?.avatarUrl;
         const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
-        const currentUser: User = {
-          user: {
-            userName: username,
-            email: email,
-            emailConfirmed: emailConfirmed,
-            roles: roles,
-            avatarUrl: avatarUrl,
-            twoFactorEnabled: twoFactorEnabled,
-          },
+        const newUser: User = {
+          userName: username,
+          email: email,
+          emailConfirmed: emailConfirmed,
+          roles: roles,
+          avatarUrl: avatarUrl,
+          twoFactorEnabled: twoFactorEnabled,
         };
-        setAuth(currentUser);
+        login(newUser);
         navigate(returnUrl ? returnUrl : "/", { replace: true });
         //        }
       }
