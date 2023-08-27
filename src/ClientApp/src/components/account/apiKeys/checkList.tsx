@@ -21,6 +21,7 @@ const CheckList = (props: CheckListProps) => {
       <input
         type="checkbox"
         key={index}
+        id={item.value}
         itemID={item.value}
         onChange={(e) => itemChanged(index, e.target.checked)}
         className="mr-2"

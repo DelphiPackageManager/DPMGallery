@@ -7,11 +7,11 @@ export type NewApiKeyProps = {
 
 let dummyItems: CheckListItem[] = [
   {
-    value: "One",
+    value: "VSoft.Awaitable",
     checked: false,
   },
   {
-    value: "Two",
+    value: "Sprin4D.Persistence",
     checked: false,
   },
   {
