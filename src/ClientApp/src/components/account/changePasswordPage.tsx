@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "../../api/axios";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import PageContainer from "../pageContainer";
 import SetPasswordPage from "./setPasswordPage";
 
@@ -10,6 +10,9 @@ const CHANGEPWD_URL = "/ui/account/change-password";
 const ChangePasswordPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const axios = useAxiosPrivate();
+
+  const passwordRef = useRef<HTMLInputElement>(null);
   const [hasPassword, setHasPassword] = useState(false);
   const [pageTitle, setPageTitle] = useState("Password");
   const [statusMessage, setStatusMessage] = useState("");
@@ -18,8 +21,8 @@ const ChangePasswordPage = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [errMsg, setErrorMessage] = useState("");
-  const passwordRef = useRef<HTMLInputElement>(null);
   const [disabled, setDisabled] = useState(false);
+
   useEffect(() => {
     (async () => {
       setStatusMessage("Checking password status....");

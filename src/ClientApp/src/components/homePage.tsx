@@ -11,7 +11,7 @@ const HomePage = () => {
         </div>
       </div>
 
-      <PageContainer className="px-2">
+      <PageContainer className="px-2 ">
         <div className="pt-8 text-gray-600 dark:text-gray-400 mb-8">
           <div className="flex flex-row items-center ">
             <img src="/img/dpm-large.png" className="mr-4 w-16 h-16 md:w-20 md:h-20" />
@@ -20,7 +20,7 @@ const HomePage = () => {
 
           <h3>Open source package manager for Delphi XE2 - 11.3 </h3>
         </div>
-        <div className="flex flex-row flex-1 gap-4">
+        <div className="flex flex-row flex-1 gap-4 ">
           <div className="bg-primary-700 text-gray-100 p-4 rounded-md w-1/2 ">
             <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
               <div className="flex flex-row h-full">

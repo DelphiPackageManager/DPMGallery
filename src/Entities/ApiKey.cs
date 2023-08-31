@@ -15,7 +15,7 @@ namespace DPMGallery.Entities
         public string Name { get; set; }
 
         [Column("key_hashed")]
-        public string KeyHashed { get; set; }
+        public string KeyHashed { get; set; } //only used for inserts!
 
         //do not persist!
         public string Key { get; set; }
@@ -38,5 +38,7 @@ namespace DPMGallery.Entities
         [Column("scopes")]
         public ApiKeyScope Scopes { get; set; }
 
+        [Column("revoked")]
+        public bool Revoked { get; set; }
     }
 }

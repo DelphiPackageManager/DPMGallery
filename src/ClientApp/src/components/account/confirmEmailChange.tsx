@@ -15,11 +15,11 @@ const ConfirmEmailChangePage = () => {
 
   const code = searchParams.get("code");
   const email = searchParams.get("email") || "";
-  const userId = searchParams.get("userId");
+  const userName = searchParams.get("userName");
 
   const postConfirmation = async () => {
     try {
-      const response = await axios.post("/ui/account/confirm-email-change", { userId, code, email });
+      const response = await axios.post("/ui/account/confirm-email-change", { userName, code, email });
       if (response?.status == 200) {
         setStatusMessage("Thank you for confirming your email change.");
         //update the auth context
@@ -49,7 +49,7 @@ const ConfirmEmailChangePage = () => {
   };
 
   useEffect(() => {
-    if (!code || !userId || !email) {
+    if (!code || !userName || !email) {
       SetErrorMessage("Invalid confirmation link");
       return;
     }

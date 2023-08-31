@@ -214,12 +214,12 @@ namespace DPMGallery.Services
                                 return new PackageIndexingResult()
                                 {
                                     Status = PackageIndexingStatus.Forbidden,
-                                    Message = "You are not an ower of package " + package.PackageId
+                                    Message = "You are not an owner of package " + package.PackageId
                                 };
                                 
                             }
                             //check that the api key actually has permissions to push a new version
-                            if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion))
+                            if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion) || apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage))
                             {
                                 return new PackageIndexingResult()
                                 {

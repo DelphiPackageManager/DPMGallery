@@ -17,22 +17,27 @@
 	<ItemGroup>
 	  <Compile Remove="Areas\**" />
 	  <Compile Remove="ClientApp\**" />
+	  <Compile Remove="Search\**" />
 	  <Content Remove="Areas\**" />
 	  <Content Remove="ClientApp\**" />
+	  <Content Remove="Search\**" />
 	  <EmbeddedResource Remove="Areas\**" />
 	  <EmbeddedResource Remove="ClientApp\**" />
+	  <EmbeddedResource Remove="Search\**" />
 	  <None Remove="Areas\**" />
 	  <None Remove="ClientApp\**" />
+	  <None Remove="Search\**" />
 	  <TypeScriptCompile Remove="Areas\**" />
 	  <TypeScriptCompile Remove="ClientApp\**" />
+	  <TypeScriptCompile Remove="Search\**" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.3" />
+		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="7.0.4" />
 		<PackageReference Include="AWSSDK.S3" Version="3.7.201.14" />
 		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.201.12" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
-		<PackageReference Include="Dapper" Version="2.0.143" />
+		<PackageReference Include="Dapper" Version="2.0.151" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
 		<PackageReference Include="FluentMigrator" Version="3.3.2" />
 		<PackageReference Include="FluentMigrator.Runner" Version="3.3.2" />
@@ -51,7 +56,7 @@
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="7.0.0" />
-		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.1.5">
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.2.2">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
@@ -65,9 +70,7 @@
 
 
 	<ItemGroup>
-		<Folder Include="Search\" />
 		<Folder Include="Serialization\" />
-		<Folder Include="Views\Packages\" />
 		<Folder Include="wwwroot\" />
 		<Folder Include="wwwroot\assets\" />
 	</ItemGroup>
@@ -80,11 +83,6 @@
 	  <Compile Remove="Controllers\PoliciesController.cs" />
 	  <Compile Remove="Controllers\ProfilesController.cs" />
 	  <Compile Remove="Repositories\SearchRepository1.cs" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Content Remove="Views\Packages\Details.cshtml" />
-	  <Content Remove="Views\Packages\Index.cshtml" />
-	  <Content Remove="Views\Packages\Upload.cshtml" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="postcss.config.js" />

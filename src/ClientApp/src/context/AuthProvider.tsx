@@ -21,10 +21,6 @@ export interface AuthContextInterface {
   logout: () => void;
 }
 
-const defaultAuth: Auth = {
-  user: null,
-};
-
 const defaultAuthContext: AuthContextInterface = {
   currentUser: null,
   login: (value: User | null) => {},

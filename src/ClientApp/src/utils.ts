@@ -44,3 +44,30 @@ export const validateEmail = (email: string) => {
       /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 };
+
+export const UTCNow = () => {
+  const now = new Date();
+
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
+  const day = now.getUTCDate();
+  const hours = now.getUTCHours();
+  const minutes = now.getUTCMinutes();
+  const seconds = now.getUTCSeconds();
+  const milliseconds = now.getUTCMilliseconds();
+
+  const ts = `${year}-${month}-${day} 
+              ${hours}:${minutes}:${seconds}.${milliseconds}`;
+
+  return new Date(ts);
+};
+
+export class DateUtils {
+  public static jsonToJSDate(value: string): any {
+    var pattern = /Date\(([^)]+)\)/;
+    var results = pattern.exec(value);
+    if (results === null || results.length < 1) return null;
+    var dt = new Date(parseFloat(results[1]));
+    return dt;
+  }
+}

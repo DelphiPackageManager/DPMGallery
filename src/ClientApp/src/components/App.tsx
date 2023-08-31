@@ -1,7 +1,7 @@
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom";
-import ConfirmEmailPage from "./confirmEmailPage";
 import DownloadsPage from "./downloadsPage";
 import StatsPage from "./statsPage";
+import VerifyEmailPage from "./verifyEmailPage";
 
 import DisableAuthenticatorPage from "./account/2fa/disable2fa";
 import EnableAuthenticatorPage from "./account/2fa/enableauthenticator";
@@ -54,7 +54,7 @@ const App = () => {
         <Route path="/lockedout" element={<LockedOutPage />} />
         <Route path="/externallogin" element={<ExternalLoginPage />} />
         <Route path="/createaccount" element={<RegisterPage />} />
-        <Route path="/confirmemail" element={<ConfirmEmailPage />} />
+        <Route path="/verifyemail" element={<VerifyEmailPage />} />
         <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
         <Route path="/resetpassword" element={<ResetPasswordPage />} />
 

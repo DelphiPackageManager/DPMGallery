@@ -34,11 +34,11 @@ export default function NavBar() {
     const { logout } = useAuth();
     const handlClick = async (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
-      //post to logout endpoint and then redirect to home.
+      //post to logout endpoint and then redirect to login page.
       try {
         await axiosPrivate.post("/ui/auth/logout");
         logout();
-        navigate("/");
+        navigate("/login");
       } catch (err: any) {
         //not much we can do here.
       }

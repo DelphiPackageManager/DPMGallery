@@ -63,7 +63,7 @@ namespace DPMGallery.Controllers.UI
 
     public class ConfirmEmailModel
     {
-        public string UserId { get; set; }
+        public string UserName { get; set; }
 
         public string Code { get; set; }
     }
@@ -96,7 +96,8 @@ namespace DPMGallery.Controllers.UI
         private readonly IUserStore<User> _userStore;
         private readonly IUserEmailStore<User> _emailStore;
         private readonly IEmailSender _emailSender;
-        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IUserStore<User> userStore, IUserEmailStore<User> emailStore, ServerConfig serverConfig, IEmailSender emailSender)
+        private readonly UrlEncoder _urlEncoder;
+        public AuthController(SignInManager<User> signInManager, UserManager<User> userManager, IUserStore<User> userStore, IUserEmailStore<User> emailStore, ServerConfig serverConfig, IEmailSender emailSender, UrlEncoder urlEncoder)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -104,6 +105,7 @@ namespace DPMGallery.Controllers.UI
             _userStore = userStore;
             _emailStore = emailStore;
             _emailSender = emailSender;
+            _urlEncoder = urlEncoder;
         }
 
         private async Task<Tuple<object, List<Claim>>> GenerateProfileObject(User user)
@@ -308,18 +310,18 @@ namespace DPMGallery.Controllers.UI
             if (!result.Succeeded)
                 return StatusCode(StatusCodes.Status500InternalServerError, new ResponseModel { Status = "Error", Message = "User creation failed! Please check user details and try again." });
 
-            var userId = await _userManager.GetUserIdAsync(user);
+            //var userId = await _userManager.GetUserIdAsync(user);
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl = _serverConfig.SiteBaseUrl + "/confirmemail";
+            var callbackUrl = _serverConfig.SiteBaseUrl + "/verifyemail";
             var parameters = HttpUtility.ParseQueryString(string.Empty);
-            parameters["userId"] = userId;
+            parameters["userName"] = model.Username;
             parameters["code"] = code;
             callbackUrl += "?" + parameters.ToString();
             try
             {
-                await _emailSender.SendEmailAsync(model.Email, "DPM Gallery - Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                await _emailSender.SendEmailAsync(model.Email, "[DPM Gallery] - Verify your email address",
+                    $"Please verify your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
             }
             catch
             {
@@ -435,7 +437,7 @@ namespace DPMGallery.Controllers.UI
 
             await _emailSender.SendEmailAsync(
                 model.Email,
-                "DPM Gallery - Reset Password",
+                "[DPM Gallery] - Reset Password",
                 $"Please reset your password by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
             return Ok();
@@ -475,15 +477,15 @@ namespace DPMGallery.Controllers.UI
         [AllowAnonymous] //user might click on email when not logged in
         public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailModel model)
         {
-            if (model.UserId == null || model.Code == null)
+            if (model.UserName == null || model.Code == null)
             {
                 return BadRequest("No code or userid provided");
             }
 
-            var user = await _userManager.FindByIdAsync(model.UserId);
+            var user = await _userManager.FindByNameAsync(model.UserName);
             if (user == null)
             {
-                return NotFound($"Unable to load user with ID '{model.UserId}'.");
+                return NotFound($"Unable to load user with name '{model.UserName}'.");
             }
 
             var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(model.Code));
@@ -543,15 +545,15 @@ namespace DPMGallery.Controllers.UI
                         var userId = await _userManager.GetUserIdAsync(newUser);
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(newUser);
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-                        var callbackUrl = _serverConfig.SiteBaseUrl + "/confirmemail";
+                        var callbackUrl = _serverConfig.SiteBaseUrl + "/verifyemail";
                         var parameters = HttpUtility.ParseQueryString(string.Empty);
                         parameters["userId"] = userId;
                         parameters["code"] = code;
                         callbackUrl += "?" + parameters.ToString();
                         try
                         {
-                            await _emailSender.SendEmailAsync(model.Email, "DPM Gallery - Confirm your email",
-                                $"Please confirm your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                            await _emailSender.SendEmailAsync(model.Email, "[DPM Gallery] - Vefify your email address",
+                                $"Please verify your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                         } catch
                         {
@@ -660,9 +662,8 @@ namespace DPMGallery.Controllers.UI
             var result = await _userManager.AddLoginAsync(user, info);
             if (!result.Succeeded)
             {
-                //StatusMessage = "The external login was not added. External logins can only be associated with one account.";
-                
-                return BadRequest("Error adding external login : " + result.ToString());
+                string statusMessage = "The external login was not added. External logins can only be associated with one account.";
+                return LocalRedirect(returnUrl + "?error=" + _urlEncoder.Encode(statusMessage));
             }
 
             // Clear the existing external cookie to ensure a clean login process

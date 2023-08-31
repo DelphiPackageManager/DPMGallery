@@ -1,11 +1,10 @@
 //import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { User } from "../context/AuthProvider";
+import fetchIdentity from "../fechIdentity";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-//import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import { useEffect, useState } from "react";
-import fetchIdentity from "../fechIdentity";
 import { useDidMount } from "../hooks/useDidMount";
 import usePageVisibility from "../hooks/usePageVisibility";
 import Footer from "./footer";
@@ -98,7 +97,7 @@ const Layout = () => {
     <>
       <div className="flex flex-col m-0 h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <NavBar />
-        <div className="flex-grow mt-[3.5rem]">
+        <div className="flex flex-col flex-grow mt-[3.5rem]">
           <Outlet />
         </div>
         <Footer />

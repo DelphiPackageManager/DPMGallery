@@ -1,8 +1,13 @@
+import { minimatch } from "minimatch";
 import { useState } from "react";
+import useEscapeKey from "../../../hooks/useEscapeKey";
+import { ApiKey, ApiKeyScopes } from "../../../types";
 import CheckList, { CheckListItem } from "./checkList";
 
 export type NewApiKeyProps = {
-  hidden: boolean;
+  //hidden: boolean;
+  onNewApiKey: (apiKey: ApiKey) => void;
+  hide: () => void;
 };
 
 let dummyItems: CheckListItem[] = [
@@ -26,12 +31,15 @@ let dummyItems: CheckListItem[] = [
 
 const NewApiKey = (props: NewApiKeyProps) => {
   const [keyName, setKeyName] = useState("");
+  const [expires, setExpires] = useState(365);
+  const [glob, setGlob] = useState("");
+
   const [owner, setOwner] = useState("");
   const [canPush, setCanPush] = useState(false);
+  const [pushScopes, setPushScopes] = useState(ApiKeyScopes.pushPackageVersion);
+  const [unlistScope, setUnlistScope] = useState(ApiKeyScopes.none);
+
   const [packages, setPackages] = useState<CheckListItem[]>(dummyItems);
-  const radioHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //
-  };
 
   const onPackageSelectionChange = (selectedId: number, value: boolean) => {
     let newItem: CheckListItem = {
@@ -44,8 +52,35 @@ const NewApiKey = (props: NewApiKeyProps) => {
     setPackages(newPackages);
   };
 
+  function addDays(date: Date, days: number): Date {
+    date.setDate(date.getDate() + days);
+    return date;
+  }
+
+  const onCreateClick = () => {
+    var date = new Date();
+    date = addDays(date, expires);
+    var expires_utc = date.toUTCString();
+    let scopes: ApiKeyScopes = unlistScope;
+    if (canPush) scopes |= pushScopes;
+
+    props.hide();
+    let newKey: ApiKey = {
+      name: keyName,
+      globPattern: glob,
+      expiresUTC: expires_utc,
+      revoked: false,
+      packageList: "",
+      scopes: scopes,
+    };
+    props.onNewApiKey(newKey);
+    return true;
+  };
+
+  useEscapeKey(props.hide);
+
   return (
-    <form className="w-full my-4 p-4 border border-gray-500 dark:border-gray-700" hidden={props.hidden}>
+    <form className="w-full my-4 p-4 border border-gray-500 dark:border-gray-700">
       <div className="flex flex-row gap-2 items-center">
         <div className="flex flex-col">
           <div className="mr-2">
@@ -67,7 +102,12 @@ const NewApiKey = (props: NewApiKeyProps) => {
             <label htmlFor="newKeyExpires">Expires</label>
           </div>
           <div className="">
-            <select id="newKeyExpires" defaultValue={365} className="text-gray-900  bg-gray-200 dark:text-gray-50 dark:bg-gray-700 p-1 rounded">
+            <select
+              id="newKeyExpires"
+              defaultValue={365}
+              value={expires}
+              onChange={(e) => setExpires(+e.target.value)}
+              className="text-gray-900  bg-gray-200 dark:text-gray-50 dark:bg-gray-700 p-1 rounded">
               <option value={1}>1 day</option>
               <option value={90}>90 days</option>
               <option value={180}>180 day</option>
@@ -110,10 +150,12 @@ const NewApiKey = (props: NewApiKeyProps) => {
               <input
                 type="radio"
                 id="scopeNewAndVersion"
-                name="pushScope"
+                name="pushScopes"
                 className="mr-2 w-5"
-                value="scopeNewAndVersion"
-                checked
+                checked={(pushScopes & ApiKeyScopes.pushNewPackage) === ApiKeyScopes.pushNewPackage}
+                onChange={(e) => {
+                  setPushScopes(ApiKeyScopes.pushNewPackage);
+                }}
                 disabled={!canPush}
               />
               <label htmlFor="scopeNewAndVersion" className="">
@@ -121,14 +163,33 @@ const NewApiKey = (props: NewApiKeyProps) => {
               </label>
             </div>
             <div className="flex items-center py-1">
-              <input type="radio" id="scopeVersion" name="pushScope" className="mr-2 w-5" value="scopeVersion" disabled={!canPush} />
+              <input
+                type="radio"
+                id="scopeVersion"
+                name="pushScopes"
+                className="mr-2 w-5"
+                checked={(pushScopes & ApiKeyScopes.pushPackageVersion) === ApiKeyScopes.pushPackageVersion}
+                onChange={(e) => {
+                  setPushScopes(ApiKeyScopes.pushPackageVersion);
+                }}
+                disabled={!canPush}
+              />
               <label htmlFor="scopeVersion" className="">
-                Push new packages and package versions
+                Push new package versions
               </label>
             </div>
           </div>
           <label htmlFor="scopeUnlist" className="flex flex-row">
-            <input type="checkbox" id="scopeUnlist" name="scopeUnlist" className="mr-2" />
+            <input
+              type="checkbox"
+              id="scopeUnlist"
+              name="scopeUnlist"
+              className="mr-2"
+              checked={(unlistScope & ApiKeyScopes.unlistPackage) === ApiKeyScopes.unlistPackage}
+              onChange={(e) => {
+                setUnlistScope(e.target.checked ? ApiKeyScopes.unlistPackage : ApiKeyScopes.none);
+              }}
+            />
             Unlist
           </label>
         </div>
@@ -141,7 +202,7 @@ const NewApiKey = (props: NewApiKeyProps) => {
         </label>
         <div className="flex mt-2 items-start gap-6">
           <div className="flex-1">
-            <input type="text" id="globPattern" />
+            <input type="text" id="globPattern" value={glob} onChange={(e) => setGlob(e.target.value)} />
             <h3 className="mt-2">Available Packages</h3>
             <div className="p-2 border border-gray-700">
               <CheckList height="h-40" items={packages} onItemChanged={onPackageSelectionChange} />
@@ -154,8 +215,12 @@ const NewApiKey = (props: NewApiKeyProps) => {
         </div>
       </div>
       <div className="flex flex-row items-center justify-around mt-4 ">
-        <button className="btn btn-primary btn-small w-48">Create</button>
-        <button className="btn btn-outline btn-small w-48">Cancel</button>
+        <button className="btn btn-primary btn-small w-48" onClick={() => props.hide()}>
+          Create
+        </button>
+        <button className="btn btn-outline btn-small w-48" onClick={() => onCreateClick()}>
+          Cancel
+        </button>
       </div>
     </form>
   );

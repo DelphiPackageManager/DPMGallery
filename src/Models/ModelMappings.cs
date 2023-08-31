@@ -48,7 +48,58 @@ namespace DPMGallery.Models
                 model.VersionRange = entity.VersionRange;
             });
 
-        }
 
+            Mapping<ApiKey, ApiKeyModel>.Configure((entity, model) =>
+            {
+                model.Id = entity.Id;
+                model.UserId = entity.UserId;
+                model.Name = entity.Name;
+                model.Packages = entity.Packages;
+                model.ExpiresUTC = entity.ExpiresUTC;
+                model.GlobPattern = entity.GlobPattern;
+                model.Scopes = (int)entity.Scopes;
+                model.Revoked = entity.Revoked;
+                //never send hashed key
+            });
+
+            Mapping<ApiKeyModel, ApiKey>.Configure((model, entity) =>
+            {
+                entity.Id = model.Id;
+                entity.UserId = model.UserId;
+                entity.Name = model.Name;
+                entity.Packages = model.Packages;
+                entity.ExpiresUTC = model.ExpiresUTC;
+                entity.GlobPattern = model.GlobPattern;
+                entity.Scopes = (ApiKeyScope)model.Scopes;
+                entity.Revoked = model.Revoked;
+                entity.Key = model.Key;
+            });
+
+            Mapping<UserOrganisation, UserOrganisationModel>.Configure((entity, model) =>
+            {
+                model.Id = entity.OrgId;
+                model.UserId = entity.UserId;
+                model.Name = entity.OrganisationName;
+                model.Role = entity.Role;
+            });
+
+            Mapping<OrganisationMember, OrganisationMemberModel>.Configure((entity, model) => 
+            {
+                model.OrgId = entity.OrgId;
+                model.UserId = entity.UserId;
+                model.UserName = entity.UserName;
+                model.Role = entity.Role;
+            });
+
+            Mapping<EditableOrganisation, EditableOrganisationModel>.Configure((entity, model) =>
+            {
+                model.OrgId = entity.OrgId;
+                model.OrganisationName = entity.OrganisationName;
+                model.Email = entity.Email;
+                model.CanContact = entity.CanContact;
+                model.NotifyOnPublish = entity.NotifyOnPublish;
+                model.Members = Mapping<OrganisationMember, OrganisationMemberModel>.Map(entity.Members);
+            });
+        }
     }
 }

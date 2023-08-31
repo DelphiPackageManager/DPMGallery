@@ -37,7 +37,7 @@ namespace DPMGallery.Controllers.UI
     {
         public string Email { get; set; }
         public string Code { get; set; }
-        public string UserId { get; set; }
+        public string UserName { get; set; }
     }
 
     public class ChangePasswordModel
@@ -465,23 +465,23 @@ namespace DPMGallery.Controllers.UI
                 return Unauthorized();
             }
 
-            var userId = await _userManager.GetUserIdAsync(user);
+            //var userId = await _userManager.GetUserIdAsync(user);
             var email = await _userManager.GetEmailAsync(user);
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
             var qparams = HttpUtility.ParseQueryString(string.Empty);
-            qparams["userId"] = userId;
+            qparams["userName"] = user.UserName;
             qparams["code"] = code;
-            var callbackUrl = _serverConfig.SiteBaseUrl + "/confirmemail?" + qparams.ToString();
+            var callbackUrl = _serverConfig.SiteBaseUrl + "/verifyemail?" + qparams.ToString();
 
             try
             {
 
                 await _emailSender.SendEmailAsync(
                     email,
-                    "DPM Gallery - Confirm your email",
-                    $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    "[DPM Gallery] - Verify your email",
+                    $"Please verify your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
             }
             catch (Exception ex)
             {
@@ -521,8 +521,8 @@ namespace DPMGallery.Controllers.UI
                 {
                     await _emailSender.SendEmailAsync(
                         model.NewEmail,
-                        "DPM Gallery - Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                        "[DPM Gallery] - Verify your email",
+                        $"Please verify your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
                 }
                 catch (Exception ex)
                 {

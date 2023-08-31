@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import axios from "../../api/axios";
 import useAuth from "../../hooks/useAuth";
+import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { validateEmail } from "../../utils";
 import PageContainer from "../pageContainer";
 
@@ -13,6 +13,7 @@ const EmailSettingsPage = () => {
   const [emailConfirmed, setEmailConfirmed] = useState(false);
   const [changeEnabled, setChangeEnabled] = useState(false);
   const { currentUser } = useAuth();
+  const axios = useAxiosPrivate();
   const newEmailRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -60,7 +61,7 @@ const EmailSettingsPage = () => {
   };
 
   return (
-    <PageContainer>
+    <div className="h-full">
       <h3>Manage Email</h3>
 
       <div className="mt-4">
@@ -121,7 +122,7 @@ const EmailSettingsPage = () => {
           <div className="w-10 ml-2"></div>
         </form>
       </div>
-    </PageContainer>
+    </div>
   );
 };
 

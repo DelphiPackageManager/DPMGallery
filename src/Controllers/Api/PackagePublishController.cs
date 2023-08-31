@@ -112,7 +112,7 @@ namespace DPMGallery.Controllers
                         case PackageIndexingStatus.Success:
                             return StatusCode(201);
                         default:
-                            return StatusCode(201);
+                            return StatusCode(500, "Unknown error"); 
                     }
 
                 }

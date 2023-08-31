@@ -14,6 +14,7 @@ using NuGet.Versioning;
 
 namespace DPMGallery.Services
 {
+    //TODO : this is pointless - move the contents the the call sites (controllers). 
     public class SearchService : ISearchService
     {
         private readonly ILogger _logger;

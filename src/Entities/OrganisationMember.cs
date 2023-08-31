@@ -1,10 +1,10 @@
 ﻿using Dapper.Contrib.Extensions;
 using DPMGallery.Data;
+using Microsoft.AspNetCore.Identity;
 using System;
 
 namespace DPMGallery.Entities
 {
-    [Table(Constants.Database.TableNames.OrganisationMembers)]
     public class OrganisationMember
     {
         [Column("org_id")]
@@ -12,6 +12,9 @@ namespace DPMGallery.Entities
 
         [Column("user_id")]
         public int UserId { get; set; }
+
+        [Column("user_name")]
+        public string UserName { get; set; }
 
         [Column("role")]
         public MemberRole Role { get; set; }

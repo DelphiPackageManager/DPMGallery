@@ -1,4 +1,5 @@
 import { ButtonHTMLAttributes, useEffect, useState } from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import PageContainer from "../pageContainer";
 
@@ -24,6 +25,8 @@ const ExternalLoginsPage = () => {
   const [logins, setLogins] = useState<LoginsModel>(null);
   const [errMsg, setErrorMessage] = useState("");
   const [busy, setBusy] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchLogins = async () => {
@@ -42,8 +45,13 @@ const ExternalLoginsPage = () => {
         setBusy(false);
       }
     };
-
     fetchLogins();
+    //not ideal but best way I could find to do this.
+    let error = searchParams.get("error");
+    if (error) {
+      alert(error);
+      navigate("/account/externallogins"); //clean up the addressbar
+    }
   }, []);
 
   const handleRemoveLogin = async (event: React.MouseEvent<HTMLButtonElement>, provider: string, providerKey: string) => {
@@ -151,10 +159,10 @@ const ExternalLoginsPage = () => {
     <PageContainer>
       <h3>Manage your external logins</h3>
       {errMsg && <p>{errMsg}</p>}
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full mt-2">
         <CurrentLogins />
       </div>
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full mt-2">
         <OtherLogins />
       </div>
     </PageContainer>

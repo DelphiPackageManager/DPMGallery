@@ -1,8 +1,9 @@
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from "../api/axios";
+
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import PageContainer from "./pageContainer";
 
 type ExternalDetails = {
@@ -24,6 +25,7 @@ const ExternalLoginPage = () => {
   let { returnUrl } = useParams() || "/";
   let { remoteError } = useParams() || false;
   const navigate = useNavigate();
+  const axios = useAxiosPrivate();
 
   const fetchDetails = async () => {
     try {

@@ -61,7 +61,7 @@ namespace DPMGallery.Middleware
             // validate it here
             var valid = true;
             ApiKey apiKey;
-            //NOT : Not using ApiKeyRepository here as we can't used scoped services here.
+            //NOTE : Not using ApiKeyRepository here as we can't used scoped services here.
             using (var dbContext = _dbContextFactory.CreateDbContext())
             {
                 string hashed = key.GetHashSha256();
