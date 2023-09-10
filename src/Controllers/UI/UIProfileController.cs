@@ -4,12 +4,13 @@ using DPMGallery.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace DPMGallery.Controllers.UI
 {
     [Route("ui")]
     [ApiController]
+    [DisableRateLimiting]
     public class UIProfileController : ControllerBase
     {
 

@@ -5,7 +5,7 @@ const HomePage = () => {
   return (
     <>
       {/* This can't be in the page container due to sticky position */}
-      <div className="bg-primary  dark:bg-primary-900 w-full sticky top-[3.5rem] ">
+      <div className="bg-brand w-full sticky top-[3.5rem] ">
         <div className="container mx-auto flex flex-row items-center justify-center py-2 pt-1 mt-0 ">
           <PackageSearchBar doNavigateOnClear={false} value={""} />
         </div>
@@ -21,7 +21,7 @@ const HomePage = () => {
           <h3>Open source package manager for Delphi XE2 - 11.3 </h3>
         </div>
         <div className="flex flex-row flex-1 gap-4 ">
-          <div className="bg-primary-700 text-gray-100 p-4 rounded-md w-1/2 ">
+          <div className="bg-brand text-gray-100 p-4 rounded-md w-1/2 ">
             <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
               <div className="flex flex-row h-full">
                 <div className="text-left h-12 w-12 mb-2">
@@ -34,7 +34,7 @@ const HomePage = () => {
               </div>
             </a>
           </div>
-          <div className=" bg-primary-700 text-gray-100 p-4 rounded-md w-1/2">
+          <div className="bg-brand text-gray-100 p-4 rounded-md w-1/2">
             <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
               <div className="flex flex-row h-full">
                 <div className="text-left h-12 w-12 mb-2">

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 //import useAuth from "../../hooks/useAuth";
+import { Button } from "@/components/ui/button";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import PageContainer from "../../pageContainer";
 
@@ -77,17 +78,17 @@ const TwoFactorAuthenticationPage = () => {
           )}
           {twofaConfig?.isMachineRemembered && (
             <form className="inline-block" onSubmit={handleForgetBrowser}>
-              <button type="submit" className="btn btn-outline">
+              <Button type="submit" variant="outline">
                 Forget this browser
-              </button>
+              </Button>
             </form>
           )}
           <div className="flex flex-row gap-3 pt-2">
-            <Link to="/account/disable2fa" className="btn btn-outline">
-              Disable 2FA
+            <Link to="/account/disable2fa">
+              <Button variant="outline">Disable 2FA</Button>
             </Link>
-            <Link to="/account/generaterecoverycodes" className="btn btn-outline">
-              Reset recovery codes
+            <Link to="/account/generaterecoverycodes">
+              <Button variant="outline">Reset recovery codes</Button>
             </Link>
           </div>
         </div>
@@ -95,17 +96,17 @@ const TwoFactorAuthenticationPage = () => {
       <h4 className="mt-2">Authenticator app</h4>
       <div className="pt-2">
         {!twofaConfig?.hasAuthenticator && (
-          <Link to="/account/enableauthenticator" className="btn btn-outline">
-            Add Authenticator app
+          <Link to="/account/enableauthenticator">
+            <Button variant="outline">Add Authenticator app</Button>
           </Link>
         )}
         {twofaConfig?.hasAuthenticator && (
           <div className="flex flex-row gap-3">
-            <Link to="/account/enableauthenticator" className="btn btn-primary">
-              Set up Authenticator app
+            <Link to="/account/enableauthenticator">
+              <Button>Set up Authenticator app</Button>
             </Link>
-            <Link to="/account/resetauthenticator" className="btn btn-danger">
-              Reset Authenticator app
+            <Link to="/account/resetauthenticator">
+              <Button variant="destructive">Reset Authenticator app</Button>
             </Link>
           </div>
         )}

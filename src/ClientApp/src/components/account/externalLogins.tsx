@@ -2,6 +2,7 @@ import { ButtonHTMLAttributes, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import PageContainer from "../pageContainer";
+import { Button } from "../ui/button";
 
 type ExternalLoginModel = {
   loginProvider: string;
@@ -92,15 +93,17 @@ const ExternalLoginsPage = () => {
             {logins.showRemoveButton && (
               <div>
                 <input type="hidden" name="LoginProvider" value={item.providerKey} />
-                <button
+                <Button
                   type="submit"
-                  className="btn btn-danger btn-small"
+                  variant="destructive"
+                  size="sm"
+                  className="w-20"
                   title={`Remove this ${item.providerDisplayName} login from your account`}
                   value={item.loginProvider}
                   onClick={(e) => handleRemoveLogin(e, item.loginProvider, item.providerKey)}
                   disabled={busy}>
                   Remove
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -131,16 +134,18 @@ const ExternalLoginsPage = () => {
             {item.displayName}
           </div>
           <div className="flex justify-end">
-            <button
+            <Button
               id={item.name}
               type="submit"
-              className="btn btn-outline btn-small w-16"
+              className="w-20"
+              variant="create"
+              size="sm"
               name="provider"
               value={item.name}
               title={`"Log in using your ${item.displayName} account"`}
               disabled={busy}>
               Add
-            </button>
+            </Button>
           </div>
         </form>
       );

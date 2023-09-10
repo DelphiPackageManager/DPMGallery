@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { AxiosError } from "axios";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
@@ -119,9 +120,9 @@ const EnableAuthenticatorPage = () => {
                     {errMsg !== "" && <span className="text-danger"></span>}
                   </div>
 
-                  <button type="submit" className="w-full btn btn btn-primary" disabled={!code}>
+                  <Button type="submit" className="w-full" disabled={!code}>
                     Verify Code
-                  </button>
+                  </Button>
                   {errMsg !== "" && (
                     <div className="text-red-600" role="alert">
                       {errMsg}

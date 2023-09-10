@@ -59,16 +59,26 @@ namespace DPMGallery
 
             services.AddRateLimiter(options =>
             {
-                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                options.AddFixedWindowLimiter(policyName: "api-fixed", options =>
                 {
-                    return RateLimitPartition.GetFixedWindowLimiter(partitionKey: httpContext.Request.Headers.Host.ToString(), partition =>
-                        new FixedWindowRateLimiterOptions
-                        {
-                            PermitLimit = serverConfig.RateLimiting.PermitLimit,
-                            AutoReplenishment = true,
-                            Window = TimeSpan.FromSeconds(serverConfig.RateLimiting.Window)
-                        });
+                    options.PermitLimit = serverConfig.RateLimiting.PermitLimit;
+                    options.Window = TimeSpan.FromSeconds(serverConfig.RateLimiting.Window);
+                    options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+                    //options.QueueLimit = 200; //TODO :add to 
+                    options.AutoReplenishment = true;
                 });
+
+
+                //options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
+                //{
+                //    return RateLimitPartition.GetFixedWindowLimiter(partitionKey: httpContext.Request.Headers.Host.ToString(), partition =>
+                //        new FixedWindowRateLimiterOptions
+                //        {
+                //            PermitLimit = serverConfig.RateLimiting.PermitLimit,
+                //            AutoReplenishment = true,
+                //            Window = TimeSpan.FromSeconds(serverConfig.RateLimiting.Window)
+                //        });
+                //});
                 options.OnRejected = async (context, token) =>
                 {
                     context.HttpContext.Response.StatusCode = 429;

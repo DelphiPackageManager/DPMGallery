@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import PageContainer from "../pageContainer";
+import { Button } from "../ui/button";
 import SetPasswordPage from "./setPasswordPage";
 
 const CHECKPWDSTATUS_URL = "/ui/account/haspassword";
@@ -145,9 +146,9 @@ const ChangePasswordPage = () => {
               placeholder=""></input>
           </div>
           <div className="mt-4">
-            <button type="submit" className="btn btn-primary w-60" disabled={disabled}>
+            <Button type="submit" className="w-60" disabled={disabled}>
               Update password
-            </button>
+            </Button>
           </div>
         </form>
       )}

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
+import { Button } from "../ui/button";
 
 interface SetPasswordPageProps {
   setHasPassword: React.Dispatch<React.SetStateAction<boolean>>;
@@ -90,9 +91,9 @@ const SetPasswordPage: React.FunctionComponent<SetPasswordPageProps> = (props) =
           placeholder=""></input>
       </div>
       <div className="mt-4">
-        <button type="submit" className="btn btn-primary w-60" disabled={disabled}>
+        <Button type="submit" className="w-60" disabled={disabled}>
           Set password
-        </button>
+        </Button>
       </div>
       {statusMessage && <p>{statusMessage}</p>}
     </form>

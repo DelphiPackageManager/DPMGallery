@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
@@ -45,9 +46,9 @@ const GenerateRecoveryCodesPage = () => {
       </div>
       <div>
         <form onSubmit={handleSubmit}>
-          <button className="btn btn-danger" type="submit">
+          <Button variant="destructive" type="submit">
             Generate Recovery Codes
-          </button>
+          </Button>
         </form>
       </div>
       {errMsg !== "" && (

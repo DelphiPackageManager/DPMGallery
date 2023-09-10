@@ -5,6 +5,22 @@ import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import DarkModeToggle from "./darkModeToggle";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+ 
+
 // import useAuth so we can tell if logged in
 export default function NavBar() {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
@@ -24,7 +40,7 @@ export default function NavBar() {
   }, [location, width, height]);
 
   const navStyle =
-    "block py-2 pr-4 pl-3 border-b border-primary-600 hover:bg-primary-900 dark:hover:bg-primary  md:hover:bg-inherit md:dark:hover:bg-inherit md:hover:opacity-80   md:border-0 md:p-0";
+    "block py-2 pr-4 pl-3 border-b border-primary-600 md:hover:bg-inherit md:dark:hover:bg-inherit md:hover:opacity-80   md:border-0 md:p-0";
 
   const isLoggedIn = currentUser !== null ? true : false;
 
@@ -103,7 +119,7 @@ export default function NavBar() {
   };
 
   return (
-    <nav className="bg-primary dark:bg-primary-900 text-white  min-h-[3.5rem] py-2 z-10 px-4 md:px-6 fixed top-0 w-full ">
+    <nav className="bg-brand text-white  min-h-[3.5rem] py-2 z-10 px-4 md:px-6 fixed top-0 w-full ">
       <div className="flex flex-wrap justify-between items-center mx-auto max-w-5xl">
         <div className="flex items-center">
           <NavLink className="self-center text-xl whitespace-nowrap text-white mr-3" to="/">
@@ -138,7 +154,7 @@ export default function NavBar() {
         <div
           className={`${
             isNavExpanded ? "" : "hidden"
-          } absolute md:relative top-14 md:top-[unset] left-0 md:left-[unset] bg-primary dark:bg-primary-900 justify-between items-center w-full md:flex md:w-auto md:order-1`}
+          } absolute md:relative top-14 md:top-[unset] left-0 md:left-[unset] justify-between items-center w-full md:flex md:w-auto md:order-1`}
           id="mobile-menu-2">
           <ul className="flex flex-col mt-4 font-medium md:flex-row md:space-x-8 md:mt-0">
             <li>

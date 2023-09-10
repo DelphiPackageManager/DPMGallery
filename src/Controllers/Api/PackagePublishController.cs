@@ -2,6 +2,7 @@
 using DPMGallery.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Serilog;
 using System;
 using System.IO;
@@ -14,6 +15,7 @@ namespace DPMGallery.Controllers
 {
     [Authorize]
     [ApiController]
+    [DisableRateLimiting]
     public class PackagePublishController : Controller
     {
         private readonly IPackageIndexService _packageIndexService;

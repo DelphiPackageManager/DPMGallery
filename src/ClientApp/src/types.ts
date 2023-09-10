@@ -116,21 +116,6 @@ export enum ApiKeyScopes {
   unlistPackage = 4,
 }
 
-export type UserOrganisation = {
-  id: number;
-  name: string;
-  userId: number;
-  role: MemberRole;
-  administrators: number;
-  collaborators: number;
-  packages: number;
-};
-
-export type OrganisationSettings = {
-  allowContact: boolean;
-  notifyOnPublish: boolean;
-};
-
 export enum MemberRole {
   Collaborator = 0,
   Administrator = 1,
@@ -140,6 +125,26 @@ export type OrganisationMember = {
   id: number;
   userName: string;
   role: MemberRole;
+  avatarUrl: string;
+};
+
+export type UserOrganisation = {
+  id: number;
+  name: string;
+  email: string;
+  userId: number;
+  role: MemberRole;
+  adminCount: number;
+  collaboratorCount: number;
+  packageCount: number;
+  allowContact: boolean;
+  notifyOnPublish: boolean;
+  members: Array<OrganisationMember>;
+};
+
+export type OrganisationSettings = {
+  allowContact: boolean;
+  notifyOnPublish: boolean;
 };
 
 export type EditableOrganisation = {
@@ -148,4 +153,13 @@ export type EditableOrganisation = {
   emailAddress: string;
   settings: OrganisationSettings;
   members: OrganisationMember[] | null;
+};
+
+export const memberRoleToString = (role: MemberRole): string => {
+  switch (role) {
+    case MemberRole.Administrator:
+      return "Administrator";
+    case MemberRole.Collaborator:
+      return "Collaborator";
+  }
 };

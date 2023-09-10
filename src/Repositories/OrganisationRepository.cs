@@ -72,69 +72,129 @@ namespace DPMGallery.Repositories
             return result != null;
         }
 
+        private class PackageCount
+        {
+            public int OwnerId { get; set; }
+
+            public int Count { get; set; }
+        }
+
+        private class MemberCount
+        {
+            public int OrgId { get; set; }
+            public int Count { get; set; }
+            public MemberRole Role { get; set; }
+        }
+
         /// <summary>
         /// gets all the organisations a user is a member of
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<UserOrganisation>> GetOrganisationsForMember(int userId,  CancellationToken cancellationToken)
+        public async Task<IEnumerable<UserOrganisation>> GetOrganisationsForMember(int userId, CancellationToken cancellationToken)
         {
-            string sql = $@"select u.id as org_id, u.user_name as org_name, m.member_id, m.member_role from
+            string sql = $@"select u.id as org_id, u.user_name as org_name, u.email as email, m.member_id, m.member_role, s.allow_contact, s.notify_on_publish from
                             {T.Users} u 
                             left join {T.OrganisationMembers} m ON m.org_id = u.id 
+                            left join {T.OrganisationSettings} s on m.org_id = s.org_id
                             where 
                             u.is_organisation = true
                             and m.member_id = @userId";
 
-            var result = await Context.QueryAsync<UserOrganisation>(sql, new { userId }, cancellationToken: cancellationToken);
+            var qresult = await Context.QueryAsync<UserOrganisation>(sql, new { userId }, cancellationToken: cancellationToken);
+            var result = qresult.ToList();
 
-            var ids = result.Select(x => x.OrgId).ToList();
+            if (result.Any())
+            {
+                var ids = result.Select(x => x.OrgId).Order().ToList();
 
-            string packageCountSql = $@"select owner_id, count(*)
+                string packageCountSql = $@"select owner_id as ownerid, count(*)
                                      from {T.PackageOwner}
                                      where owner_id = any (@ids)
                                      group by owner_id";
 
-            var orgPackageCounts = await Context.QueryAsync(packageCountSql, new { ids }, cancellationToken: cancellationToken);
+                var orgPackageCounts = await Context.QueryAsync<PackageCount>(packageCountSql, new { ids }, cancellationToken: cancellationToken);
 
-            if (orgPackageCounts.Any())
-            {
-                foreach (var item in result)
+                if (orgPackageCounts.Any())
                 {
-                    item.PackageCount = orgPackageCounts.Where(x => x.ownerid == item.OrgId).Select(x => x.count).FirstOrDefault();
+                    foreach (var item in result)
+                    {
+                        item.PackageCount = orgPackageCounts.Where(x => x.OwnerId == item.OrgId).Select(x => x.Count).FirstOrDefault();
+                    }
+                }
+
+
+                ////counts could really be done in linq.
+                //var memberCountsSql = $@"select org_id as orgid, count(distinct member_id), member_role as role
+                //                     from {T.OrganisationMembers}
+                //                     where org_id = any (@ids)
+                //                     group by org_id, member_role
+                //                     order by org_id, member_role desc";
+
+                //var orgMemberCounts = await Context.QueryAsync<MemberCount>(memberCountsSql, new { ids }, cancellationToken: cancellationToken);
+
+                //if (orgMemberCounts.Any())
+                //{
+                //    foreach (var item2 in result)
+                //    {
+                //        var admins = orgMemberCounts.Where(x => x.OrgId == item2.OrgId && x.Role == MemberRole.Administrator).FirstOrDefault();
+                //        item2.AdminCount = admins != null ? admins.Count : 0;
+                //        var collabs = orgMemberCounts.Where(x => x.OrgId == item2.OrgId && x.Role == MemberRole.Collaborator).FirstOrDefault();
+                //        item2.CollaboratorCount = collabs != null ? collabs.Count : 0;
+                //    }
+                //}
+
+                var membersSql = $@"select m.*, u.user_name, u.email from {T.OrganisationMembers} m
+                                    left join {T.Users} u ON u.id = m.member_id
+                                    where org_id = any (@ids)
+                                    order by org_id";
+                var members = await Context.QueryAsync<OrganisationMember>(membersSql, new { ids }, cancellationToken: cancellationToken);
+
+                if (members.Any())
+                {
+                    foreach (var item3 in result)
+                    {
+                        item3.Members = members.Where(x => x.OrgId == item3.OrgId).OrderBy(y => y.UserName).ToList();
+                        item3.AdminCount = item3.Members.Where(x => x.Role == MemberRole.Administrator).Count();
+                        item3.CollaboratorCount = item3.Members.Where(x => x.Role == MemberRole.Collaborator).Count();
+                    }
                 }
             }
-
-            var memberCountsSql = $@"select org_id, count(*), member_role
-                                     from {T.OrganisationMembers}
-                                     where org_id = any (@ids)
-                                     group by org_id, member_role";
-
-            var orgMemberCounts = await Context.QueryAsync(memberCountsSql, new { ids }, cancellationToken: cancellationToken);
-
-
             return result;
         }
 
-        /// <summary>
-        /// gets the editable details of an organiseation.
-        /// </summary>
-        /// <param name="orgId"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task<EditableOrganisation> GetEditableOrganisationAsync(int orgId, CancellationToken cancellationToken)
+        public async Task<bool> CheckUserExists(string userName, CancellationToken cancellationToken)
         {
-            string sql = $@"select u.id, u.user_name, u.email, s.* from 
-                            {T.Users} u
-                            left join {T.OrganisationSettings}  s ON s.org_id = u.id
-                            where u.is_organisation = true and u.id = @orgId";
-            var result = await Context.QueryFirstOrDefaultAsync<EditableOrganisation>(sql, new { orgId }, cancellationToken: cancellationToken);
+            string normalizedUser = userName.ToUpper();
+            string sql = $@"select count(*) from {T.Users}
+                            where normalized_user_name = @normalizedUser";
 
+            var count = await Context.ExecuteScalarAsync<int>(sql, new { normalizedUser }, cancellationToken: cancellationToken);
 
-            return result;
+            return count > 0;
+
         }
 
-    
+
+        ///// <summary>
+        ///// gets the editable details of an organiseation.
+        ///// </summary>
+        ///// <param name="orgId"></param>
+        ///// <param name="cancellationToken"></param>
+        ///// <returns></returns>
+        //public async Task<EditableOrganisation> GetEditableOrganisationAsync(int orgId, CancellationToken cancellationToken)
+        //{
+        //    string sql = $@"select u.id, u.user_name, u.email, s.* from 
+        //                    {T.Users} u
+        //                    left join {T.OrganisationSettings}  s ON s.org_id = u.id
+        //                    where u.is_organisation = true and u.id = @orgId";
+        //    var result = await Context.QueryFirstOrDefaultAsync<EditableOrganisation>(sql, new { orgId }, cancellationToken: cancellationToken);
+
+
+        //    return result;
+        //}
+
+
     }
 }

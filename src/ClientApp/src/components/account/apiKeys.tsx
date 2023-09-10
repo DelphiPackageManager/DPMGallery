@@ -6,6 +6,7 @@ import useModal from "../../hooks/useModal";
 import { ApiKey } from "../../types";
 import Modal from "../modal";
 import PageContainer from "../pageContainer";
+import { Button } from "../ui/button";
 import ApiKeyCard from "./apiKeys/apiKeyCard";
 import NewApiKey from "./apiKeys/newApiKey";
 
@@ -65,9 +66,7 @@ const APIKeysPage = () => {
             also remove existing API keys if necessary.
           </p>
           <div className="mt-2">
-            <button className="btn btn-primary" onClick={() => showModal()}>
-              Create New Key
-            </button>
+            <Button onClick={() => showModal()}>Create New Key</Button>
           </div>
           <Modal isOpen={isOpen} title="New Api Key">
             <NewApiKey hide={hideModal} onNewApiKey={onNewApiKey} />

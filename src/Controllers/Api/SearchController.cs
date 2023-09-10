@@ -14,7 +14,7 @@ namespace DPMGallery.Controllers
 {
     [ApiController]
     [AllowAnonymous]
-   // [EnableRateLimiting("Api")]
+    [EnableRateLimiting("api-fixed")]
     public class SearchController : Controller
     {
 

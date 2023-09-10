@@ -5,6 +5,7 @@ import axios from "../api/axios";
 import { AuthContextInterface, User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
 import PageContainer from "./pageContainer";
+import { Button } from "./ui/button";
 
 const LoginPage = () => {
   const { login, logout } = useAuth();
@@ -148,9 +149,9 @@ const LoginPage = () => {
                     Forgot password?
                   </Link>
                 </div>
-                <button type="submit" className="w-full btn btn-primary">
+                <Button type="submit" className="w-full">
                   Log In
-                </button>
+                </Button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Don’t have an account yet?{" "}
                   <Link to="/createaccount" replace className="font-medium text-primary-600 hover:underline dark:text-primary-500">
@@ -170,19 +171,19 @@ const LoginPage = () => {
             <form method="POST" action={EXTERNAL_LOGIN}>
               <input name="returnurl" className="hidden" defaultValue={from} />
               <div className="flex items-center justify-center gap-4 py-4">
-                <button className="btn btn-outline" name="provider" value="Google">
+                <Button name="provider" value="Google" variant="secondary">
                   <svg className="w-4 h-4" fill="currentColor">
                     <use href="#google" />
                   </svg>
 
                   <span className="pl-2">Log In with Google</span>
-                </button>
-                <button className="btn btn-outline" name="provider" value="GitHub">
+                </Button>
+                <Button variant="secondary" name="provider" value="GitHub">
                   <svg className="w-5 h-5">
                     <use href="#github" />
                   </svg>
                   <span className="pl-2">Log In with GitHub</span>
-                </button>
+                </Button>
               </div>
             </form>
           </div>

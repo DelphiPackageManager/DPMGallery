@@ -7,6 +7,7 @@ import { NavLink } from "react-router-dom";
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
 import { validateEmail } from "../utils";
+import { Button } from "./ui/button";
 
 const RegisterPage = () => {
   const errRef = useRef<HTMLParagraphElement>(null);
@@ -183,12 +184,9 @@ const RegisterPage = () => {
                   </label>
                 </div>
               </div>
-              <button
-                type="submit"
-                disabled={!emailValid || disabled}
-                className="w-full text-white bg-primary-600 hover:bg-primary-700 disabled:opacity-50 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+              <Button type="submit" disabled={!emailValid || disabled} className="w-full">
                 Create an account
-              </button>
+              </Button>
               <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                 Already have an account?{" "}
                 <NavLink to="/login" replace className="font-medium text-primary-600 hover:underline dark:text-primary-500">
@@ -207,19 +205,19 @@ const RegisterPage = () => {
 
           <form action="/ui/auth/external" method="POST">
             <div className="flex items-center justify-center gap-4 py-4">
-              <button className="btn btn-outline" name="provider" value="Google">
+              <Button variant="secondary" name="provider" value="Google">
                 <svg className="w-4 h-4" fill="currentColor">
                   <use href="#google" />
                 </svg>
 
                 <span className="pl-2">Log In with Google</span>
-              </button>
-              <button className="btn btn-outline" name="provider" value="GitHub">
+              </Button>
+              <Button variant="secondary" name="provider" value="GitHub">
                 <svg className="w-5 h-5">
                   <use href="#github" />
                 </svg>
                 <span className="pl-2">Log In with GitHub</span>
-              </button>
+              </Button>
             </div>
           </form>
         </div>

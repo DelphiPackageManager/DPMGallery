@@ -4,6 +4,7 @@ import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import PageContainer from "./pageContainer";
+import { Button } from "./ui/button";
 
 const LoginWith2faPage = () => {
   const navigate = useNavigate();
@@ -110,9 +111,9 @@ const LoginWith2faPage = () => {
             </label>
           </div>
           <div>
-            <button type="submit" className="w-100 btn btn-primary" disabled={!code}>
+            <Button type="submit" variant="default" className="w-100" disabled={!code}>
               Log in
-            </button>
+            </Button>
           </div>
           {errMsg !== "" && (
             <div className="mt-2 errmsg" role="alert">

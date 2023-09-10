@@ -1,3 +1,4 @@
+import { Slot } from "@radix-ui/react-slot";
 import * as React from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -30,7 +31,7 @@ const PackageSearchBar: React.FunctionComponent<IPackageSearchBarProps> = ({ doN
       <div className="w-full flex flex-col">
         <div className="relative flex justify-around items-center ">
           <span className="absolute inset-y-0 left-0 flex items-center justify-center">
-            <button type="submit" className="p-2 focus:outline-none text-gray-400">
+            <button type="submit" className="p-2 focus:outline-none text-gray-400 dark:text-gray-800">
               <svg
                 fill="none"
                 stroke="currentColor"
@@ -48,7 +49,7 @@ const PackageSearchBar: React.FunctionComponent<IPackageSearchBarProps> = ({ doN
             type="text"
             name="q"
             id="search"
-            className="w-full focus:outline-none focus:shadow-none  !pl-10  text-base text-gray-900  rounded-full border-none placeholder:text-gray-300 dark:placeholder:text-gray-600 dark:bg-gray-700 dark:text-white"
+            className="searchBar w-full focus:outline-none focus:shadow-none p-2 !pl-10 text-base text-gray-900  rounded border-none placeholder:text-gray-300 dark:placeholder:text-gray-400 dark:text-gray-900"
             placeholder="Search Packages"
             autoComplete="off"
             onKeyDown={_handleKeyDown}

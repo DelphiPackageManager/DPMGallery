@@ -5,6 +5,7 @@ using DPMGallery.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 namespace DPMGallery.Controllers.UI
 {
     [ApiController]
+    [DisableRateLimiting]
     public class OrganisationController : Controller
     {
         private readonly UserManager<User> _userManager;
@@ -21,6 +23,7 @@ namespace DPMGallery.Controllers.UI
             _userManager = userManager;
             _organisationRepository = organisationRepository;
         }
+
         [HttpGet]
         [Authorize]
         [Route("/ui/account/user-organisations")]
@@ -41,6 +44,21 @@ namespace DPMGallery.Controllers.UI
             var userOrgs = await _organisationRepository.GetOrganisationsForMember(user.Id, cancellationToken);
 
             return Ok(Mapping<UserOrganisation, UserOrganisationModel>.Map(userOrgs));
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("/ui/account/check-member/{userName}")]
+        public async Task<IActionResult> GetUserOrganisationsAsync([FromRoute] string userName, CancellationToken cancellationToken = default)
+        {
+            bool exists = await _organisationRepository.CheckUserExists(userName, cancellationToken);
+            if (!exists)
+            {
+                return NotFound();
+            } else
+            {
+                return Ok();
+            }
         }
     }
 }

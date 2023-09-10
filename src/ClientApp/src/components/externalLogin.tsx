@@ -5,6 +5,7 @@ import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import PageContainer from "./pageContainer";
+import { Button } from "./ui/button";
 
 type ExternalDetails = {
   email: string;
@@ -127,6 +128,7 @@ const ExternalLoginPage = () => {
                       name="userName"
                       placeholder="Please enter your username."
                       value={userName}
+                      size={200}
                       onChange={(e) => setUserName(e.target.value)}
                     />
                     <label htmlFor="email" className=" text-sm font-medium text-gray-800 dark:text-white">
@@ -141,9 +143,7 @@ const ExternalLoginPage = () => {
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                     />
-                    <button type="submit" className="w-96 btn btn-lg btn-primary">
-                      Register
-                    </button>
+                    <Button type="submit">Create Account</Button>
                   </div>
                 </form>
               </div>

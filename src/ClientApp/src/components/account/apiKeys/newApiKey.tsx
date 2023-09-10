@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { minimatch } from "minimatch";
 import { useState } from "react";
 import useEscapeKey from "../../../hooks/useEscapeKey";
@@ -104,7 +105,6 @@ const NewApiKey = (props: NewApiKeyProps) => {
           <div className="">
             <select
               id="newKeyExpires"
-              defaultValue={365}
               value={expires}
               onChange={(e) => setExpires(+e.target.value)}
               className="text-gray-900  bg-gray-200 dark:text-gray-50 dark:bg-gray-700 p-1 rounded">
@@ -126,7 +126,6 @@ const NewApiKey = (props: NewApiKeyProps) => {
             <select
               id="newKeyPackageOwner"
               size={1}
-              defaultValue={""}
               placeholder="Select an owner"
               className="w-56 text-gray-900  bg-gray-200 dark:text-gray-50 dark:bg-gray-700 p-1 rounded"
               value={owner}
@@ -215,12 +214,12 @@ const NewApiKey = (props: NewApiKeyProps) => {
         </div>
       </div>
       <div className="flex flex-row items-center justify-around mt-4 ">
-        <button className="btn btn-primary btn-small w-48" onClick={() => props.hide()}>
+        <Button variant="default" size="sm" className="w-48" onClick={() => props.hide()}>
           Create
-        </button>
-        <button className="btn btn-outline btn-small w-48" onClick={() => onCreateClick()}>
+        </Button>
+        <Button variant="outline" size="sm" className="w-48" onClick={() => onCreateClick()}>
           Cancel
-        </button>
+        </Button>
       </div>
     </form>
   );

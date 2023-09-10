@@ -16,7 +16,6 @@ namespace DPMGallery.Controllers
     /// </summary>
     [ApiController]
     [AllowAnonymous]
-    
     public class ServiceIndexController : Controller
     {
         private readonly IServiceIndexService _serviceIndexService;

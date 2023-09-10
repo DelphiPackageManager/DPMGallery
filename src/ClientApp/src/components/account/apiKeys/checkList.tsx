@@ -1,3 +1,5 @@
+import { Checkbox } from "@/components/ui/checkbox";
+
 export type CheckListItem = {
   value: string;
   checked: boolean;
@@ -11,24 +13,27 @@ export type CheckListProps = {
 const CheckList = (props: CheckListProps) => {
   const itemChanged = (index: number, value: boolean) => {
     if (props?.onItemChanged) {
-      //  props.items[index].checked = value;
       props.onItemChanged(index, value);
     }
   };
 
   const renderItems = props.items.map((item, index) => (
-    <label htmlFor={item.value} className="flex flex-row">
-      <input
-        type="checkbox"
+    <div className="items-center flex" key={index}>
+      <Checkbox
         key={index}
         id={item.value}
         itemID={item.value}
-        onChange={(e) => itemChanged(index, e.target.checked)}
+        onCheckedChange={(e) => {
+          let value = e !== "indeterminate" ? e : false;
+          itemChanged(index, value);
+        }}
         className="mr-2"
-        checked={props.items[index].checked}
-      />
-      {item.value}
-    </label>
+        defaultValue={item.value}
+        checked={props.items[index].checked}></Checkbox>
+      <label htmlFor={item.value} className="cursor-pointer">
+        {item.value}
+      </label>
+    </div>
   ));
 
   return <div className={`overflow-y-auto ${props.height}`}>{renderItems}</div>;

@@ -259,7 +259,7 @@ namespace DPMGallery.DBMigration.Conventions
 			Create.Table(T.OrganisationSettings)
 				.WithColumn("org_id").AsInt32().ForeignKey(T.Users, "id").PrimaryKey().NotNullable()
 				.WithColumn("allow_contact").AsBoolean().WithDefaultValue(true).NotNullable()
-                .WithColumn("notify_on_publish").AsBoolean().WithDefaultValue(false).NotNullable();
+                .WithColumn("notify_on_publish").AsBoolean().WithDefaultValue(true).NotNullable();
 
             Create.Table(T.ApiKey)
 				.WithIntPrimaryKeyColumn().Identity()

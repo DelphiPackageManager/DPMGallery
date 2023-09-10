@@ -1,7 +1,4 @@
-﻿using Dapper.Contrib.Extensions;
-using DPMGallery.Data;
-using Microsoft.AspNetCore.Identity;
-using System;
+﻿using DPMGallery.Data;
 
 namespace DPMGallery.Entities
 {
@@ -10,14 +7,16 @@ namespace DPMGallery.Entities
         [Column("org_id")]
         public int OrgId { get; set; } //an organisation is a user with IsOrganisation set to true.
 
-        [Column("user_id")]
-        public int UserId { get; set; }
+        [Column("member_id")]
+        public int MemberId { get; set; }
 
         [Column("user_name")]
         public string UserName { get; set; }
 
-        [Column("role")]
+        [Column("member_role")]
         public MemberRole Role { get; set; }
 
+        [Column("email")]
+        public string Email { get; set; }
     }
 }

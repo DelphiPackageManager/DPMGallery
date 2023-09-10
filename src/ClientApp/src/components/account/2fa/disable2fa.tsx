@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { axiosPrivate } from "../../../api/axios";
@@ -56,9 +57,9 @@ const DisableAuthenticatorPage = () => {
       </div>
       {twoFaEnabled && (
         <form onSubmit={handleSubmit}>
-          <button className="btn btn-danger" type="submit">
+          <Button variant="destructive" type="submit">
             Disable 2FA
-          </button>
+          </Button>
         </form>
       )}
     </PageContainer>

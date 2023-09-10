@@ -1,18 +1,40 @@
 import { useEffect, useState } from "react";
-
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
-import useModal from "../../hooks/useModal";
-import { MemberRole, UserOrganisation } from "../../types";
-import Modal from "../modal";
+import { MemberRole, UserOrganisation, memberRoleToString } from "../../types";
 import PageContainer from "../pageContainer";
+import { Button } from "../ui/button";
+import Modal from "../ui/modal";
 import EditOrganisation from "./organisations/editOrganisation";
 
+function OrganisationRow({ item }: { item: UserOrganisation }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <tr key={item.id} className="py-2">
+      <td className="py-1 text-left"> {item.name}</td>
+      <td className="py-1 text-left">{memberRoleToString(item.role)}</td>
+      <td className="py-1 text-center">{item.adminCount} </td>
+      <td className="py-1 text-center">{item.collaboratorCount}</td>
+      <td className="py-1 text-center">{item.packageCount}</td>
+      <td className="py-1 text-right">
+        {item.role === MemberRole.Administrator && (
+          <Modal open={open} onOpenChange={setOpen}>
+            <Modal.Trigger>
+              <span>edit</span>
+            </Modal.Trigger>
+            <Modal.Content title="Edit Organisation">
+              <EditOrganisation organisation={item} afterSave={() => setOpen(false)} />
+            </Modal.Content>
+          </Modal>
+        )}
+      </td>
+    </tr>
+  );
+}
+
 const OrganisationsPage = () => {
-  const { isOpen: addIsOpen, showModal: addShowMoal, hideModal: addHideModal } = useModal();
-  const { isOpen: editIsOpen, showModal: editShowModal, hideModal: editHideModal } = useModal();
   const [organisations, setOrganisations] = useState<UserOrganisation[]>([]);
   const [errMsg, setErrorMessage] = useState("");
-  const [editOrgId, setEditOrgId] = useState(-1);
   const axios = useAxiosPrivate();
   const fetchOrganisations = async () => {
     try {
@@ -34,21 +56,6 @@ const OrganisationsPage = () => {
     fetchOrganisations();
   }, []);
 
-  const handleEditClick = (event: React.MouseEvent<HTMLButtonElement>, orgId: number) => {
-    event.preventDefault();
-    setEditOrgId(orgId);
-    editShowModal();
-  };
-
-  const memberRoleToString = (role: MemberRole): string => {
-    switch (role) {
-      case MemberRole.Administrator:
-        return "Administrator";
-      case MemberRole.Collaborator:
-        return "Collaborator";
-    }
-  };
-
   return (
     <PageContainer>
       <h3 className="mb-2">Manage Organisations</h3>
@@ -57,7 +64,7 @@ const OrganisationsPage = () => {
       </h3>
       {organisations.length == 0 && <p>You are not a member of any organisations, create one here</p>}
       <div className="my-2">
-        <button className="btn btn-primary">Create Organisation</button>
+        <Button variant={"default"}> Create Organisation</Button>
       </div>
 
       {organisations.length > 0 && (
@@ -66,31 +73,22 @@ const OrganisationsPage = () => {
             <tr className="border-b border-gray-600">
               <th className="text-md font-semibold tracking-wide text-left">Organisation</th>
               <th className="text-md font-semibold tracking-wide text-left">Member Role</th>
-              <th className="text-md font-semibold tracking-wide text-centert">Members</th>
+              <th className="text-md font-semibold tracking-wide text-centert">Administrators</th>
+              <th className="text-md font-semibold tracking-wide text-centert">Collaborators</th>
               <th className="text-md font-semibold tracking-wide text-center">Packages</th>
               <th className="text-md font-semibold tracking-wide text-right"></th>
             </tr>
           </thead>
           <tbody>
-            {organisations.map((item, index) => {
-              return (
-                <tr key={index} className="py-2">
-                  <td className="py-1 text-left"> {item.name}</td>
-                  <td className="py-1 text-left">{memberRoleToString(item.role)}</td>
-                  <td className="py-1 text-center">{item.administrators} </td>
-                  <td className="py-1 text-center">{item.collaborators}</td>
-                  <td className="py-1 text-right">
-                    {item.role === MemberRole.Administrator && <button onClick={(e) => handleEditClick(e, item.id)}>edit</button>}
-                  </td>
-                </tr>
-              );
+            {organisations.map((item) => {
+              return <OrganisationRow key={item.id} item={item} />;
             })}
           </tbody>
         </table>
       )}
-      <Modal title="Edit" isOpen={editIsOpen}>
+      {/* <Modal title="Edit" isOpen={editIsOpen}>
         <EditOrganisation orgId={editOrgId} hide={editHideModal} />
-      </Modal>
+      </Modal> */}
     </PageContainer>
   );
 };

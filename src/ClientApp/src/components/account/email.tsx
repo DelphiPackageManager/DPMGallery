@@ -3,6 +3,7 @@ import useAuth from "../../hooks/useAuth";
 import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { validateEmail } from "../../utils";
 import PageContainer from "../pageContainer";
+import { Button } from "../ui/button";
 
 const SENDVERIFYEMAIL_URL = "/ui/account/send-verify-email";
 
@@ -85,9 +86,9 @@ const EmailSettingsPage = () => {
         </div>
         {!emailConfirmed && (
           <div className="mt-1">
-            <button className="btn btn-link" onClick={handleSendVerificationEmail}>
+            <Button variant="link" onClick={handleSendVerificationEmail}>
               Send verification email
-            </button>
+            </Button>
           </div>
         )}
         {statusMessage && (
@@ -116,9 +117,9 @@ const EmailSettingsPage = () => {
               <div className="w-10 ml-2"></div>
             </div>
           </div>
-          <button className="mt-4 btn btn-primary btn-large disabled:bg-gray-500 disabled:hover:bg-gray-500" disabled={!changeEnabled} type="submit">
+          <Button size="lg" className="mt-4" disabled={!changeEnabled} type="submit">
             Change Email
-          </button>
+          </Button>
           <div className="w-10 ml-2"></div>
         </form>
       </div>

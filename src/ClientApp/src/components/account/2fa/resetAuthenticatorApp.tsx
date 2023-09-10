@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "../../../api/axios";
@@ -46,9 +47,9 @@ const ResetAuthenticatorAppPage = () => {
           </div>
         )}
         <form onSubmit={handleSubmit}>
-          <button id="reset-authenticator-button" className="btn btn-danger" type="submit">
+          <Button id="reset-authenticator-button" variant="destructive" type="submit">
             Reset authenticator key
-          </button>
+          </Button>
         </form>
       </div>
     </PageContainer>

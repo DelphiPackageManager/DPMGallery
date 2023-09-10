@@ -6,6 +6,7 @@ using DPMGallery.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,6 +14,7 @@ using System.Threading.Tasks;
 namespace DPMGallery.Controllers.UI
 {
     [ApiController]
+    [DisableRateLimiting]
     public class ApiKeyController : Controller
     {
         private readonly UserManager<User> _userManager;
