@@ -1,9 +1,11 @@
+import { SITE_URL } from "@/constants";
 import * as React from "react";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import useStatistics from "../hooks/useStatistics";
 import { timeAgo } from "../utils";
 import Loader from "./loader";
+import Meta from "./meta";
 import PageContainer from "./pageContainer";
 import { PackageDownloads, Statistics, VersionDownloads } from "./statistics/statisticsTypes";
 
@@ -26,12 +28,14 @@ const StatsPage: React.FunctionComponent<IStatsPageProps> = (props) => {
 
   return (
     <PageContainer>
+      <Meta title="DPM - Statistics" canonical={`${SITE_URL}/statistics`} />
+
       <h1>Statistics</h1>
       {!error && loading && <Loader />}
       {!error && !loading && statistics && (
         <React.Fragment>
           <h4 className="mt-4">Statistics Last updated : {lastUpdated}</h4>
-          <div className="mt-4 ">
+          <div className="mt-4 px-2">
             <div className="">
               <span>Unique Packages : </span>
               <span>{statistics.uniquePackages}</span>
@@ -42,11 +46,11 @@ const StatsPage: React.FunctionComponent<IStatsPageProps> = (props) => {
             </div>
           </div>
 
-          <div className="mt4 flex flex-row  flex-1 gap-8 w-full">
-            <div className="mt-2 text-left w-1/2">
+          <div className="px-2 mt-2 flex flex-col md:flex-row gap-4 md:gap-8 w-full">
+            <div className="mt-2 text-left basis-full">
               <h2>Package downloads</h2>
               <div className="flex flex-row w-full justify-between border-b-2 border-gray-500 dark:border-gray-700 my-4">
-                <div className=" w-1/2">
+                <div className="">
                   <span>Name</span>
                 </div>
                 <div className="">
@@ -57,7 +61,9 @@ const StatsPage: React.FunctionComponent<IStatsPageProps> = (props) => {
               {statistics.topPackageDownloads.map((pkg: PackageDownloads, index: number) => (
                 <div className="flex flex-row w-full justify-between">
                   <div key={index} className=" w-1/2">
-                    <Link to={"/packages/" + pkg.packageId + "/"}>{pkg.packageId}</Link>
+                    <Link to={"/packages/" + pkg.packageId + "/"} className=" hover:underline">
+                      {pkg.packageId}
+                    </Link>
                   </div>
                   <div key={index} className="">
                     {pkg.downloads}
@@ -65,7 +71,7 @@ const StatsPage: React.FunctionComponent<IStatsPageProps> = (props) => {
                 </div>
               ))}
             </div>
-            <div className="mt-2 text-left w-1/2">
+            <div className="mt-2 text-left basis-full">
               <h2>Package Version downloads</h2>
               <div className="flex flex-row w-full justify-between border-b-2 border-gray-500 dark:border-gray-700 my-4">
                 <div className=" w-1/2 ">
@@ -82,7 +88,9 @@ const StatsPage: React.FunctionComponent<IStatsPageProps> = (props) => {
               {statistics.topVersionDownloads.map((pkg: VersionDownloads, index: number) => (
                 <div className="flex flex-row w-full justify-between">
                   <div key={index} className=" w-1/2">
-                    <Link to={"/packages/" + pkg.packageId + "/" + pkg.version + "/"}>{pkg.packageId}</Link>
+                    <Link to={"/packages/" + pkg.packageId + "/" + pkg.version + "/"} className="hover:underline">
+                      {pkg.packageId}
+                    </Link>
                   </div>
                   <div key={index} className="text-left w-1/4">
                     {pkg.version}

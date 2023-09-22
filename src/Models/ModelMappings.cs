@@ -13,6 +13,11 @@ namespace DPMGallery.Models
     {
         public static void Configure()
         {
+            Mapping<PackageOwnerInfo, PackageOwnerModel>.Configure((e, model) =>
+            {
+                model.UserName = e.UserName;
+                model.EmailHash = e.EmailHash;
+            });
 
             Mapping<UISearchResult, PackageListItemModel>.Configure((r, model) =>
             {
@@ -25,7 +30,8 @@ namespace DPMGallery.Models
                 model.IsReservedPrefix = r.IsReservedPrefix;
                 model.Description = r.Description;
                 model.Owners = r.Owners;
-                model.Icon = r.Icon;
+                model.OwnerInfos = Mapping<PackageOwnerInfo, PackageOwnerModel>.Map(r.OwnerInfos);
+				model.Icon = r.Icon;
                 model.PublishedUtc = r.PublishedUtc;
                 model.Published = r.PublishedUtc.ToPrettyDate();
                 //some older packages have comma separated tags

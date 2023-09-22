@@ -60,5 +60,6 @@ namespace DPMGallery.Controllers.UI
                 return Ok();
             }
         }
+
     }
 }

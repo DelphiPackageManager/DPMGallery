@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace DPMGallery.Models
 {
+
     public class PackageDetailsModel
     {
         public PackageDetailsModel()
@@ -12,8 +13,7 @@ namespace DPMGallery.Models
             CompilerPlatforms = new List<PackageDetailCompilerModel>();
             Licenses = new List<string>();
             Tags = new List<string>();
-            Owners = new List<string>();
-            OwnerMD5s = new List<string>();
+            Owners = new List<PackageOwnerModel>();
         }
         
         public string PackageId { get; set; }
@@ -21,6 +21,8 @@ namespace DPMGallery.Models
         public string PackageName { get; set; }
 
         public string PackageVersion { get; set; }
+
+        public string Description { get; set; }
 
         public bool PrefixReserved { get; set; }
 
@@ -49,9 +51,7 @@ namespace DPMGallery.Models
 
         public List<string> Licenses { get; set; }
 
-        public List<string> Owners { get; set; }
-
-        public List<string> OwnerMD5s { get; set; }
+        public List<PackageOwnerModel> Owners { get; set; }
 
         public long TotalDownloads { get; set; }
 

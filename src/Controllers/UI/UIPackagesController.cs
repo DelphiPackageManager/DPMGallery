@@ -102,9 +102,11 @@ namespace DPMGallery.Controllers.UI
 
         [AllowAnonymous]
         [HttpGet]
-        [Route("packagedetails/{packageId}/{packageVersion}")]
-        [OutputCache(Duration = 10, VaryByRouteValueNames = new string[] { "*" })]
-        public async Task<IActionResult> PackageDetails([FromRoute] string packageId, [FromRoute] string packageVersion, CancellationToken cancellationToken = default) 
+
+		[Route("packagedetails/{packageId}")]
+		[Route("packagedetails/{packageId}/{packageVersion}")]
+		[OutputCache(Duration = 10, VaryByRouteValueNames = new string[] { "*" })]
+        public async Task<IActionResult> PackageDetails([FromRoute] string packageId, [FromRoute] string packageVersion = "", CancellationToken cancellationToken = default) 
         {
 
             PackageDetailsModel model = await _uiService.UIGetPackageDetails(packageId, packageVersion, cancellationToken: cancellationToken);

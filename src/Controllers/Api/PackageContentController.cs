@@ -176,6 +176,7 @@ namespace DPMGallery.Controllers.Api
             {
                 fileExt = await _packageContentService.GetPackageIconFileExtAsync(id, compiler, thePlatform, version, cancellationToken);
             }
+
             var packageStream = await _packageContentService.GetPackageStreamAsync(downloadFileType, id, compiler, thePlatform, version, cancellationToken);
             if (packageStream == null)
             {

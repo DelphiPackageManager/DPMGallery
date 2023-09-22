@@ -18,15 +18,14 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
- 
+} from "@/components/ui/dropdown-menu";
 
 // import useAuth so we can tell if logged in
 export default function NavBar() {
   const [isNavExpanded, setIsNavExpanded] = useState(false);
   const { currentUser } = useAuth();
-  //let location = useLocation();
-  let { state } = useLocation();
+
+  let { state, pathname } = useLocation();
   const { width, height } = useWindowSize();
 
   const buttonHandler = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -37,10 +36,10 @@ export default function NavBar() {
   //close the mobile menu when we change routes.
   useEffect(() => {
     setIsNavExpanded(false);
-  }, [location, width, height]);
+  }, [pathname, width, height]);
 
   const navStyle =
-    "block py-2 pr-4 pl-3 border-b border-primary-600 md:hover:bg-inherit md:dark:hover:bg-inherit md:hover:opacity-80   md:border-0 md:p-0";
+    "block py-2 pr-4 pl-3 border-b border-primary-600 md:hover:bg-inherit md:dark:hover:bg-inherit md:hover:opacity-80 md:border-0 md:p-0";
 
   const isLoggedIn = currentUser !== null ? true : false;
 
@@ -154,7 +153,7 @@ export default function NavBar() {
         <div
           className={`${
             isNavExpanded ? "" : "hidden"
-          } absolute md:relative top-14 md:top-[unset] left-0 md:left-[unset] justify-between items-center w-full md:flex md:w-auto md:order-1`}
+          } absolute md:relative top-14 md:top-[unset] left-0 md:left-[unset] justify-between items-center w-full md:flex md:w-auto md:order-1 bg-brand`}
           id="mobile-menu-2">
           <ul className="flex flex-col mt-4 font-medium md:flex-row md:space-x-8 md:mt-0">
             <li>

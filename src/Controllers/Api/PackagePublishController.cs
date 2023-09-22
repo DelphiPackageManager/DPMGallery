@@ -104,7 +104,7 @@ namespace DPMGallery.Controllers
                         case PackageIndexingStatus.InvalidPackage:
                             return BadRequest(result.Message);
                         case PackageIndexingStatus.Forbidden:
-                            return Forbid(result.Message);
+                            return StatusCode(403, result.Message);
                         case PackageIndexingStatus.PackageAlreadyExists:
                             return StatusCode(409, "Package already exists");
                         case PackageIndexingStatus.Error:

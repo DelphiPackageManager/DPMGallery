@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using AngleSharp.Html;
@@ -22,7 +23,7 @@ namespace DPMGallery.Repositories
     //Web UI Methods
     partial class SearchRepository : RepositoryBase
     {
-        
+
         private async Task<List<PackageDependency>> GetPackageVersionDependencies(int[] versionIds, CancellationToken cancellationToken)
         {
             var sql = @"select packageversion_id, package_id, version_range
@@ -30,7 +31,7 @@ namespace DPMGallery.Repositories
                         where packageversion_id = ANY (@versionIds)
                         order by packageversion_id, package_id";
 
-            var results = await Context.QueryAsync<PackageDependency>(sql, new { versionIds }, cancellationToken : cancellationToken);
+            var results = await Context.QueryAsync<PackageDependency>(sql, new { versionIds }, cancellationToken: cancellationToken);
 
             return results.ToList();
 
@@ -47,6 +48,16 @@ namespace DPMGallery.Repositories
             [Column("downloads")]
             public long Downloads { get; set; }
         }
+
+        public async Task<string> GetLatestPackageVersion(string packageId, CancellationToken cancellationToken)
+        {
+            var sql = $@"SELECT  latestversion
+                        FROM public.search_latest_version
+                        where packageid = @packageId
+                        order by versionid desc
+                        limit 1";
+		    return await Context.ExecuteScalarAsync<string>(sql, new { packageId }, cancellationToken: cancellationToken);
+		}
 
         public async Task<List<PackageVersionModel>> GetPackageVersions(string packageId, CancellationToken cancellationToken)
         {
@@ -123,6 +134,7 @@ namespace DPMGallery.Repositories
                     {
                         PackageId = firstEntry.PackageId,
                         PackageVersion = firstEntry.Version,
+                        Description = firstEntry.Description,
                         IsLatestVersion = firstEntry.Version == firstEntry.LatestVersion,
                         IsPrerelease = firstEntry.IsPreRelease,
                         IsCommercial = firstEntry.IsCommercial,
@@ -142,9 +154,14 @@ namespace DPMGallery.Repositories
 
                     foreach (var owner in owners)
                     {
-                        model.Owners.Add(owner.owner);
-                        string email = (string)owner.email;
-                        model.OwnerMD5s.Add(email.ToLower().ToMd5());
+                        var newOwner = new PackageOwnerModel()
+                        {
+                            UserName = (string)owner.owner,
+                          
+                        };
+						string email = (string)owner.email;
+						newOwner.EmailHash = email.ToLower().ToMd5();
+						model.Owners.Add(newOwner);
                     }
 
 

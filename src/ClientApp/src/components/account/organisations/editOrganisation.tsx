@@ -16,18 +16,18 @@ export type EditOrganisationProps = {
 type MemberRowProps = {
   member: OrganisationMember;
   currentUserName?: string;
-  canDelete: boolean;
+  canDeleteAdmin: boolean;
   onDelete: (member: OrganisationMember) => void;
 };
 
-const MemberRow = ({ member, currentUserName, canDelete, onDelete }: MemberRowProps) => {
+const MemberRow = ({ member, currentUserName, canDeleteAdmin, onDelete }: MemberRowProps) => {
   const thatsYou = member.userName === currentUserName ? " (thats you)" : "";
 
   const onDeleteClick = (member: OrganisationMember) => {
     onDelete(member);
   };
 
-  const canDeleteMember = member.role !== MemberRole.Administrator || canDelete;
+  const canDeleteMember = member.role !== MemberRole.Administrator || canDeleteAdmin;
 
   return (
     <tr key={member.id} className="py-2">
@@ -55,7 +55,7 @@ const MemberRow = ({ member, currentUserName, canDelete, onDelete }: MemberRowPr
 const EditOrganisation = ({ organisation, afterSave }: EditOrganisationProps) => {
   const [saving, setSaving] = useState(false);
   const { currentUser } = useAuth();
-  const [currentOrg, setCurrentOrg] = useState(organisation);
+  const [currentOrg, setCurrentOrg] = useState({ ...organisation }); //note cloning organisation here!
 
   const [canDeleteAdmin, setCanDeleteAdmin] = useState(false);
 
@@ -64,7 +64,6 @@ const EditOrganisation = ({ organisation, afterSave }: EditOrganisationProps) =>
     setSaving(true);
 
     //let data = Object.fromEntries(new FormData(event.currentTarget));
-    console.log("calling afterSave");
     //await updateContact(contact.id, data);
     afterSave();
   }
@@ -74,21 +73,20 @@ const EditOrganisation = ({ organisation, afterSave }: EditOrganisationProps) =>
       return element.role === MemberRole.Administrator;
     }).length;
     setCanDeleteAdmin(admins > 1);
-  }, [organisation]);
+  }, [currentOrg]);
 
   const onMemberDelete = (member: OrganisationMember) => {
     //
     const newMembers = currentOrg.members.filter((item) => item !== member);
-
     setCurrentOrg((prev) => ({ ...prev, members: newMembers }));
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col min-w-full">
+    <form onSubmit={handleSubmit} className="flex flex-col grow">
       <h2 className="mt-2">{currentOrg.name}</h2>
-      <fieldset disabled={saving} className="flex-grow group flex flex-col w-full justify-between">
+      <fieldset disabled={saving} className="grow group flex flex-col w-full justify-between">
         <div className="w-full mt-4 min-w-full">
-          <Tabs defaultValue="email" className="flex flex-col content-stretch w-full">
+          <Tabs defaultValue="email" className="flex flex-col">
             <TabsList className="w-full border-b border-primary text-base bg-white dark:bg-gray-800 items-start">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="notify">Notifications</TabsTrigger>
@@ -132,8 +130,12 @@ const EditOrganisation = ({ organisation, afterSave }: EditOrganisationProps) =>
                       <SelectValue placeholder="Select role" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Collaborator">Collaborator</SelectItem>
-                      <SelectItem value="Administrator">Administrator</SelectItem>
+                      <SelectItem key={"collab"} value="Collaborator">
+                        Collaborator
+                      </SelectItem>
+                      <SelectItem key={"admin"} value="Administrator">
+                        Administrator
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -141,7 +143,9 @@ const EditOrganisation = ({ organisation, afterSave }: EditOrganisationProps) =>
                   Add
                 </Button>
               </div>
-              <p className="mt-2">A collaborator can manage the organization's packages but cannot manage the organization's memberships.</p>
+              <p className="mt-2 whitespace-break-spaces">
+                A collaborator can manage the organization's packages but cannot manage the organization's memberships.
+              </p>
               <div className="mt-2 overflow-y-auto">
                 <table className="w-full">
                   <thead className="sticky top-0 z-10">
@@ -155,10 +159,10 @@ const EditOrganisation = ({ organisation, afterSave }: EditOrganisationProps) =>
                     {currentOrg.members.map((member) => {
                       return (
                         <MemberRow
-                          key={member.id}
+                          key={member.userName}
                           member={member}
                           currentUserName={currentUser ? currentUser.userName : ""}
-                          canDelete={canDeleteAdmin}
+                          canDeleteAdmin={canDeleteAdmin}
                           onDelete={onMemberDelete}
                         />
                       );

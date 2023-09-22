@@ -66,7 +66,7 @@ const EmailSettingsPage = () => {
       <h3>Manage Email</h3>
 
       <div className="mt-4">
-        <div className="w-1/2">
+        <div className="">
           <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
             Your current email address
           </label>
@@ -76,7 +76,7 @@ const EmailSettingsPage = () => {
               type="text"
               name="currentEmail"
               id="currentEmail"
-              size={50}
+              size={60}
               className="border border-gray-300 text-gray-700 sm:text-sm rounded-lg  block p-2.5 bg-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 "
               placeholder=""
               disabled
@@ -96,7 +96,7 @@ const EmailSettingsPage = () => {
             <p className="">{statusMessage}</p>
           </div>
         )}
-        <form className="w-1/2 mt-4 flex flex-col" method="POST" onSubmit={handleSubmit}>
+        <form className="max-w-fit mt-4 flex flex-col" method="POST" onSubmit={handleSubmit}>
           <div className="mt-4 w-full">
             <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
               Your new email address
@@ -106,7 +106,7 @@ const EmailSettingsPage = () => {
                 type="email"
                 name="email"
                 id="email"
-                size={53}
+                size={60}
                 className="border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                 onChange={(e) => handleNewEmailChanged(e)}
                 placeholder="name@company.com"

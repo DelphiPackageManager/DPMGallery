@@ -548,6 +548,7 @@ namespace DPMGallery.Repositories
 
                 string ownersSql = @$"select 
                                       u.user_name as owner, 
+                                      u.email as email,
                                       o.package_id  
                                       from {T.Users}  u
                                       left join {T.PackageOwner}  o
@@ -563,7 +564,8 @@ namespace DPMGallery.Repositories
                     foreach (var item in result.searchResults)
                     {
                         item.Owners = owners.Where(x => x.package_id == item.Id).Select(x => (string)x.owner).ToList();
-                    }
+						item.OwnerInfos = owners.Where(x => x.package_id == item.Id).Select(x => new PackageOwnerInfo((string)x.owner, (string)x.email)).ToList();
+					}
                 }
             }
 

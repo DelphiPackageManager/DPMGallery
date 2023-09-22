@@ -20,8 +20,8 @@ const HomePage = () => {
 
           <h3>Open source package manager for Delphi XE2 - 11.3 </h3>
         </div>
-        <div className="flex flex-row flex-1 gap-4 ">
-          <div className="bg-brand text-gray-100 p-4 rounded-md w-1/2 ">
+        <div className="flex flex-row flex-wrap md:flex-nowrap  gap-4 ">
+          <div className="bg-brand text-gray-100 p-4 rounded-md basis-full ">
             <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
               <div className="flex flex-row h-full">
                 <div className="text-left h-12 w-12 mb-2">
@@ -34,8 +34,8 @@ const HomePage = () => {
               </div>
             </a>
           </div>
-          <div className="bg-brand text-gray-100 p-4 rounded-md w-1/2">
-            <a href="https://docs.delphi.dev/getting-started/installing.html" target="_blank">
+          <div className="bg-brand text-gray-100 p-4 rounded-md basis-full">
+            <a href="https://docs.delphi.dev/getting-started/creating-packages.html" target="_blank">
               <div className="flex flex-row h-full">
                 <div className="text-left h-12 w-12 mb-2">
                   <img src="/img/dpm32.png" />

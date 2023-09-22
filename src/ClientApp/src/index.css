@@ -138,6 +138,28 @@
   .dropdown-content .link:hover {
     @apply bg-gray-300 dark:bg-gray-700 dark:text-white;
   }
+
+  .remark {
+    @apply text-gray-900 dark:text-gray-200;
+  }
+
+  .remark p {
+    @apply my-2;
+  }
+  .remark h1 {
+    @apply text-xl font-medium py-2;
+  }
+  .remark h2 {
+    @apply text-lg py-2;
+  }
+
+  .remark ul {
+    @apply ml-3;
+  }
+
+  .remark li {
+    @apply ml-2 list-disc;
+  }
 }
 
 @keyframes dialog-overlay-show {

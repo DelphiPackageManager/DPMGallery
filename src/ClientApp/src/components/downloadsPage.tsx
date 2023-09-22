@@ -1,4 +1,6 @@
+import { SITE_URL } from "@/constants";
 import * as React from "react";
+import Meta from "./meta";
 import PageContainer from "./pageContainer";
 
 interface IDownloadsPageProps {}
@@ -6,6 +8,7 @@ interface IDownloadsPageProps {}
 const DownloadsPage: React.FunctionComponent<IDownloadsPageProps> = (props) => {
   return (
     <PageContainer>
+      <Meta title="DPM - Downloads" canonical={`${SITE_URL}/downloads`} description="Download the DPM Package Manager client" />
       <h1>Downloads</h1>
       <p className="mt-4">
         Download the latest DPM installer for Delphi XE2 - 11.x from{" "}

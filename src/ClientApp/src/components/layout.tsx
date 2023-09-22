@@ -8,6 +8,7 @@ import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useDidMount } from "../hooks/useDidMount";
 import usePageVisibility from "../hooks/usePageVisibility";
 import Footer from "./footer";
+import Meta from "./meta";
 import NavBar from "./navbar";
 
 export const LayoutLoader = async () => {
@@ -95,9 +96,10 @@ const Layout = () => {
 
   return (
     <>
+      <Meta title="DPM - Delphi Package Manager" />
       <div className="flex flex-col m-0 h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100">
         <NavBar />
-        <div className="flex flex-col flex-grow mt-[3.5rem]">
+        <div className="flex flex-col grow mt-[3.5rem]">
           <Outlet />
         </div>
         <Footer />

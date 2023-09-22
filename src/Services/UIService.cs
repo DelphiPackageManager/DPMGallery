@@ -13,6 +13,7 @@ using DPMGallery.Types;
 using static DPMGallery.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using DPMGallery.Statistics;
 
 namespace DPMGallery.Services
 {
@@ -50,6 +51,12 @@ namespace DPMGallery.Services
 
         public async Task<PackageDetailsModel> UIGetPackageDetails(string packageId, string packageVersion, CancellationToken cancellationToken = default)
         {
+
+
+            if (string.IsNullOrEmpty(packageVersion))
+            {
+                packageVersion = await _searchRepository.GetLatestPackageVersion(packageId, cancellationToken);
+            }
             string key = $"{packageId}-{packageVersion}".ToLower();
 
             //package details are expensive to get so cache for a while
@@ -57,22 +64,30 @@ namespace DPMGallery.Services
             //a specific packageid (without the version) when a new version is uploaded - so need to investigate this more. 
             var model = await _memoryCache.GetOrCreateAsync<PackageDetailsModel>(key, async (cacheEntry) =>
             {
-                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(5);
+                cacheEntry.AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(15);
                 var result =  await _searchRepository.GetPackageInfo(packageId, packageVersion, cancellationToken);
                 if (result == null)
                     return null;
 
-                
-                result.Icon = ""; //clear out the value from the db
+                bool hasIcon = !string.IsNullOrEmpty(result.Icon);
+                bool hasReadme = !string.IsNullOrEmpty(result.ReadMe);
+                result.Icon = "";
+                result.ReadMe = "";
                 foreach (var item in result.CompilerPlatforms)
                 {
                     foreach (var platform in item.Platforms)
                     {
-                        if (string.IsNullOrEmpty(result.Icon))
+                        //just get the first icon and readme
+                        if (hasIcon && string.IsNullOrEmpty(result.Icon))
                         {
                             result.Icon = GetDownloadUrl(result.PackageId, result.PackageVersion, item.CompilerVersion.ToString(), platform.Platform.ToString(), "icon");
                         }
-                        platform.DownloadUrl = GetDownloadUrl(result.PackageId, result.PackageVersion, item.CompilerVersion.ToString(), platform.Platform.ToString(), "dpkg");
+						if (hasReadme && string.IsNullOrEmpty(result.ReadMe))
+						{
+							result.ReadMe = GetDownloadUrl(result.PackageId, result.PackageVersion, item.CompilerVersion.ToString(), platform.Platform.ToString(), "readme");
+						}
+
+						platform.DownloadUrl = GetDownloadUrl(result.PackageId, result.PackageVersion, item.CompilerVersion.ToString(), platform.Platform.ToString(), "dpkg");
                     }
                 }
 

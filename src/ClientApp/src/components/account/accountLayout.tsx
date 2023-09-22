@@ -4,7 +4,7 @@ import PageContainer from "../pageContainer";
 const AccountLayout = () => {
   const activeClassName = "active";
   return (
-    <PageContainer className="flex-grow">
+    <PageContainer className="grow">
       <h1 className="">Manage your account</h1>
       <hr className="mt-1" />
       <div className="h-full mt-1">
@@ -34,7 +34,7 @@ const AccountLayout = () => {
               </li>
             </ul>
           </div>
-          <div className="items-start flex-grow">
+          <div className="items-start grow">
             <Outlet />
           </div>
         </div>

@@ -1,9 +1,11 @@
+import { SITE_URL } from "@/constants";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import { AuthContextInterface, User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
+import Meta from "./meta";
 import PageContainer from "./pageContainer";
 import { Button } from "./ui/button";
 
@@ -89,6 +91,8 @@ const LoginPage = () => {
 
   return (
     <PageContainer className="">
+      <Meta title="DPM - Login" canonical={`${SITE_URL}/login`} />
+
       <div>
         <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
           {errMsg}

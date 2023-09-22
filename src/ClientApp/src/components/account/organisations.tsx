@@ -5,6 +5,7 @@ import PageContainer from "../pageContainer";
 import { Button } from "../ui/button";
 import Modal from "../ui/modal";
 import EditOrganisation from "./organisations/editOrganisation";
+import NewOrganisation from "./organisations/newOrganisation";
 
 function OrganisationRow({ item }: { item: UserOrganisation }) {
   const [open, setOpen] = useState(false);
@@ -19,11 +20,11 @@ function OrganisationRow({ item }: { item: UserOrganisation }) {
       <td className="py-1 text-right">
         {item.role === MemberRole.Administrator && (
           <Modal open={open} onOpenChange={setOpen}>
-            <Modal.Trigger>
+            <Modal.Button>
               <span>edit</span>
-            </Modal.Trigger>
+            </Modal.Button>
             <Modal.Content title="Edit Organisation">
-              <EditOrganisation organisation={item} afterSave={() => setOpen(false)} />
+              <EditOrganisation key={item.id} organisation={item} afterSave={() => setOpen(false)} />
             </Modal.Content>
           </Modal>
         )}
@@ -35,6 +36,7 @@ function OrganisationRow({ item }: { item: UserOrganisation }) {
 const OrganisationsPage = () => {
   const [organisations, setOrganisations] = useState<UserOrganisation[]>([]);
   const [errMsg, setErrorMessage] = useState("");
+  const [open, setOpen] = useState(false);
   const axios = useAxiosPrivate();
   const fetchOrganisations = async () => {
     try {
@@ -56,6 +58,11 @@ const OrganisationsPage = () => {
     fetchOrganisations();
   }, []);
 
+  const afterSaveNewOrg = () => {
+    setOpen(false);
+    fetchOrganisations();
+  };
+
   return (
     <PageContainer>
       <h3 className="mb-2">Manage Organisations</h3>
@@ -64,7 +71,14 @@ const OrganisationsPage = () => {
       </h3>
       {organisations.length == 0 && <p>You are not a member of any organisations, create one here</p>}
       <div className="my-2">
-        <Button variant={"default"}> Create Organisation</Button>
+        <Modal open={open} onOpenChange={setOpen}>
+          <Modal.Button asChild>
+            <Button>Create Organisation</Button>
+          </Modal.Button>
+          <Modal.Content title="Create Organisation">
+            <NewOrganisation afterSave={() => afterSaveNewOrg} />
+          </Modal.Content>
+        </Modal>
       </div>
 
       {organisations.length > 0 && (
@@ -86,9 +100,6 @@ const OrganisationsPage = () => {
           </tbody>
         </table>
       )}
-      {/* <Modal title="Edit" isOpen={editIsOpen}>
-        <EditOrganisation orgId={editOrgId} hide={editHideModal} />
-      </Modal> */}
     </PageContainer>
   );
 };

@@ -11,7 +11,8 @@ namespace DPMGallery
             public const string UserName = "claim.username";
             public const string UserId = "claim.userid";
             public const string ApiKeyId = "claim.apikey-id";
-            public const string ApiKeyExpires = "claim.apikey-expires";
+			public const string ApiKeyScopes = "claim.apikey-scopes";
+			public const string ApiKeyExpires = "claim.apikey-expires";
             public const string ApiKeyGlob = "claim.apikey-glob";
             public const string ApiKeyPackages = "claim.apikey-packages";
         }

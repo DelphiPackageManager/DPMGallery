@@ -2,6 +2,7 @@
 using DPMGallery.Entities;
 using DPMGallery.Identity;
 using DPMGallery.Models.Identity;
+using DPMGallery.Repositories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -17,6 +18,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -641,8 +643,21 @@ namespace DPMGallery.Controllers.UI
 
             await _signInManager.RefreshSignInAsync(user);
             return Ok("Your password has been set.");
+        }
 
-
+        [HttpGet]
+        [Authorize]
+        [Route("/ui/account/user-exists/{userName}")]
+        public async Task<IActionResult> GetUserExists([FromRoute] string userName, CancellationToken cancellationToken = default)
+        {
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return NotFound();
+            } else
+            {
+                return Ok();
+            }
         }
     }
 }

@@ -8,6 +8,7 @@ using System.Text.Json.Serialization;
 
 namespace DPMGallery.Models
 {
+    
     public class PackageListItemModel 
     {
         public string PackageId { get; set; }
@@ -27,6 +28,8 @@ namespace DPMGallery.Models
         public string Description { get; set; }
 
         public List<string> Owners { get; set; }
+
+        public IList<PackageOwnerModel> OwnerInfos { get; set; }
 
         public string Icon { get; set; }
 

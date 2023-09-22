@@ -1,7 +1,9 @@
+import { SITE_URL } from "@/constants";
 import { useEffect, useRef } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
 import usePackages, { SearchParams } from "../../hooks/usePackages";
 import Loader from "../loader";
+import Meta from "../meta";
 import PackageSearchBar from "../packageSearchBar";
 import PageContainer from "../pageContainer";
 import PackageItemRow from "./packageItemRow";
@@ -42,6 +44,7 @@ const PackagesPage = () => {
 
   return (
     <>
+      <Meta title="DPM - Packages" canonical={`${SITE_URL}/packages`} />
       <div className="bg-brand sticky top-[3.5rem]">
         <div className="container mx-auto flex flex-row items-center justify-center py-2 pt-1 mt-0 max-w-6xl ">
           <PackageSearchBar value={query} />
@@ -74,7 +77,7 @@ const PackagesPage = () => {
             <div className="mr-3">
               {packages.prevPage > 0 ? (
                 <div>
-                  <NavLink to={getPageLink(query, packages.prevPage)} className="text-sky-600">
+                  <NavLink to={getPageLink(query, packages.prevPage)} className="text-sky-600  hover:underline">
                     Previous
                   </NavLink>
                 </div>
@@ -90,7 +93,7 @@ const PackagesPage = () => {
             <div className="ml-3">
               {packages.nextPage > 0 ? (
                 <div>
-                  <NavLink to={getPageLink(query, packages.nextPage)} className="text-sky-600">
+                  <NavLink to={getPageLink(query, packages.nextPage)} className="text-sky-600 hover:underline">
                     Next
                   </NavLink>
                 </div>

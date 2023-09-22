@@ -1,8 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { HelmetProvider } from "react-helmet-async";
 import App from "./components/App";
 import { AuthProvider, User } from "./context/AuthProvider";
 
+import { TooltipProvider } from "./components/ui/tooltip";
 import fetchIdentity from "./fechIdentity";
 import "./index.css";
 
@@ -13,7 +15,11 @@ import "./index.css";
   ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
     <React.StrictMode>
       <AuthProvider user={user}>
-        <App />
+        <HelmetProvider>
+          <TooltipProvider>
+            <App />
+          </TooltipProvider>
+        </HelmetProvider>
       </AuthProvider>
     </React.StrictMode>
   );

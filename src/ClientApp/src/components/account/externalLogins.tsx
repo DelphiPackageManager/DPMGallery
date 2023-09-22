@@ -86,7 +86,7 @@ const ExternalLoginsPage = () => {
     const values = currentLogins.map((item, index) => {
       return (
         <div className="flex flex-row items-center gap-4 my-2" key={index}>
-          <div className="flex-grow" key={item.providerKey}>
+          <div className="grow" key={item.providerKey}>
             {item.providerDisplayName}
           </div>
           <div className="justify-end">
@@ -130,7 +130,7 @@ const ExternalLoginsPage = () => {
     const values = otherLogins.map((item, index) => {
       return (
         <form className="flex flex-row my-2" method="POST" action="/ui/account/link-login" key={index}>
-          <div className="flex-grow" key={item.name}>
+          <div className="grow" key={item.name}>
             {item.displayName}
           </div>
           <div className="flex justify-end">

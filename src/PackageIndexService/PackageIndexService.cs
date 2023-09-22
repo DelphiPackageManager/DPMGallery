@@ -140,22 +140,22 @@ namespace DPMGallery.Services
                     //if we get here, the metadata is probably ok
                     bool isNew = false;
 
-                    //if the read me is specified, try to read it from the package
-                    //it should be a text or markdown file
-                    if (packageVersion.HasReadMe)
-                    {
-                        try
-                        {
-                            using var readMeStream = packageReader.GetStream(packageVersion.ReadMe);
-                            using StreamReader reader = new StreamReader(readMeStream);
-                            packageVersion.ReadMe = reader.ReadToEnd();
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, $"[PackageIndexService] Error loading readme from package {package.PackageId}-{packageVersion.Version}");
+                    ////if the read me is specified, try to read it from the package
+                    ////it should be a text or markdown file
+                    //if (packageVersion.HasReadMe)
+                    //{
+                    //    try
+                    //    {
+                    //        using var readMeStream = packageReader.GetStream(packageVersion.ReadMe);
+                    //        using StreamReader reader = new StreamReader(readMeStream);
+                    //        packageVersion.ReadMe = reader.ReadToEnd();
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        _logger.Error(ex, $"[PackageIndexService] Error loading readme from package {package.PackageId}-{packageVersion.Version}");
 
-                        }
-                    }
+                    //    }
+                    //}
 
                     var apiKey = await _apiKeyRepository.GetApiKeyById(apiKeyId, cancellationToken);
                     if (apiKey == null)
@@ -219,7 +219,7 @@ namespace DPMGallery.Services
                                 
                             }
                             //check that the api key actually has permissions to push a new version
-                            if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion) || apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage))
+                            if (!(apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion) || apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage)))
                             {
                                 return new PackageIndexingResult()
                                 {

@@ -31,12 +31,12 @@ const ShowRecoveryCodesPage = () => {
         <p>If you lose your device and don't have the recovery codes you will lose access to your account.</p>
       </div>
       <div className="flex flex-row mt-2 gap-0 bg-yellow-200 text-yellow-700 font-mono">
-        <div className="flex-grow p-2 items-start justify-center">
+        <div className="grow p-2 items-start justify-center">
           {col1.map((code, index) => (
             <div>{code}</div>
           ))}
         </div>
-        <div className="flex-grow p-2 items-start justify-center">
+        <div className="grow p-2 items-start justify-center">
           {col2.map((code, index) => (
             <p>{code}</p>
           ))}

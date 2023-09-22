@@ -69,7 +69,7 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <hr className="my-3 sm:mx-auto border-primary-700 lg:my-4" />
+        <hr className="my-3 sm:mx-auto border-gray-300 lg:my-4" />
         <div className="sm:flex sm:items-center sm:justify-between">
           <span className="text-xs sm:text-center text-white text-opacity-60  ">
             Copyright © {new Date().getFullYear()} Vincent Parrett & Contributors. All Rights Reserved.

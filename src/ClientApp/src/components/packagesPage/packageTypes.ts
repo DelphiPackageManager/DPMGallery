@@ -1,4 +1,10 @@
+import _default from "@headlessui/tailwindcss";
 import { CompilerVersion, Platform } from "../../types";
+
+export type PackageOwnerModel = {
+  userName: string;
+  emailHash: string;
+};
 
 export type PackageResultItem = {
   published: string;
@@ -10,6 +16,7 @@ export type PackageResultItem = {
   isPrelease: boolean;
   description: string;
   owners: string[];
+  ownerInfos: PackageOwnerModel[];
   icon: string | null;
   hasIcon: boolean;
   tags: string[] | null;
@@ -29,9 +36,10 @@ export type PackageSearchResult = {
 
 export type PackageVersionModel = {
   version: string;
-  publishedutc: string;
+  publishedUtc: string;
   published: string;
   downloads: number;
+  _published: string;
 };
 
 export type PackageDependencyModel = {
@@ -54,6 +62,7 @@ export type PackageDetailsModel = {
   packageId: string;
   packageName: string;
   packageVersion: string;
+  description: string;
   prefixReserved: boolean;
   isPrerelease: boolean;
   isLatestVersion: boolean;
@@ -68,8 +77,7 @@ export type PackageDetailsModel = {
   readMe: string;
   repositoryUrl: string;
   licenses: string[];
-  owners: string[];
-  ownerMD5s: string[];
+  owners: PackageOwnerModel[];
   totalDownloads: number;
   currentVersionDownload: number;
   tags: string[];

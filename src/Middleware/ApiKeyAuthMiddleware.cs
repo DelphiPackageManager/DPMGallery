@@ -38,13 +38,6 @@ namespace DPMGallery.Middleware
                     var headerKey = ctx.Request.Headers["X-ApiKey"].FirstOrDefault();
                     await ValidateApiKey(ctx, userManager, _next, headerKey);
                 }
-                //else if (ctx.Request.Query.ContainsKey("apikey"))
-                //{
-                //    if (ctx.Request.Query.TryGetValue("apikey", out var queryKey))
-                //    {
-                //        await ValidateApiKey(ctx, userManager, _next, queryKey);
-                //    }
-                //}
                 else
                 {
                     await _next(ctx);
@@ -97,6 +90,7 @@ namespace DPMGallery.Middleware
                     new Claim(Claims.UserName, user.UserName),
                     new Claim(Claims.UserId, user.Id.ToString()),
                     new Claim(Claims.ApiKeyId, apiKey.Id.ToString()), //we need this in the packageindexservice
+                    new Claim(Claims.ApiKeyScopes, apiKey.Scopes.ToString()), //we need this in the packageindexservice
                     new Claim(Claims.ApiKeyExpires, apiKey.ExpiresUTC.ToFileTimeUtc().ToString()),
                 };
 
