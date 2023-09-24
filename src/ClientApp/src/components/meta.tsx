@@ -18,6 +18,7 @@ const Meta = ({ url, title, description, imgUrl, canonical, children }: IMetaPro
   return (
     <>
       <Helmet title={title}>
+        {description && <meta name="description" content={description} />}
         {url && <meta property="og:url" content={url} />}
         <meta property="og:type" content="website" />
         {description && <meta property="og:description" content={description} />}
