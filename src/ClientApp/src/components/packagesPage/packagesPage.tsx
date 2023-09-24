@@ -56,7 +56,7 @@ const PackagesPage = () => {
 
   return (
     <>
-      <Meta title="DPM - Packages" canonical={`${SITE_URL}/packages`} />
+      <Meta title="DPM - Packages" description="DPM Package List" canonical={`${SITE_URL}/packages`} />
       <div className="bg-brand sticky top-[3.5rem]">
         <div className="container mx-auto flex flex-row items-center justify-center py-2 pt-1 mt-0 max-w-6xl ">
           <PackageSearchBar value={query} />
