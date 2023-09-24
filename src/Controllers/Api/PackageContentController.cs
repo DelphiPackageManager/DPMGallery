@@ -144,9 +144,16 @@ namespace DPMGallery.Controllers.Api
                 return NotFound();
             }
 
-            //if the storage is a cdn (ie aws or google cloud) then redirect to the cdn url for the package file.
-            //note we are returning a 302 temporary redirect as we still want downloads to come here so we can count them
-            if (_storageService.IsCDN())
+			string fileExt = "";
+			if (downloadFileType == DownloadFileType.icon)
+			{
+				fileExt = await _packageContentService.GetPackageIconFileExtAsync(id, compiler, thePlatform, version, cancellationToken);
+			}
+
+
+			//if the storage is a cdn (ie aws or google cloud) then redirect to the cdn url for the package file.
+			//note we are returning a 302 temporary redirect as we still want downloads to come here so we can count them
+			if (_storageService.IsCDN())
             {
                 if (string.IsNullOrEmpty(_serverConfig.Storage.CDNBaseUri))
                 {
@@ -164,18 +171,20 @@ namespace DPMGallery.Controllers.Api
                     packageUrl = packageUrl.TrimEnd('/');
 
 
-                //add path elements
+				//add path elements
 
-                //make sure the path to the file is lowercase to avoid issues with linux filesystems
-                packageUrl = $"{packageUrl}/{compilerVersion}/{platform}/{id}/{id}-{compilerVersion}-{platform}-{version}.{fileType}".ToLower();
-                return Redirect(packageUrl);
+				if (downloadFileType == DownloadFileType.icon)
+				{
+                    fileType = fileExt.Remove(0, 1).ToLower();
+				}
+
+
+				//make sure the path to the file is lowercase to avoid issues with linux filesystems
+				packageUrl = $"{packageUrl}/{compiler.Sanitise()}/{platform}/{id}/{id}-{compiler.Sanitise()}-{platform}-{version}.{fileType}".ToLower();
+
+				return Redirect(packageUrl);
             }
             //we only get here if we are using the filesystem for storage, which is dev only.
-            string fileExt = "";
-            if (downloadFileType == DownloadFileType.icon)
-            {
-                fileExt = await _packageContentService.GetPackageIconFileExtAsync(id, compiler, thePlatform, version, cancellationToken);
-            }
 
             var packageStream = await _packageContentService.GetPackageStreamAsync(downloadFileType, id, compiler, thePlatform, version, cancellationToken);
             if (packageStream == null)
