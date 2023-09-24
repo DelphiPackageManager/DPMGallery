@@ -31,7 +31,7 @@ const PackageSearchBar: React.FunctionComponent<IPackageSearchBarProps> = ({ doN
       <div className="w-full flex flex-col">
         <div className="relative flex justify-around items-center ">
           <span className="absolute inset-y-0 left-0 flex items-center justify-center">
-            <button type="submit" className="p-2 focus:outline-none text-gray-400 dark:text-gray-800">
+            <button type="submit" aria-label="Search" className="p-2 focus:outline-none text-gray-400 dark:text-gray-800">
               <svg
                 fill="none"
                 stroke="currentColor"
