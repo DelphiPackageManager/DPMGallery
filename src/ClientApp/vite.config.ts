@@ -23,7 +23,16 @@ export default defineConfig({
     emptyOutDir: true,
     outDir: "../wwwroot",
     manifest: true,
+    rollupOptions: {
+      output: {
+        manualChunks: (id: string) => {
+          //if (id.includes("react")) return "react";
+          if (id.includes("node_modules")) return "vendor";
+        },
+      },
+    },
   },
+
   server: {
     port: 3175,
     cors: true,
