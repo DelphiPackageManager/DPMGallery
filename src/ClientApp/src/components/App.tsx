@@ -1,8 +1,20 @@
 import { createBrowserRouter, createRoutesFromElements, Navigate, Route, RouterProvider } from "react-router-dom";
-import DownloadsPage from "./downloadsPage";
-import StatsPage from "./statsPage";
-import VerifyEmailPage from "./verifyEmailPage";
-
+import DownloadsPage from "../pages/downloadsPage";
+import ErrorPage from "../pages/errorPage";
+import ExternalLoginPage from "../pages/externalLogin";
+import ForgotPasswordPage from "../pages/forgotPasswordPage";
+import HomePage from "../pages/homePage";
+import LockedOutPage from "../pages/lockedOutPage";
+import LoginPage from "../pages/loginPage";
+import LoginWith2faPage from "../pages/loginWith2fa";
+import NotFoundPage from "../pages/notfoundPage";
+import PackagePoliciesPage from "../pages/packagePoliciesPage";
+import ProfilePage from "../pages/profilePage";
+import RegisterPage from "../pages/registerPage";
+import ResetPasswordPage from "../pages/resetPasswordPage";
+import StatsPage from "../pages/statsPage";
+import UploadPage from "../pages/uploadPage";
+import VerifyEmailPage from "../pages/verifyEmailPage";
 import DisableAuthenticatorPage from "./account/2fa/disable2fa";
 import EnableAuthenticatorPage from "./account/2fa/enableauthenticator";
 import GenerateRecoveryCodesPage from "./account/2fa/generateRecoveryCodes";
@@ -17,26 +29,13 @@ import EmailSettingsPage from "./account/email";
 import ExternalLoginsPage from "./account/externalLogins";
 import MyPackagesPage from "./account/myPackages";
 import OrganisationsPage from "./account/organisations";
-import ErrorPage from "./errorPage";
-import ExternalLoginPage from "./externalLogin";
-import ForgotPasswordPage from "./forgotPasswordPage";
-import HomePage from "./homePage";
 import Layout, { LayoutLoader } from "./layout";
-import LockedOutPage from "./lockedOutPage";
-import LoginPage from "./loginPage";
-import LoginWith2faPage from "./loginWith2fa";
-import NotFoundPage from "./notfoundPage";
-import PackagePoliciesPage from "./packagePoliciesPage";
 import PackagePage from "./packagesPage/packagePage";
 import PackagesPage from "./packagesPage/packagesPage";
 import PrivacyPage from "./policies/privacyPage";
 import TermsPage from "./policies/termsPage";
-import ProfilePage from "./profilePage";
-import RegisterPage from "./registerPage";
 import RequireAuthRoute from "./requireAuth";
-import ResetPasswordPage from "./resetPasswordPage";
 import RickRoll from "./rickRoll";
-import UploadPage from "./uploadPage";
 
 const App = () => {
   const router = createBrowserRouter(

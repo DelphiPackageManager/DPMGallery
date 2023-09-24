@@ -7,7 +7,7 @@ export type SearchParams = {
   page?: number;
 };
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+//const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 //copy code from PackagesPage so we can reuse on profile page
 const usePackages = () => {

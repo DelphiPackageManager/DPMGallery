@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import PageContainer from "../components/pageContainer";
+import { Button } from "../components/ui/button";
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import PageContainer from "./pageContainer";
-import { Button } from "./ui/button";
 
 const LoginWith2faPage = () => {
   const navigate = useNavigate();

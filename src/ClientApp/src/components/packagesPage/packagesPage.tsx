@@ -1,6 +1,8 @@
 import { SITE_URL } from "@/constants";
-import { useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useSearchParams } from "react-router-dom";
+import { getPackages } from "../../api/clientApi";
 import usePackages, { SearchParams } from "../../hooks/usePackages";
 import Loader from "../loader";
 import Meta from "../meta";
@@ -9,38 +11,48 @@ import PageContainer from "../pageContainer";
 import PackageItemRow from "./packageItemRow";
 
 const PackagesPage = () => {
-  let [searchParams] = useSearchParams();
+  let [searchParams, setSearchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
   const pageStr = searchParams.get("page") || "1";
   const page = Number.parseInt(pageStr);
+  const [currentPage, setCurrentPage] = useState(page);
 
-  const sq: SearchParams = {
-    query: query,
-    page: page,
-  };
   const controller = new AbortController();
 
-  const [{ loading, error, packages }, getPackages] = usePackages();
+  const packagesQuery = useQuery({
+    queryKey: ["packages", currentPage, query],
+    queryFn: () => getPackages(currentPage, query, controller.signal),
+    staleTime: 10000,
+    keepPreviousData: true,
+  });
 
-  useEffect(() => {
-    //dealing with useffect running twice in dev mode due to strict mode
-    getPackages(sq, controller);
-  }, [query, page]);
+  const { isLoading } = packagesQuery;
 
-  function getPageLink(query: string, page: number): string {
-    let result = "";
-    if (query !== "") {
-      result = `?q=${query}`;
+  const packages = packagesQuery.isSuccess ? packagesQuery.data : null;
+  const totalPages = packages ? packages.totalPackages / packages.pageSize : 0;
+
+  const doSetCurrentPage = (pg: number) => {
+    if (pg > 1) {
+      searchParams.set("page", pg.toString());
+    } else {
+      searchParams.delete("page");
     }
-    if (page > 1) {
-      if (result != "") {
-        result = result + `&page=${page}`;
-      } else {
-        result = `?page=${page}`;
-      }
+    setSearchParams(searchParams);
+
+    setCurrentPage(pg);
+  };
+
+  const prevPageClick = () => {
+    if (currentPage > 1) {
+      doSetCurrentPage(currentPage - 1);
     }
-    return result;
-  }
+  };
+
+  const nextPageClick = () => {
+    if (currentPage < totalPages) {
+      doSetCurrentPage(currentPage + 1);
+    }
+  };
 
   return (
     <>
@@ -51,9 +63,9 @@ const PackagesPage = () => {
         </div>
       </div>
       <PageContainer>
-        {!error && loading && <Loader />}
+        {isLoading && <Loader />}
 
-        {!error && !loading && packages && (
+        {packages && (
           <div className="text-2xl  mt-2 text-center">
             {packages.query == "" ? (
               <h1 role="alert" className="">
@@ -66,20 +78,22 @@ const PackagesPage = () => {
             )}
           </div>
         )}
-        {!error &&
-          !loading &&
-          packages &&
+        {packages &&
           packages?.packages.map((pkg, index) => {
             return <PackageItemRow key={index} index={index} pkg={pkg} />;
           })}
-        {!error && !loading && packages && (
+        {packages && (
           <div className="flex flex-row justify-center text-xl py-4">
             <div className="mr-3">
               {packages.prevPage > 0 ? (
                 <div>
-                  <NavLink to={getPageLink(query, packages.prevPage)} className="text-sky-600  hover:underline">
+                  <button className="text-sky-600 hover:underline" onClick={() => prevPageClick()}>
                     Previous
-                  </NavLink>
+                  </button>
+
+                  {/* <NavLink to={getPageLink(query, packages.prevPage)} className="text-sky-600  hover:underline">
+                      Previous
+                    </NavLink> */}
                 </div>
               ) : (
                 <div>
@@ -93,9 +107,13 @@ const PackagesPage = () => {
             <div className="ml-3">
               {packages.nextPage > 0 ? (
                 <div>
-                  <NavLink to={getPageLink(query, packages.nextPage)} className="text-sky-600 hover:underline">
+                  <button className="text-sky-600 hover:underline" onClick={() => nextPageClick()}>
                     Next
-                  </NavLink>
+                  </button>
+
+                  {/* <NavLink to={getPageLink(query, packages.nextPage)} className="text-sky-600 hover:underline">
+                      Next
+                    </NavLink> */}
                 </div>
               ) : (
                 <div>

@@ -2,8 +2,8 @@ import { useState } from "react";
 import axios from "../api/axios";
 
 import { useNavigate } from "react-router-dom";
-import PageContainer from "./pageContainer";
-import { Button } from "./ui/button";
+import PageContainer from "../components/pageContainer";
+import { Button } from "../components/ui/button";
 
 const FORGOTPWD_URL = "/ui/auth/forgotpassword";
 

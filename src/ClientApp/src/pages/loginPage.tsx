@@ -3,11 +3,11 @@ import * as React from "react";
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
+import Meta from "../components/meta";
+import PageContainer from "../components/pageContainer";
+import { Button } from "../components/ui/button";
 import { AuthContextInterface, User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
-import Meta from "./meta";
-import PageContainer from "./pageContainer";
-import { Button } from "./ui/button";
 
 const LoginPage = () => {
   const { login, logout } = useAuth();

@@ -18,6 +18,8 @@ namespace DPMGallery.Models
 
         public int PrevPage { get; set; }
 
+        public int PageSize { get; set; }
+
         public IList<PackageListItemModel> Packages { get; set; } = new List<PackageListItemModel>();
     }
 }

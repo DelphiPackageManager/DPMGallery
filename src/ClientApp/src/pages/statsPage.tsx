@@ -2,12 +2,12 @@ import { SITE_URL } from "@/constants";
 import * as React from "react";
 import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
+import Loader from "../components/loader";
+import Meta from "../components/meta";
+import PageContainer from "../components/pageContainer";
+import { PackageDownloads, Statistics, VersionDownloads } from "../components/statistics/statisticsTypes";
 import useStatistics from "../hooks/useStatistics";
 import { timeAgo } from "../utils";
-import Loader from "./loader";
-import Meta from "./meta";
-import PageContainer from "./pageContainer";
-import { PackageDownloads, Statistics, VersionDownloads } from "./statistics/statisticsTypes";
 
 interface IStatsPageProps {}
 
@@ -59,15 +59,13 @@ const StatsPage: React.FunctionComponent<IStatsPageProps> = (props) => {
               </div>
 
               {statistics.topPackageDownloads.map((pkg: PackageDownloads, index: number) => (
-                <div className="flex flex-row w-full justify-between">
-                  <div key={index} className=" w-1/2">
+                <div key={index} className="flex flex-row w-full justify-between">
+                  <div className=" w-1/2">
                     <Link to={"/packages/" + pkg.packageId + "/"} className=" hover:underline">
                       {pkg.packageId}
                     </Link>
                   </div>
-                  <div key={index} className="">
-                    {pkg.downloads}
-                  </div>
+                  <div className="">{pkg.downloads}</div>
                 </div>
               ))}
             </div>
@@ -86,18 +84,14 @@ const StatsPage: React.FunctionComponent<IStatsPageProps> = (props) => {
               </div>
 
               {statistics.topVersionDownloads.map((pkg: VersionDownloads, index: number) => (
-                <div className="flex flex-row w-full justify-between">
-                  <div key={index} className=" w-1/2">
+                <div key={index} className="flex flex-row w-full justify-between">
+                  <div className=" w-1/2">
                     <Link to={"/packages/" + pkg.packageId + "/" + pkg.version + "/"} className="hover:underline">
                       {pkg.packageId}
                     </Link>
                   </div>
-                  <div key={index} className="text-left w-1/4">
-                    {pkg.version}
-                  </div>
-                  <div key={index} className="text-right w-1/4 ">
-                    {pkg.downloads}
-                  </div>
+                  <div className="text-left w-1/4">{pkg.version}</div>
+                  <div className="text-right w-1/4 ">{pkg.downloads}</div>
                 </div>
               ))}
             </div>

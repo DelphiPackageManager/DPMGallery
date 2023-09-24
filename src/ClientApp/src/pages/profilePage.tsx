@@ -1,46 +1,61 @@
 import { SITE_URL } from "@/constants";
 import { firstOrNull } from "@/utils";
-import React, { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useEffect, useRef, useState } from "react";
 import { NavLink, useParams, useSearchParams } from "react-router-dom";
-import usePackages, { SearchParams } from "../hooks/usePackages";
-import Meta from "./meta";
-import PackageSearchBar from "./packageSearchBar";
-import PackageItemRow from "./packagesPage/packageItemRow";
-import { PackageOwnerModel } from "./packagesPage/packageTypes";
-import PageContainer from "./pageContainer";
+import { getPackages } from "../api/clientApi";
+import Meta from "../components/meta";
+import PackageItemRow from "../components/packagesPage/packageItemRow";
+import { PackageOwnerModel, PackageSearchResult } from "../components/packagesPage/packageTypes";
+import PageContainer from "../components/pageContainer";
 
 const ProfilePage = () => {
-  const effectRan = useRef(false);
   let { userName } = useParams();
-  let [searchParams] = useSearchParams();
+  let [searchParams, setSearchParams] = useSearchParams();
+  const [ownerInfo, setOwnerInfo] = useState<PackageOwnerModel | null>(null);
   const pageStr = searchParams.get("page") || "1";
   const page = Number.parseInt(pageStr);
+  const [currentPage, setCurrentPage] = useState(page);
 
   const query = `owner:${userName}`;
 
-  const sq: SearchParams = {
-    query: query,
-    page: page,
-  };
   const controller = new AbortController();
 
-  const [{ loading, error, packages }, getPackages] = usePackages();
-  const [ownerInfo, setOwnerInfo] = useState<PackageOwnerModel | null>(null);
-  useEffect(() => {
-    //dealing with useffect running twice in dev mode due to strict mode
-    if (effectRan.current === true) {
-      getPackages(sq, controller);
+  const packagesQuery = useQuery({
+    queryKey: ["packages", page, query],
+    queryFn: () => getPackages(page, query, controller.signal),
+  });
+
+  const { isError, isLoading } = packagesQuery;
+
+  const packages = packagesQuery.isSuccess ? packagesQuery.data : null;
+  const totalPages = packages ? packages.totalPackages / packages.pageSize : 0;
+
+  const doSetCurrentPage = (pg: number) => {
+    if (pg > 1) {
+      searchParams.set("page", pg.toString());
+    } else {
+      searchParams.delete("page");
     }
-    return () => {
-      if (effectRan.current === true) {
-        controller.abort();
-      }
-      effectRan.current = true;
-    };
-  }, [query, page]);
+    setSearchParams(searchParams);
+
+    setCurrentPage(pg);
+  };
+
+  const prevPageClick = () => {
+    if (currentPage > 1) {
+      doSetCurrentPage(currentPage - 1);
+    }
+  };
+
+  const nextPageClick = () => {
+    if (currentPage < totalPages) {
+      doSetCurrentPage(currentPage + 1);
+    }
+  };
 
   useEffect(() => {
-    if (packages?.packages) {
+    if (packages) {
       let firstPackage = firstOrNull(packages.packages);
       if (firstPackage) {
         let info = firstPackage.ownerInfos.find((item) => {
@@ -66,21 +81,21 @@ const ProfilePage = () => {
 
       <div className="flex flex-col-reverse md:flex-row pt-2 grow">
         <div className="px-4 mt-2 md:mt-1 md:ml-2  border-r border-gray-400 dark:border-gray-600 grow">
-          {!error && !loading && packages && (
+          {!isError && !isLoading && packages && (
             <div className="container mx-auto max-w-5xl pt-2 px-2 mb-4 text-gray-700 dark:text-gray-500">
               {packages?.packages.map((pkg, index) => {
                 return <PackageItemRow key={index} index={index} pkg={pkg} />;
               })}
             </div>
           )}
-          {!error && !loading && packages && (
+          {!isError && !isLoading && packages && (
             <div className="flex flex-row justify-center text-xl py-4 ">
               <div className="mr-3">
                 {packages.prevPage > 0 ? (
                   <div>
-                    <NavLink to={getPageLink(packages.prevPage)} className="text-sky-500">
+                    <button className="text-sky-600 hover:underline" onClick={() => prevPageClick()}>
                       Previous
-                    </NavLink>
+                    </button>
                   </div>
                 ) : (
                   <div>
@@ -94,9 +109,9 @@ const ProfilePage = () => {
               <div className="ml-3">
                 {packages.nextPage > 0 ? (
                   <div>
-                    <NavLink to={getPageLink(packages.nextPage)} className="text-sky-500">
+                    <button className="text-sky-600 hover:underline" onClick={() => nextPageClick()}>
                       Next
-                    </NavLink>
+                    </button>
                   </div>
                 ) : (
                   <div>

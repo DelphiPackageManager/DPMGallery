@@ -1,6 +1,6 @@
 import { SITE_URL } from "@/constants";
-import Meta from "./meta";
-import PageContainer from "./pageContainer";
+import Meta from "../components/meta";
+import PageContainer from "../components/pageContainer";
 
 const NotFoundPage = () => {
   return (

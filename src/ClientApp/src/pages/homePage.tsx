@@ -1,5 +1,5 @@
-import PackageSearchBar from "./packageSearchBar";
-import PageContainer from "./pageContainer";
+import PackageSearchBar from "../components/packageSearchBar";
+import PageContainer from "../components/pageContainer";
 
 const HomePage = () => {
   return (

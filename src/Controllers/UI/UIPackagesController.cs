@@ -42,6 +42,7 @@ namespace DPMGallery.Controllers.UI
             [FromQuery] bool prerelease = true,
             [FromQuery] bool commercial = true,
             [FromQuery] bool trial = true,
+            [FromQuery] int pageSize = 12, 
             CancellationToken cancellationToken = default)
         {
             CompilerVersion compilerVersion = CompilerVersion.UnknownVersion;
@@ -73,10 +74,11 @@ namespace DPMGallery.Controllers.UI
                 return BadRequest();
             }
 
-            var take = 12; //TODO Change to 20 this once we have more packages
-            var skip = page > 0 ? (page - 1) * take : 0;
+            var skip = page > 0 ? (page - 1) * pageSize : 0;
 
-            var model = await _uiService.UISearchAsync(query, skip, take, prerelease, commercial, trial, cancellationToken);
+            var model = await _uiService.UISearchAsync(query, skip, pageSize, prerelease, commercial, trial, cancellationToken);
+
+            model.PageSize = pageSize;
 
             var sanitizer = new HtmlSanitizer();
             //Sanitise any text fields - description etc. 
@@ -87,7 +89,7 @@ namespace DPMGallery.Controllers.UI
 
             model.Query = query;
 
-            if (model.TotalPackages - (skip + take) > 0)
+            if (model.TotalPackages - (skip + pageSize) > 0)
             {
                 model.NextPage = page + 1;
             }

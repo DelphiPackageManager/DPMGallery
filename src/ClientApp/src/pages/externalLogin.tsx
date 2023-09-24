@@ -1,11 +1,11 @@
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import PageContainer from "../components/pageContainer";
+import { Button } from "../components/ui/button";
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import PageContainer from "./pageContainer";
-import { Button } from "./ui/button";
 
 type ExternalDetails = {
   email: string;

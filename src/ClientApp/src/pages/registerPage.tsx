@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
-import PageContainer from "./pageContainer";
+import PageContainer from "../components/pageContainer";
 
 import { NavLink } from "react-router-dom";
+import { Button } from "../components/ui/button";
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
 import { validateEmail } from "../utils";
-import { Button } from "./ui/button";
 
 const RegisterPage = () => {
   const errRef = useRef<HTMLParagraphElement>(null);

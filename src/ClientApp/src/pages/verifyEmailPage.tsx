@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import PageContainer from "../components/pageContainer";
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import PageContainer from "./pageContainer";
 
 const VerifyEmailPage = () => {
   const axios = useAxiosPrivate();

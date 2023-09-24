@@ -29,6 +29,7 @@ export type PackageResultItem = {
 export type PackageSearchResult = {
   totalPackages: number;
   query: string;
+  pageSize: number;
   nextPage: number;
   prevPage: number;
   packages: PackageResultItem[];

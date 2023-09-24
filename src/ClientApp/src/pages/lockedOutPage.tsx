@@ -1,4 +1,4 @@
-import PageContainer from "./pageContainer";
+import PageContainer from "../components/pageContainer";
 const LockedOutPage = () => {
   return (
     <PageContainer>

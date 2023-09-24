@@ -1,7 +1,7 @@
 import { SITE_URL } from "@/constants";
 import * as React from "react";
-import Meta from "./meta";
-import PageContainer from "./pageContainer";
+import Meta from "../components/meta";
+import PageContainer from "../components/pageContainer";
 
 interface IUploadPageProps {}
 
