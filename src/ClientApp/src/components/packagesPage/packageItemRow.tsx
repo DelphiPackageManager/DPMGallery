@@ -12,7 +12,15 @@ const PackageItemRow: React.FC<PackageItemRowProps> = ({ pkg, index }) => {
   return (
     <div key={index} className="flex flex-row flex-nowrap mb-1 py-2 align-top text-sm md:text-lg hover:bg-primary-50 dark:hover:bg-gray-700 w-full">
       <div className="md:flex items-start px-2 mr-1 md:px-3 min-w-fit">
-        <img className="w-8 h-8 md:w-12 md:h-12" src="/img/dpm64light.png" />
+        <img
+          alt="package icon"
+          className="w-8 h-8 md:w-12 md:h-12"
+          src={
+            pkg.icon
+              ? `/api/v1/package/${pkg.packageId}/${pkg.compilerVersions[0]}/${pkg.platforms[0]}/${pkg.latestVersion}/icon`
+              : "/img/dpm64light.png"
+          }
+        />
       </div>
 
       <div className="grow text-left text-base text-gray-900 dark:text-gray-100">
