@@ -182,7 +182,7 @@ namespace DPMGallery.Controllers.Api
             {
                 return NotFound();
             }
-            string fileName = $"{id}-{compiler.Sanitise()}-{platform}-{version}.".ToLower();
+            string fileName = $"{id}-{compiler.Sanitise()}-{platform}-{version}".ToLower();
 
             //TODO : how do we deal with different icon file types? perhaps just stick to png?
             if (downloadFileType == DownloadFileType.icon)
