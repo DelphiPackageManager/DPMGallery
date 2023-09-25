@@ -1,5 +1,5 @@
-import axios, { AxiosError, AxiosResponse } from "axios";
-import { PackageSearchResult } from "../pages/packages/packageTypes";
+import axios from "axios";
+import { PackageSearchResult } from "../pages/packagePages/packageTypes";
 
 export type SearchParams = {
   query?: string;

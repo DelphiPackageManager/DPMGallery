@@ -6,8 +6,8 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { getPackages } from "../api/clientApi";
 import Meta from "../components/meta";
 import PageContainer from "../components/pageContainer";
-import PackageItemRow from "./packages/packageItemRow";
-import { PackageOwnerModel } from "./packages/packageTypes";
+import PackageItemRow from "./packagePages/packageItemRow";
+import { PackageOwnerModel } from "./packagePages/packageTypes";
 
 const ProfilePage = () => {
   const navigate = useNavigate();

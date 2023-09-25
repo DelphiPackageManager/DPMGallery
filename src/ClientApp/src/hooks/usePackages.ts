@@ -1,6 +1,8 @@
 import axios, { AxiosError } from "axios";
 import { useCallback, useState } from "react";
-import { PackageSearchResult } from "../pages/packages/packageTypes";
+import { PackageSearchResult } from "../pages/packagePages/packageTypes";
+
+//not used
 
 export type SearchParams = {
   query?: string;
