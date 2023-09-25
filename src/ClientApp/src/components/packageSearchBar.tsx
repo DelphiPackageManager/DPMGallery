@@ -1,28 +1,44 @@
-import { Slot } from "@radix-ui/react-slot";
-import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 
 export interface IPackageSearchBarProps {
-  doNavigateOnClear?: boolean;
   value: string;
+  onChange?: (value: string) => void;
 }
 
-const PackageSearchBar: React.FunctionComponent<IPackageSearchBarProps> = ({ doNavigateOnClear = true, value = "" }) => {
-  const navigate = useNavigate();
-
+const PackageSearchBar = ({ value, onChange }: IPackageSearchBarProps) => {
+  const [currentValue, setCurrentValue] = useState<string>(value);
+  const inputTxt = useRef<HTMLInputElement>(null);
   const _handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       //trigger search
-      const value = event.currentTarget.value;
-      navigate(`/packages?q=${value}`);
-      return;
-    }
-    if (event.key === "Escape") {
-      //clear search
-      event.currentTarget.value = "";
-      if (doNavigateOnClear) {
-        navigate("/packages");
+
+      if (onChange) {
+        onChange(currentValue);
       }
+    } else if (event.key === "Escape") {
+      setCurrentValue("");
+      //clear search
+      if (onChange) {
+        onChange("");
+      }
+    }
+    return true;
+  };
+
+  useEffect(() => {
+    setCurrentValue(value);
+    inputTxt?.current?.focus();
+  }, [value]);
+
+  const doOnChange = (v: string) => {
+    setCurrentValue(v);
+
+    //if (onChange) onChange(value);
+  };
+
+  const onSearchIconClick = () => {
+    if (onChange) {
+      onChange(currentValue);
     }
   };
 
@@ -31,7 +47,11 @@ const PackageSearchBar: React.FunctionComponent<IPackageSearchBarProps> = ({ doN
       <div className="w-full flex flex-col">
         <div className="relative flex justify-around items-center ">
           <span className="absolute inset-y-0 left-0 flex items-center justify-center">
-            <button type="submit" aria-label="Search" className="p-2 focus:outline-none text-gray-400 dark:text-gray-800">
+            <button
+              type="button"
+              aria-label="Search"
+              className="p-2 focus:outline-none text-gray-400 dark:text-gray-800"
+              onClick={() => onSearchIconClick()}>
               <svg
                 fill="none"
                 stroke="currentColor"
@@ -53,7 +73,9 @@ const PackageSearchBar: React.FunctionComponent<IPackageSearchBarProps> = ({ doN
             placeholder="Search Packages"
             autoComplete="off"
             onKeyDown={_handleKeyDown}
-            defaultValue={value}
+            onChange={(e) => doOnChange(e.target.value)}
+            value={currentValue}
+            ref={inputTxt}
           />
         </div>
       </div>

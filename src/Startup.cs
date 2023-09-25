@@ -40,6 +40,7 @@ namespace DPMGallery
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+           
             var serverConfig = ServerConfig.Current;
             services.AddSingleton(serverConfig);
             _configuration.Bind(serverConfig);
@@ -49,15 +50,33 @@ namespace DPMGallery
                 return Serilog.Log.Logger;
             });
 
-            //allows running behind nginx or yarp
-            services.Configure<ForwardedHeadersOptions>(options =>
+
+			//services.AddCors(options =>
+			//{
+			//	options.AddPolicy("AllowSpecified", policy =>
+			//	{
+			//		policy.WithOrigins("https://delphi.dev",
+			//						   "https://localhost:5002",
+			//							"https://*.delphi.dev")
+			//		.SetIsOriginAllowedToAllowWildcardSubdomains()
+			//		.AllowAnyMethod().AllowAnyHeader();
+			//	});
+			//});
+
+
+
+			//allows running behind nginx or yarp
+			services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
                 options.KnownNetworks.Clear();
                 options.KnownProxies.Clear();
             });
 
-            services.AddRateLimiter(options =>
+         
+            
+
+			services.AddRateLimiter(options =>
             {
                 options.AddFixedWindowLimiter(policyName: "api-fixed", options =>
                 {
@@ -188,25 +207,11 @@ namespace DPMGallery
                     }
                     return Task.CompletedTask;
                 };
-            })//.AddCookie(options =>
-            //{
-            //    options.Cookie.SameSite = SameSiteMode.Lax;
-            //    options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
-            //    options.Cookie.IsEssential = true;
-            //    options.Events.OnRedirectToLogin += context =>
-            //    {
-            //        context.Response.StatusCode = 401;
-            //        return Task.CompletedTask;
-            //    };
-            //})
-
-            //need to figure out how to use these with react
+            })
             .AddGoogle(options =>
             {
-                //IConfigurationSection googleAuthNSection =
-                //Configuration.GetSection("Authentication:Google");
-                options.ClientId = serverConfig.Authentication.Google.ClientId;// .googleAuthNSection["ClientId"];
-                options.ClientSecret = serverConfig.Authentication.Google.ClientSecret;//  googleAuthNSection["ClientSecret"];
+                options.ClientId = serverConfig.Authentication.Google.ClientId;
+                options.ClientSecret = serverConfig.Authentication.Google.ClientSecret;
                 options.Scope.Add("profile");
                 options.CallbackPath = new PathString("/oauth-google");
                 options.SignInScheme = IdentityConstants.ExternalScheme;
@@ -221,13 +226,10 @@ namespace DPMGallery
                 options.Scope.Add("user:login");
                 options.ClaimActions.MapJsonKey("urn:github:login", "login");
                 options.ClaimActions.MapJsonKey("urn:github:login", "email");
-                //options.ClaimActions.MapJsonKey("urn:github:url", "html_url");
-                //options.ClaimActions.MapJsonKey("urn:github:avatar", "avatar_url");
-               // options.SignInScheme = IdentityConstants.ApplicationScheme;
             });
 
 
-            services.AddControllers().AddJsonOptions(j =>
+			services.AddControllers().AddJsonOptions(j =>
             {
                 j.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
@@ -237,26 +239,9 @@ namespace DPMGallery
                 configuration.RootPath = "wwwroot";
             });
 
-            services.AddCors();
 
-
-
-
-
-            //services.AddHttpLogging(logging =>
-            //{
-            //    // Customize HTTP logging here.
-            //    logging.LoggingFields = HttpLoggingFields.All;
-            //    //logging.ResponseHeaders.Add("My-Response-Header");
-            //    //logging.MediaTypeOptions.AddText("application/javascript");
-            //    logging.RequestBodyLogLimit = 4096;
-            //    logging.ResponseBodyLogLimit = 4096;
-            //});
-
-            DTOMappings.Configure();
+			DTOMappings.Configure();
             ModelMappings.Configure();
-            // configuration (resolvers, counter key builders)
-            //services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
         }
 
@@ -271,12 +256,7 @@ namespace DPMGallery
                         headers.CacheControl?.NoCache == false)
                     {
                         headers.CacheControl.NoCache = true;
-                        //headers.CacheControl = new CacheControlHeaderValue
-                        //{
-                        //    NoCache = true
-                        //};
                     }
-
                     return Task.FromResult(0);
                 });
                 await next();
@@ -286,57 +266,75 @@ namespace DPMGallery
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+			if (env.IsDevelopment())
+			{
+				//app.UseCors(config =>
+				//{
+				//	config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+				//});
+			}
+			else
+			{
+				//app.UseCors(config =>
+				//{
+				//	config.WithOrigins("https://delphi.dev",
+				//					   "https://localhost:5002",
+				//						"https://*.delphi.dev")
+				//	.SetIsOriginAllowedToAllowWildcardSubdomains()
+				//	.AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+				//});
 
-            if (env.IsDevelopment())
-            {
-                app.UseCors(config =>
-                {
-                    config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
-                }) ;
-            }
-            else
-            {
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
-            }
-            
-            app.UseForwardedHeaders();
-            //app.UseIpRateLimiting(); //TODO : replace with built in rate limiting
-            app.UseHttpsRedirection();
+				//app.UseCors(builder => builder.AllowAnyOrigin()
+				//				.AllowAnyMethod()
+				//				.AllowAnyHeader());
+
+				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+				//app.UseHsts();
+			}
+
+			
+
+
+			app.UseForwardedHeaders();
+			//app.UseIpRateLimiting(); //TODO : replace with built in rate limiting
+			app.UseHttpsRedirection();
+			
             app.UseStaticFiles();
-
+            //app.UseSpaStaticFiles();
 
             string[] nonSpaUrls = { "/api", "/ui", "/oauth-" };
 
-            app.MapWhen(x => !nonSpaUrls.Any(y => x.Request.Path.Value.StartsWith(y)), builder =>
+			
+
+			app.MapWhen(x => !nonSpaUrls.Any(y => x.Request.Path.Value.StartsWith(y)), builder =>
             {
-                builder.UseSpa(spa =>
-                {
-                    if (env.IsDevelopment())
-                    {
-                        // Make sure you have started the frontend with npm run dev
-                        spa.UseProxyToSpaDevelopmentServer("http://localhost:3175");
-                    }
-                    else
-                    {
-                        spa.Options.SourcePath = "wwwroot";
-                    }
-                });
+            	builder.UseSpa(spa =>
+            	{
+            		//spa.ApplicationBuilder.UseCors("AllowSpecified");
+            		if (env.IsDevelopment())
+            		{
+            			// Make sure you have started the frontend with npm run dev
+            			spa.UseProxyToSpaDevelopmentServer("http://localhost:3175");
+            		}
+            		else
+            		{
+            			spa.Options.SourcePath = "wwwroot";
+            		}
+            	});
+
             });
 
+			app.UseRouting();
 
-            app.UseRateLimiter();
 
-            //app.UseCookiePolicy();
-            //app.UseSerilogRequestLogging();
-            app.UseApiKeyAuthMiddleware();
-            app.UseOperationCancelledMiddleware();
-            app.UseRouting();
-            app.UseOutputCache();
+			//app.UseCors("AllowSpecified");
 
-            app.UseAuthentication();
+			app.UseOperationCancelledMiddleware();
+			app.UseOutputCache();
+
+			app.UseApiKeyAuthMiddleware();
+			app.UseAuthentication();
             app.UseAuthorization();
-            //app.UseHttpLogging();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

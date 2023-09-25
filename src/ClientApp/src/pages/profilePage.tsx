@@ -1,18 +1,20 @@
 import { SITE_URL } from "@/constants";
 import { firstOrNull } from "@/utils";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
-import { NavLink, useParams, useSearchParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { getPackages } from "../api/clientApi";
 import Meta from "../components/meta";
-import PackageItemRow from "../components/packagesPage/packageItemRow";
-import { PackageOwnerModel, PackageSearchResult } from "../components/packagesPage/packageTypes";
 import PageContainer from "../components/pageContainer";
+import PackageItemRow from "./packages/packageItemRow";
+import { PackageOwnerModel } from "./packages/packageTypes";
 
 const ProfilePage = () => {
-  let { userName } = useParams();
-  let [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { userName } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [ownerInfo, setOwnerInfo] = useState<PackageOwnerModel | null>(null);
+
   const pageStr = searchParams.get("page") || "1";
   const page = Number.parseInt(pageStr);
   const [currentPage, setCurrentPage] = useState(page);
@@ -38,7 +40,6 @@ const ProfilePage = () => {
       searchParams.delete("page");
     }
     setSearchParams(searchParams);
-
     setCurrentPage(pg);
   };
 
@@ -66,15 +67,10 @@ const ProfilePage = () => {
     }
   }, [packages]);
 
-  function getPageLink(page: number): string {
-    let result = "";
-    if (page > 1) {
-      result = `?page=${page}`;
-    }
-    return result;
-  }
+  const onTagClick = (tag: string) => {
+    navigate(`/packages?q=tag:${tag}`);
+  };
 
-  //todo : use same code from packages page.
   return (
     <PageContainer>
       <Meta title={`DPM - Profile - ${userName}`} canonical={`${SITE_URL}/packages`} />
@@ -84,7 +80,7 @@ const ProfilePage = () => {
           {!isError && !isLoading && packages && (
             <div className="container mx-auto max-w-5xl pt-2 px-2 mb-4 text-gray-700 dark:text-gray-500">
               {packages?.packages.map((pkg, index) => {
-                return <PackageItemRow key={index} index={index} pkg={pkg} />;
+                return <PackageItemRow key={index} index={index} pkg={pkg} onTagClick={onTagClick} />;
               })}
             </div>
           )}
@@ -136,14 +132,6 @@ const ProfilePage = () => {
           <div className="flex flex-col ">
             <div className="mt-4 text-2xl text-gray-600 dark:text-gray-300">
               <span className="whitespace-nowrap">{packages?.totalPackages} Packages</span>
-            </div>
-            <div className="flex flex-row md:flex-col mt-1 md:mt-2 items-baseline">
-              <div className="text-base md:text-xl text-gray-600 dark:text-gray-400">
-                <span>124,687</span>
-              </div>
-              <div className="ml-2 md:ml-0 mt-1 text-sm md:text-lg text-gray-600 dark:text-gray-400">
-                <span>Downloads</span>
-              </div>
             </div>
           </div>
         </div>

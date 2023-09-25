@@ -1,13 +1,22 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import PackageSearchBar from "../components/packageSearchBar";
 import PageContainer from "../components/pageContainer";
 
 const HomePage = () => {
+  const navigate = useNavigate();
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    if (query) navigate(`/packages?q=${query}`);
+  }, [query]);
+
   return (
     <>
       {/* This can't be in the page container due to sticky position */}
       <div className="bg-brand w-full sticky top-[3.5rem] ">
         <div className="container mx-auto flex flex-row items-center justify-center py-2 pt-1 mt-0 ">
-          <PackageSearchBar doNavigateOnClear={false} value={""} />
+          <PackageSearchBar value={query} onChange={setQuery} />
         </div>
       </div>
 
