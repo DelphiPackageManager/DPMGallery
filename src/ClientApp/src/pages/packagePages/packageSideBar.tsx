@@ -56,14 +56,26 @@ const PackageSideBar = ({ packageDetails, currentVersion }: PackageSideBarProps)
         <StopwatchIcon className="mr-2 h-4 w-4" />
         <span className="text-sm">Last Updated {currentVersion?.published}</span>
       </div>
-      <div className="mt-2 flex items-center">
-        <GlobeAltIcon className="mr-2 h-4 w-4" />
-        <span className="text-sm">
-          <a href={packageDetails?.projectUrl} className="hover:underline">
-            Project Website
-          </a>
-        </span>
-      </div>
+      {packageDetails?.projectUrl && (
+        <div className="mt-2 flex items-center">
+          <GlobeAltIcon className="mr-2 h-4 w-4" />
+          <span className="text-sm">
+            <a href={packageDetails?.projectUrl} className="hover:underline">
+              Project Website
+            </a>
+          </span>
+        </div>
+      )}
+      {packageDetails?.repositoryUrl && (
+        <div className="mt-2 flex items-center">
+          <GlobeAltIcon className="mr-2 h-4 w-4" />
+          <span className="text-sm">
+            <a href={packageDetails?.repositoryUrl} className="hover:underline">
+              Source Respository
+            </a>
+          </span>
+        </div>
+      )}
     </div>
   );
 };
