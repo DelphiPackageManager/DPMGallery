@@ -1,9 +1,7 @@
 //import { useEffect } from "react";
-import axios from "@/api/axios";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
-import { User } from "../context/AuthProvider";
-import fetchIdentity, { IDENTITY_URL } from "../fechIdentity";
+import fetchIdentity from "../fechIdentity";
 import useAuth from "../hooks/useAuth";
 import { useDidMount } from "../hooks/useDidMount";
 import usePageVisibility from "../hooks/usePageVisibility";
@@ -54,42 +52,42 @@ const Layout = () => {
     })();
   }, [isPageVisible]);
 
-  const fetchData = async () => {
-    try {
-      if (currentUser !== null) return;
+  // const fetchData = async () => {
+  //   try {
+  //     if (currentUser !== null) return;
 
-      //using axios private so we get the new refresh token.
-      const response = await axios.post(
-        IDENTITY_URL,
-        {},
-        {
-          withCredentials: true,
-        }
-      );
-      if (!response.data) {
-        return;
-      }
+  //     //using axios private so we get the new refresh token.
+  //     const response = await axios.post(
+  //       IDENTITY_URL,
+  //       {},
+  //       {
+  //         withCredentials: true,
+  //       }
+  //     );
+  //     if (!response.data) {
+  //       return;
+  //     }
 
-      const username = response?.data?.userName;
-      const email = response?.data?.email;
-      const emailConfirmed = response?.data?.emailConfirmed;
-      const roles = response?.data?.roles;
-      const avatarUrl = response?.data?.avatarUrl;
-      const twoFactorEnabled = response?.data?.twoFactorEnabled;
+  //     const username = response?.data?.userName;
+  //     const email = response?.data?.email;
+  //     const emailConfirmed = response?.data?.emailConfirmed;
+  //     const roles = response?.data?.roles;
+  //     const avatarUrl = response?.data?.avatarUrl;
+  //     const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
-      const user: User = {
-        userName: username,
-        email: email,
-        emailConfirmed: emailConfirmed,
-        roles: roles,
-        avatarUrl: avatarUrl,
-        twoFactorEnabled: twoFactorEnabled,
-      };
-      login(user);
-    } catch (err) {
-      logout();
-    }
-  };
+  //     const user: User = {
+  //       userName: username,
+  //       email: email,
+  //       emailConfirmed: emailConfirmed,
+  //       roles: roles,
+  //       avatarUrl: avatarUrl,
+  //       twoFactorEnabled: twoFactorEnabled,
+  //     };
+  //     login(user);
+  //   } catch (err) {
+  //     logout();
+  //   }
+  // };
 
   return (
     <>
