@@ -1,5 +1,5 @@
+import axios from "@/api/axios";
 import { useEffect, useState } from "react";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { MemberRole, UserOrganisation, memberRoleToString } from "../../types";
 import PageContainer from "../pageContainer";
 import { Button } from "../ui/button";
@@ -37,7 +37,6 @@ const OrganisationsPage = () => {
   const [organisations, setOrganisations] = useState<UserOrganisation[]>([]);
   const [errMsg, setErrorMessage] = useState("");
   const [open, setOpen] = useState(false);
-  const axios = useAxiosPrivate();
   const fetchOrganisations = async () => {
     try {
       const response = await axios.get<UserOrganisation[]>("/ui/account/user-organisations");

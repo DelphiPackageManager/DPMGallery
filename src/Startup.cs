@@ -2,7 +2,6 @@ using DPMGallery.Entities;
 using DPMGallery.Extensions;
 using DPMGallery.Identity;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,12 +14,9 @@ using System.Text.Json.Serialization;
 using DPMGallery.Services;
 using Serilog;
 using DPMGallery.Models;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using System;
 using Microsoft.AspNetCore.HttpOverrides;
 using System.Linq;
-using System.Net.Http.Headers;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 
@@ -50,7 +46,8 @@ namespace DPMGallery
                 return Serilog.Log.Logger;
             });
 
-
+            //NOTE : we are using cloudfare for cors configuration
+            //if running this elsewhere then uncomment and configure cors as required.
 			//services.AddCors(options =>
 			//{
 			//	options.AddPolicy("AllowSpecified", policy =>
@@ -136,7 +133,6 @@ namespace DPMGallery
             {
                 options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = true;
-                //options.Stores.
 
                 options.Password.RequireDigit = true;
                 options.Password.RequiredLength = 8;
@@ -149,16 +145,22 @@ namespace DPMGallery
             .AddDefaultTokenProviders()
             .AddDapperStores();
 
-            //services.Configure<CookiePolicyOptions>(options =>
-            //{
-            //    // This lambda determines whether user consent for non-essential 
-            //    // cookies is needed for a given request.
-            //    options.CheckConsentNeeded = context => true;
-            //    // requires using Microsoft.AspNetCore.Http;
-            //    options.MinimumSameSitePolicy = SameSiteMode.Strict;
-            //});
+			//services.Configure<CookiePolicyOptions>(options =>
+			//{
+			//    // This lambda determines whether user consent for non-essential 
+			//    // cookies is needed for a given request.
+			//    options.CheckConsentNeeded = context => true;
+			//    // requires using Microsoft.AspNetCore.Http;
+			//    options.MinimumSameSitePolicy = SameSiteMode.Strict;
+			//});
 
-            services.AddOutputCache(x =>
+			//services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, option =>
+			//{
+			//	option.Cookie.Name = "Hello"; // change cookie name
+			//	option.ExpireTimeSpan = TimeSpan.FromDays(7); // change cookie expire time span
+			//});
+
+			services.AddOutputCache(x =>
             {
                 x.AddPolicy("UIQuery", builder => {
                     builder.Cache()
@@ -168,46 +170,49 @@ namespace DPMGallery
                 }, excludeDefaultPolicy: true);
             });
 
-            services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+            services.AddAuthentication()
+            //services.AddAuthentication(options =>
+            //{
+            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+            //    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
 
-            }).AddJwtBearer(options =>
-            {
-                options.SaveToken = true;
-                options.RequireHttpsMetadata = false;
-                options.TokenValidationParameters = new TokenValidationParameters()
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ClockSkew = TimeSpan.Zero,
-                    ValidAudience = serverConfig.Authentication.Jwt.ValidAudience,
-                    ValidIssuer = serverConfig.Authentication.Jwt.ValidIssuer,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(serverConfig.Authentication.Jwt.Secret))
-                };
-                options.Events = new JwtBearerEvents();
-                options.Events.OnMessageReceived = context => {
-                    if (context.Request.Cookies.ContainsKey("X-Access-Token"))
-                    {
-                        context.Token = context.Request.Cookies["X-Access-Token"];
-                    }
+            //}).AddIdentityCookies();
 
-                    return Task.CompletedTask;
-                };
-                options.Events.OnAuthenticationFailed = context =>
-                {
-                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-                    {
-                        context.Response.Headers.Append("IS-TOKEN-EXPIRED", "true");
-                    }
-                    return Task.CompletedTask;
-                };
-            })
+            //.AddJwtBearer(options =>
+            //{
+            //    options.SaveToken = true;
+            //    options.RequireHttpsMetadata = false;
+            //    options.TokenValidationParameters = new TokenValidationParameters()
+            //    {
+            //        ValidateIssuer = true,
+            //        ValidateAudience = true,
+            //        ValidateLifetime = true,
+            //        ValidateIssuerSigningKey = true,
+            //        ClockSkew = TimeSpan.Zero,
+            //        ValidAudience = serverConfig.Authentication.Jwt.ValidAudience,
+            //        ValidIssuer = serverConfig.Authentication.Jwt.ValidIssuer,
+            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(serverConfig.Authentication.Jwt.Secret))
+            //    };
+            //    options.Events = new JwtBearerEvents();
+            //    options.Events.OnMessageReceived = context => {
+            //        if (context.Request.Cookies.ContainsKey("X-Access-Token"))
+            //        {
+            //            context.Token = context.Request.Cookies["X-Access-Token"];
+            //        }
+
+            //        return Task.CompletedTask;
+            //    };
+            //    options.Events.OnAuthenticationFailed = context =>
+            //    {
+            //        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+            //        {
+            //            context.Response.Headers.Append("IS-TOKEN-EXPIRED", "true");
+            //        }
+            //        return Task.CompletedTask;
+            //    };
+            //})
             .AddGoogle(options =>
             {
                 options.ClientId = serverConfig.Authentication.Google.ClientId;

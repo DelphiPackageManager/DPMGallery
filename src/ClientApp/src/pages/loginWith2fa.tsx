@@ -1,10 +1,10 @@
+import axios from "@/api/axios";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PageContainer from "../components/pageContainer";
 import { Button } from "../components/ui/button";
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 const LoginWith2faPage = () => {
   const navigate = useNavigate();
@@ -15,7 +15,6 @@ const LoginWith2faPage = () => {
   const [code, setCode] = useState("");
   const [rememberMachine, setRememberMachine] = useState(true);
   const { login, logout } = useAuth();
-  const axiosPrivate = useAxiosPrivate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -27,7 +26,7 @@ const LoginWith2faPage = () => {
       };
       console.log(state);
 
-      const response = await axiosPrivate.post("/ui/auth/login-2fa", state);
+      const response = await axios.post("/ui/auth/login-2fa", state);
       if (response?.data?.lockedOut) {
         navigate("/lockedout");
         return;

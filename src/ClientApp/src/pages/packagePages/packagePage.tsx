@@ -13,7 +13,7 @@ import remarkGfm from "remark-gfm";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-import { axiosPrivate } from "@/api/axios";
+import axios from "@/api/axios";
 import { SITE_URL } from "@/constants";
 import { firstOrNull } from "@/utils";
 import { Crosshair2Icon, InfoCircledIcon, ReaderIcon, StopwatchIcon } from "@radix-ui/react-icons";
@@ -66,7 +66,7 @@ const PackagePage = () => {
       } else {
         url = `/ui/packagedetails/${packageId}`; ///get the latest version
       }
-      const response = await axiosPrivate.get<PackageDetailsModel>(url, {
+      const response = await axios.get<PackageDetailsModel>(url, {
         signal: controller.signal,
         baseURL: "/",
       });
@@ -92,7 +92,7 @@ const PackagePage = () => {
       if (model?.readMe) {
         try {
           //withcredentials false is important.
-          const readMeResponse = await axiosPrivate.get<string>(model.readMe, {
+          const readMeResponse = await axios.get<string>(model.readMe, {
             signal: controller.signal,
             baseURL: "/",
             headers: { "Content-Type": "text/plain" },

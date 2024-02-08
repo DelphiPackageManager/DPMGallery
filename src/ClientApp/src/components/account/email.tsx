@@ -1,8 +1,7 @@
+import axios from "@/api/axios";
 import { useEffect, useRef, useState } from "react";
 import useAuth from "../../hooks/useAuth";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { validateEmail } from "../../utils";
-import PageContainer from "../pageContainer";
 import { Button } from "../ui/button";
 
 const SENDVERIFYEMAIL_URL = "/ui/account/send-verify-email";
@@ -14,7 +13,6 @@ const EmailSettingsPage = () => {
   const [emailConfirmed, setEmailConfirmed] = useState(false);
   const [changeEnabled, setChangeEnabled] = useState(false);
   const { currentUser } = useAuth();
-  const axios = useAxiosPrivate();
   const newEmailRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {

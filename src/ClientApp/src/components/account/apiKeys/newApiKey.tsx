@@ -126,7 +126,6 @@ const NewApiKey = (props: NewApiKeyProps) => {
             <select
               id="newKeyPackageOwner"
               size={1}
-              placeholder="Select an owner"
               className="w-56 text-gray-900  bg-gray-200 dark:text-gray-50 dark:bg-gray-700 p-1 rounded"
               value={owner}
               onChange={(e) => setOwner(e.target.value)}>

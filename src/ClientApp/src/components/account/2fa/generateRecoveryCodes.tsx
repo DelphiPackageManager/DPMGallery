@@ -1,11 +1,10 @@
+import axios from "@/api/axios";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import PageContainer from "../../pageContainer";
 
 const GenerateRecoveryCodesPage = () => {
-  const axiosPrivate = useAxiosPrivate();
   const [errMsg, setErrorMessage] = useState("");
 
   const navigate = useNavigate();
@@ -13,7 +12,7 @@ const GenerateRecoveryCodesPage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await axiosPrivate.post("/ui/account/2fa-generatecodes");
+      const response = await axios.post("/ui/account/2fa-generatecodes");
       if (response.data?.codes) {
         navigate("/account/showrecoverycodes", {
           state: {

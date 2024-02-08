@@ -8,8 +8,6 @@ using DB = DPMGallery.Constants.Database;
 
 namespace DPMGallery.DBMigration.Conventions
 {
-
-
 	[Migration(1, "Initial Schema creation")]
 	public class DPMGallery_1_001 : Migration
 	{

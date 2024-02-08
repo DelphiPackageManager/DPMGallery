@@ -1,10 +1,10 @@
 //import { useEffect } from "react";
+import axios from "@/api/axios";
 import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { User } from "../context/AuthProvider";
-import fetchIdentity from "../fechIdentity";
+import fetchIdentity, { IDENTITY_URL } from "../fechIdentity";
 import useAuth from "../hooks/useAuth";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import { useDidMount } from "../hooks/useDidMount";
 import usePageVisibility from "../hooks/usePageVisibility";
 import Footer from "./footer";
@@ -12,15 +12,12 @@ import Meta from "./meta";
 import NavBar from "./navbar";
 
 export const LayoutLoader = async () => {
-  //const axiosPrivate = useAxiosPrivate();
   return null;
 };
 
 const Layout = () => {
   const [wasLoggedIn, setWasLoggedIn] = useState(false);
   const { currentUser, login, logout } = useAuth();
-  const axiosPrivate = useAxiosPrivate();
-  const PROFILE_URL = "/ui/auth/identity";
   const navigate = useNavigate();
   const isPageVisible = usePageVisibility();
   const didMount = useDidMount();
@@ -62,8 +59,8 @@ const Layout = () => {
       if (currentUser !== null) return;
 
       //using axios private so we get the new refresh token.
-      const response = await axiosPrivate.post(
-        PROFILE_URL,
+      const response = await axios.post(
+        IDENTITY_URL,
         {},
         {
           withCredentials: true,

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 //import useAuth from "../../hooks/useAuth";
+import axios from "@/api/axios";
 import { Button } from "@/components/ui/button";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import PageContainer from "../../pageContainer";
 
 type TwoFactorAuthModel = {
@@ -14,14 +14,13 @@ type TwoFactorAuthModel = {
 
 const TwoFactorAuthenticationPage = () => {
   //const { auth } = useAuth();
-  const axiosPrivate = useAxiosPrivate();
   const [twofaConfig, setTwoFaConfig] = useState<TwoFactorAuthModel>(null);
   const [errMsg, setErrorMessage] = useState("");
 
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const response = await axiosPrivate.get("/ui/account/2fa-config");
+        const response = await axios.get("/ui/account/2fa-config");
         setErrorMessage("");
         setTwoFaConfig(response.data);
         //  console.log(response.data);
@@ -40,7 +39,7 @@ const TwoFactorAuthenticationPage = () => {
     event.preventDefault();
     //console.log("forgetting machine");
     try {
-      const response = await axiosPrivate.post("/ui/account/2fa-forget");
+      const response = await axios.post("/ui/account/2fa-forget");
       setErrorMessage("");
       setTwoFaConfig(response.data);
       //console.log(response.data);

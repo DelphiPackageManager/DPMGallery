@@ -36,7 +36,7 @@ const LoginPage = () => {
     event.preventDefault();
 
     try {
-      const response = await axios.post(LOGIN_URL, { username: user, password: pwd });
+      const response = await axios.post(LOGIN_URL, { username: user, password: pwd, rememberMe: rememberMe });
       if (response?.data?.requires2fa) {
         logout(); //why?
         navigate("/loginwith2fa", {

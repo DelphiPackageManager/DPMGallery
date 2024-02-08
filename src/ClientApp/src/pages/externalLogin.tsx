@@ -1,11 +1,12 @@
+import axios from "@/api/axios";
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { AxiosError } from "axios";
 import PageContainer from "../components/pageContainer";
 import { Button } from "../components/ui/button";
 import { User } from "../context/AuthProvider";
 import useAuth from "../hooks/useAuth";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 
 type ExternalDetails = {
   email: string;
@@ -26,7 +27,6 @@ const ExternalLoginPage = () => {
   let { returnUrl } = useParams() || "/";
   let { remoteError } = useParams() || false;
   const navigate = useNavigate();
-  const axios = useAxiosPrivate();
 
   const fetchDetails = async () => {
     try {
@@ -36,12 +36,10 @@ const ExternalLoginPage = () => {
         setEmail(response.data.email);
       }
     } catch (err: any) {
-      if (err?.response) {
-        if (err.response.statusMessage) {
-          setErrorMessage(err.response.statusMessage);
-        } else {
-          setErrorMessage("Error fetching external login details - Error :  " + err.response.status.toString());
-        }
+      if (err?.message) {
+        setErrorMessage(err.message);
+      } else {
+        setErrorMessage("Error fetching external login details - Unknown error");
       }
     }
   };
@@ -84,12 +82,10 @@ const ExternalLoginPage = () => {
         //        }
       }
     } catch (err: any) {
-      if (err?.response) {
-        if (err.response.statusMessage) {
-          setErrorMessage(err.response.statusMessage);
-        } else {
-          setErrorMessage("Error fetching external login details - Error :  " + err.response.status.toString());
-        }
+      if (err?.response?.data) {
+        setErrorMessage("Error creating external login :  " + err?.response?.data);
+      } else {
+        setErrorMessage("Error creating external login :  " + "unknown error");
       }
     }
   };
@@ -106,11 +102,12 @@ const ExternalLoginPage = () => {
             Associate your {`${details?.providerDisplayName}`} account.
           </h2>
           <hr />
-
-          <p id="external-login-description" className="text-info mb-4 mt-4">
-            You've successfully authenticated with <strong>{`${details?.providerDisplayName}`}</strong>. Please enter an email address for this site
-            below and click the Register button to finish logging in.
-          </p>
+          {!errMsg && (
+            <p id="external-login-description" className="text-info mb-4 mt-4">
+              You've successfully authenticated with <strong>{`${details?.providerDisplayName}`}</strong>. Please enter a username/email for this site
+              below and click the Create Account button to finish logging in.
+            </p>
+          )}
           <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto lg:py-4 w-full ">
             <div className="bg-white rounded-lg shadow-md dark:shadow-none shadow-gray-200 dark:shadow-gray-800 border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
               <div className="p-6 space-y-4 md:space-y-6 sm:p-8">

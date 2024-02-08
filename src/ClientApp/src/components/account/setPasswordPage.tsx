@@ -1,5 +1,5 @@
+import axios from "@/api/axios";
 import { useRef, useState } from "react";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import { Button } from "../ui/button";
 
 interface SetPasswordPageProps {
@@ -15,7 +15,6 @@ const SetPasswordPage: React.FunctionComponent<SetPasswordPageProps> = (props) =
   const [disabled, setDisabled] = useState(false);
   const [errMsg, setErrorMessage] = useState("");
   const passwordRef = useRef<HTMLInputElement>(null);
-  const axios = useAxiosPrivate();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();

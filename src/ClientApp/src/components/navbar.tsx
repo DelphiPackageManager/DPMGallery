@@ -1,8 +1,8 @@
+import axios from "@/api/axios";
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { useWindowSize } from "usehooks-ts";
 import useAuth from "../hooks/useAuth";
-import useAxiosPrivate from "../hooks/useAxiosPrivate";
 import DarkModeToggle from "./darkModeToggle";
 
 import {
@@ -45,13 +45,12 @@ export default function NavBar() {
 
   const Profile = () => {
     const navigate = useNavigate();
-    const axiosPrivate = useAxiosPrivate();
     const { logout } = useAuth();
     const handlClick = async (event: React.MouseEvent<HTMLDivElement>) => {
       event.preventDefault();
       //post to logout endpoint and then redirect to login page.
       try {
-        await axiosPrivate.post("/ui/auth/logout");
+        await axios.post("/ui/auth/logout");
         logout();
         navigate("/login");
       } catch (err: any) {

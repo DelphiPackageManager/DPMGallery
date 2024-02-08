@@ -1,6 +1,6 @@
+import axios from "@/api/axios";
 import { ButtonHTMLAttributes, useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import PageContainer from "../pageContainer";
 import { Button } from "../ui/button";
 
@@ -22,7 +22,6 @@ type LoginsModel = {
 } | null;
 
 const ExternalLoginsPage = () => {
-  const axiosPrivate = useAxiosPrivate();
   const [logins, setLogins] = useState<LoginsModel>(null);
   const [errMsg, setErrorMessage] = useState("");
   const [busy, setBusy] = useState(false);
@@ -33,7 +32,7 @@ const ExternalLoginsPage = () => {
     const fetchLogins = async () => {
       setBusy(true);
       try {
-        const reponse = await axiosPrivate.get<LoginsModel>("/ui/account/external-logins");
+        const reponse = await axios.get<LoginsModel>("/ui/account/external-logins");
         if (reponse?.data) {
           setLogins(reponse.data);
           setErrorMessage("");
@@ -65,7 +64,7 @@ const ExternalLoginsPage = () => {
 
     setBusy(true);
     try {
-      const reponse = await axiosPrivate.post("/ui/account/remove-login", { loginProvider: provider, providerKey: providerKey });
+      const reponse = await axios.post("/ui/account/remove-login", { loginProvider: provider, providerKey: providerKey });
       if (reponse?.data) {
         setLogins(reponse.data);
         setErrorMessage("");

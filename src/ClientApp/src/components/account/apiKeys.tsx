@@ -1,7 +1,7 @@
+import axios from "@/api/axios";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import useModal from "../../hooks/useModal";
 import { ApiKey } from "../../types";
 import Modal from "../modal";
@@ -16,7 +16,6 @@ const APIKeysPage = () => {
   const { currentUser } = useAuth();
   const emailConfirmed = currentUser && currentUser.emailConfirmed;
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
-  const axios = useAxiosPrivate();
 
   const fetchApiKeys = async () => {
     try {
@@ -29,7 +28,7 @@ const APIKeysPage = () => {
         if (err.response.statusMessage) {
           setErrorMessage(err.response.statusMessage);
         } else {
-          setErrorMessage("Error fetching external login details - Error :  " + err.response.status.toString());
+          setErrorMessage("Error fetching api keys - Error :  " + err.response.status.toString());
         }
       }
     }

@@ -1,13 +1,12 @@
+import axios from "@/api/axios";
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import useAuth from "../../hooks/useAuth";
-import useAxiosPrivate from "../../hooks/useAxiosPrivate";
 import PageContainer from "../pageContainer";
 
 const ConfirmEmailChangePage = () => {
   const location = useLocation();
   let navigate = useNavigate();
-  const axios = useAxiosPrivate();
   const { currentUser, login } = useAuth();
   const [searchParams] = useSearchParams();
   let [statusMessage, setStatusMessage] = useState("");

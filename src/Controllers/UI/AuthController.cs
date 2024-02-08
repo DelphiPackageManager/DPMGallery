@@ -3,24 +3,19 @@ using DPMGallery.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using System;
-using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using DPMGallery.Extensions;
 using System.Threading;
-using Microsoft.AspNetCore.Http.HttpResults;
 using DPMGallery.Models.Identity;
 using Microsoft.AspNetCore.Authentication;
 using System.Web;
-using FluentMigrator.Infrastructure;
 using Microsoft.AspNetCore.WebUtilities;
 using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -108,24 +103,11 @@ namespace DPMGallery.Controllers.UI
             _urlEncoder = urlEncoder;
         }
 
-        private async Task<Tuple<object, List<Claim>>> GenerateProfileObject(User user)
+        private async Task<object> GenerateProfileObject(User user)
         {
             var userRoles = await _userManager.GetRolesAsync(user);
 
-            var authClaims = new List<Claim>
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                };
-
             userRoles.Add("RegisteredUser");
-            foreach (var userRole in userRoles)
-            {
-                authClaims.Add(new Claim(ClaimTypes.Role, userRole));
-            }
-            authClaims.Add(new Claim(ClaimTypes.Email, user.Email));
-            authClaims.Add(new Claim(EmailConfirmedClaim, user.EmailConfirmed.ToString()));
-
             var hash = user.Email.ToLower().ToMd5();
 
             var userProfile = new
@@ -138,7 +120,7 @@ namespace DPMGallery.Controllers.UI
                 twoFactorEnabled = user.TwoFactorEnabled
             };
 
-            return new Tuple<object, List<Claim>>(userProfile, authClaims);
+            return userProfile;
         }
 
 
@@ -161,51 +143,20 @@ namespace DPMGallery.Controllers.UI
 
             var result = await GenerateProfileObject(user);
 
-            return Ok(result.Item1);
+            return Ok(result);
         }
 
-        private async Task<Tuple<object, List<Claim>>> GenerateJWT(User user, bool rememberMe)
-        {
-            var result = await GenerateProfileObject(user);
-
-            var token = CreateToken(result.Item2);
-            var refreshToken = GenerateRefreshToken();
-
-            user.RefreshToken = refreshToken;
-            DateTimeOffset refreshTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays);
-
-            user.RefreshTokenExpiryTime = refreshTokenExpires;
-
-            await _userManager.UpdateAsync(user);
-
-            string Token = new JwtSecurityTokenHandler().WriteToken(token);
-
-            DateTimeOffset? accessTokenExpires = null;
-
-            if (rememberMe)
-            {
-#if DEBUG
-                accessTokenExpires = DateTimeOffset.UtcNow.AddMinutes(1); //TESTING Remove
-#else
-                    accessTokenExpires = DateTimeOffset.UtcNow.AddDays(_serverConfig.Authentication.Jwt.RefreshTokenValidityInDays + 1);
-#endif
-                Response.Cookies.Append("X-Remember-Me", "true", new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires?.AddMinutes(2) });
-            }
-            Response.Cookies.Append("X-Access-Token", Token, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = accessTokenExpires });
-
-            Response.Cookies.Append("X-Refresh-Token", user.RefreshToken, new CookieOptions() { HttpOnly = true, SameSite = SameSiteMode.Strict, Expires = refreshTokenExpires });
-            return result;
-        }
 
         [HttpPost]
         [Route("logout")]
         [Authorize]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout()
         {
-            //just delete the the token cookies.
+            //just delete the the token cookies as we are no longer using them.
             Response.Cookies.Delete("X-Access-Token");
             Response.Cookies.Delete("X-Refresh-Token");
             Response.Cookies.Delete("X-Remember-Me");
+            await _signInManager.SignOutAsync();
             return Ok();
         }
 
@@ -230,8 +181,9 @@ namespace DPMGallery.Controllers.UI
             }
             var result = await _signInManager.PasswordSignInAsync(user, requestDTO.Password, requestDTO.RememberMe, lockoutOnFailure: false);
             if (result.Succeeded) {
-                var jwt = await GenerateJWT(user, requestDTO.RememberMe);
-                return Ok(jwt.Item1);
+				var profile = await GenerateProfileObject(user);
+
+				return Ok(profile);
             }
             if (result.RequiresTwoFactor)
             {
@@ -270,8 +222,8 @@ namespace DPMGallery.Controllers.UI
 
             if (result.Succeeded)
             {
-                var jwt = await GenerateJWT(user, model.RememberMe);
-                return Ok(jwt.Item1);
+				var profile = await GenerateProfileObject(user);
+                return Ok(profile);
             }
             else if (result.IsLockedOut)
             {
@@ -328,45 +280,43 @@ namespace DPMGallery.Controllers.UI
                 //TODO : log exception
             }
 
-            var jwt = await GenerateJWT(user, true);
-            return Ok(jwt.Item1);
-
-            //return Ok(new ResponseModel { Status = "Success", Message = "User created successfully!" });
+            var profile = await GenerateProfileObject(user);
+            return Ok(profile);
         }
 
-        [HttpPost]
-        [Route("refresh-token")]
-        public async Task<IActionResult> RefreshToken()
-        {
-            string oldAccessToken = Request.Cookies.FirstOrDefault(x => x.Key == "X-Access-Token").Value;
-            string refreshToken = Request.Cookies.FirstOrDefault(x => x.Key == "X-Refresh-Token").Value;
-            string rememberMe = Request.Cookies.FirstOrDefault(x => x.Key == "X-Remember-Me").Value;
-            if (string.IsNullOrEmpty(oldAccessToken) || string.IsNullOrEmpty(refreshToken))
-                return Unauthorized();
+        //[HttpPost]
+        //[Route("refresh-token")]
+        //public async Task<IActionResult> RefreshToken()
+        //{
+        //    string oldAccessToken = Request.Cookies.FirstOrDefault(x => x.Key == "X-Access-Token").Value;
+        //    string refreshToken = Request.Cookies.FirstOrDefault(x => x.Key == "X-Refresh-Token").Value;
+        //    string rememberMe = Request.Cookies.FirstOrDefault(x => x.Key == "X-Remember-Me").Value;
+        //    if (string.IsNullOrEmpty(oldAccessToken) || string.IsNullOrEmpty(refreshToken))
+        //        return Unauthorized();
 
-            var principal = GetPrincipalFromExpiredToken(oldAccessToken);
-            if (principal == null)
-            {
-                return BadRequest("Invalid access token");
-            }
+        //    var principal = GetPrincipalFromExpiredToken(oldAccessToken);
+        //    if (principal == null)
+        //    {
+        //        return BadRequest("Invalid access token");
+        //    }
 
-            string username = principal.Identity?.Name;
-            if (string.IsNullOrEmpty(username))
-            {
-                return BadRequest("Invalid access token");
-            }
+        //    string username = principal.Identity?.Name;
+        //    if (string.IsNullOrEmpty(username))
+        //    {
+        //        return BadRequest("Invalid access token");
+        //    }
 
-            var user = await _userManager.FindByNameAsync(username);
+        //    var user = await _userManager.FindByNameAsync(username);
 
-            if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTimeOffset.UtcNow)
-            {
-                return Unauthorized();
-            }
+        //    if (user == null || user.RefreshToken != refreshToken || user.RefreshTokenExpiryTime <= DateTimeOffset.UtcNow)
+        //    {
+        //        return Unauthorized();
+        //    }
 
-            await GenerateJWT(user, !string.IsNullOrEmpty(rememberMe));
-            //should we return profile here?
-            return Ok();
-        }
+        //    await GenerateJWT(user, !string.IsNullOrEmpty(rememberMe));
+        //    //should we return profile here?
+        //    return Ok();
+        //}
 
         /// <summary>
         /// when an external auth button is clicked on the login form we do a post to here.
@@ -511,12 +461,20 @@ namespace DPMGallery.Controllers.UI
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return BadRequest("Error loading external login information during confirmation.");
+                return BadRequest(
+                    new
+                    {
+                        statusMessage = "Error loading external login information during confirmation."
+                    });
+
             }
 
             if (!ModelState.IsValid)
             {
-                return BadRequest("Username and Email are required.");
+                return BadRequest(
+                    new { 
+                        statusMessage = "Username and Email are required." }
+                    );
             }
 
             var externalEmail = info.Principal.FindFirstValue(ClaimTypes.Email);
@@ -538,7 +496,7 @@ namespace DPMGallery.Controllers.UI
 
                 if (createResult.Succeeded)
                 {
-                    var jwt = await GenerateJWT(newUser, true);
+                    var profile = await GenerateProfileObject(newUser);
                     
                     if (mustConfirm)
                     {
@@ -561,7 +519,7 @@ namespace DPMGallery.Controllers.UI
                         }
 
                     }
-                    return Ok(jwt.Item1);
+                    return Ok(profile);
                 }
                 else
                 {
@@ -570,7 +528,8 @@ namespace DPMGallery.Controllers.UI
             }
             else
             {
-                return BadRequest(createResult.Errors.ToString());
+                var errors = string.Join("\r\n", createResult.Errors.Select(x => x.Description));
+				return BadRequest(errors);
             }
         }
 
@@ -619,7 +578,7 @@ namespace DPMGallery.Controllers.UI
                 user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);// FindByEmailAsync(email);
                 if (user != null)
                 {
-                    await GenerateJWT(user, false);//we do need this as it updates the user
+                    //await GenerateJWT(user, false);//we do need this as it updates the user
                     //should return to a page that will cause the identity check?
                     return LocalRedirect(redirectTo);
                 }
@@ -703,51 +662,51 @@ namespace DPMGallery.Controllers.UI
             return NoContent();
         }
 
-        private JwtSecurityToken CreateToken(List<Claim> authClaims)
-        {
-            //var aud = authClaims.FirstOrDefault(x => x.Type == "aud");
-            //if (aud != null)
-            //    authClaims.Remove(aud);
+        //private JwtSecurityToken CreateToken(List<Claim> authClaims)
+        //{
+        //    //var aud = authClaims.FirstOrDefault(x => x.Type == "aud");
+        //    //if (aud != null)
+        //    //    authClaims.Remove(aud);
 
-            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.Jwt.Secret));
+        //    var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.Jwt.Secret));
 
-            var token = new JwtSecurityToken(
-                issuer: _serverConfig.Authentication.Jwt.ValidIssuer,
-                audience: _serverConfig.Authentication.Jwt.ValidAudience,
-                expires: DateTime.Now.AddMinutes(_serverConfig.Authentication.Jwt.TokenValidityInMinutes),
-                claims: authClaims,
-                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
-                );
+        //    var token = new JwtSecurityToken(
+        //        issuer: _serverConfig.Authentication.Jwt.ValidIssuer,
+        //        audience: _serverConfig.Authentication.Jwt.ValidAudience,
+        //        expires: DateTime.Now.AddMinutes(_serverConfig.Authentication.Jwt.TokenValidityInMinutes),
+        //        claims: authClaims,
+        //        signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+        //        );
 
-            return token;
-        }
+        //    return token;
+        //}
 
-        private static string GenerateRefreshToken()
-        {
-            var randomNumber = new byte[64];
-            using var rng = RandomNumberGenerator.Create();
-            rng.GetBytes(randomNumber);
-            return Convert.ToBase64String(randomNumber);
-        }
+        //private static string GenerateRefreshToken()
+        //{
+        //    var randomNumber = new byte[64];
+        //    using var rng = RandomNumberGenerator.Create();
+        //    rng.GetBytes(randomNumber);
+        //    return Convert.ToBase64String(randomNumber);
+        //}
 
-        private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
-        {
-            var tokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateAudience = false,
-                ValidateIssuer = false,
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.Jwt.Secret)),
-                ValidateLifetime = false
-            };
+        //private ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        //{
+        //    var tokenValidationParameters = new TokenValidationParameters
+        //    {
+        //        ValidateAudience = false,
+        //        ValidateIssuer = false,
+        //        ValidateIssuerSigningKey = true,
+        //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_serverConfig.Authentication.Jwt.Secret)),
+        //        ValidateLifetime = false
+        //    };
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
-            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
-                throw new SecurityTokenException("Invalid token");
+        //    var tokenHandler = new JwtSecurityTokenHandler();
+        //    var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+        //    if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+        //        throw new SecurityTokenException("Invalid token");
 
-            return principal;
+        //    return principal;
 
-        }
+        //}
     }
 }

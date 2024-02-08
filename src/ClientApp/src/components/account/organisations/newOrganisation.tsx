@@ -1,6 +1,6 @@
+import axios from "@/api/axios";
 import Modal from "@/components/ui/modal";
 import { Spinner } from "@/components/ui/spinner";
-import useAxiosPrivate from "@/hooks/useAxiosPrivate";
 import * as Form from "@radix-ui/react-form";
 import { FormEvent, useEffect, useState } from "react";
 
@@ -15,8 +15,6 @@ const NewOrganisation = ({ afterSave }: NewOrganisationProps) => {
   const [debouncedOrgName, setDebouncedOrgName] = useState("");
   const [orgExists, setOrgExists] = useState(false);
   const [saving, setSaving] = useState(false);
-
-  const axios = useAxiosPrivate();
 
   useEffect(() => {
     const delayInputTimeoutId = setTimeout(() => {

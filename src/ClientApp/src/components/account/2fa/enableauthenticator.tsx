@@ -1,9 +1,9 @@
+import axios from "@/api/axios";
 import { Button } from "@/components/ui/button";
 import { AxiosError } from "axios";
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import PageContainer from "../../pageContainer";
 
 type AuthenticatorDetailsModel = {
@@ -12,7 +12,6 @@ type AuthenticatorDetailsModel = {
 } | null;
 
 const EnableAuthenticatorPage = () => {
-  const axiosPrivate = useAxiosPrivate();
   const [errMsg, setErrorMessage] = useState("");
   const [config, setConFig] = useState<AuthenticatorDetailsModel>(null);
   const [code, setCode] = useState("");
@@ -20,7 +19,7 @@ const EnableAuthenticatorPage = () => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     try {
-      const response = await axiosPrivate.post("/ui/account/2fa-verify", { code: code });
+      const response = await axios.post("/ui/account/2fa-verify", { code: code });
       if (response.data?.codes) {
         navigate("/account/showrecoverycodes", {
           state: {
@@ -45,7 +44,7 @@ const EnableAuthenticatorPage = () => {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        const response = await axiosPrivate.get("/ui/account/2fa-keyinfo");
+        const response = await axios.get("/ui/account/2fa-keyinfo");
         setErrorMessage("");
         console.log(response.data);
         setConFig(response.data);

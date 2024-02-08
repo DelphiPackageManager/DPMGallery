@@ -1,8 +1,8 @@
 import { createAxiosInitial } from "./api/axios";
 import { User } from "./context/AuthProvider";
+export const IDENTITY_URL = "/ui/auth/identity";
 
 const fetchIdentity = async (): Promise<User | null> => {
-  const IDENTITY_URL = "/ui/auth/identity";
   const axiosInitial = createAxiosInitial();
   try {
     //using axios initial so we get the new refresh token.

@@ -1,7 +1,7 @@
+import axios from "@/api/axios";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { axiosPrivate } from "../../../api/axios";
 import useAuth from "../../../hooks/useAuth";
 import PageContainer from "../../pageContainer";
 
@@ -23,7 +23,7 @@ const DisableAuthenticatorPage = () => {
     }
 
     try {
-      const response = await axiosPrivate.post("/ui/account/2fa-disable", {});
+      const response = await axios.post("/ui/account/2fa-disable", {});
       if (response.status == 200) {
         navigate("/account/twofactorauth");
         //navigate("/account/showrecoverycodes", {

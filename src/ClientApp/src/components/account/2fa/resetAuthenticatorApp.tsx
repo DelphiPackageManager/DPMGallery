@@ -1,19 +1,17 @@
+import axios from "@/api/axios";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "../../../api/axios";
-import useAxiosPrivate from "../../../hooks/useAxiosPrivate";
 import PageContainer from "../../pageContainer";
 
 const ResetAuthenticatorAppPage = () => {
   const navigate = useNavigate();
-  const axiosPrivate = useAxiosPrivate();
   const [errMsg, setErrMsg] = useState("");
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     console.log("resetting...");
-    axiosPrivate
+    axios
       .post("/ui/account/2fa-reset")
       .then((response) => {
         if (response?.status == 200) {
