@@ -4,37 +4,42 @@ const DarkModeToggle = () => {
   const [darkMode, setDarkMode] = useState<boolean | undefined>(undefined);
   const [preferDark, setPreferDark] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  var loading = true;
-  useEffect(() => {
-    setPreferDark(window.matchMedia("(prefers-color-scheme: dark)").matches);
-    const isDark = document.documentElement.classList.contains("dark");
-    setDarkMode(isDark);
-    setIsLoading(false);
-  }, []);
+	useEffect(() => {
+		let pf = window.matchMedia("(prefers-color-scheme: dark)").matches;
+		setPreferDark(pf);
+		let ldm = pf;
+		let dms = localStorage.getItem("darkMode");
+		if (dms) {
+			ldm = JSON.parse(dms);
+		}
+		setDarkMode(ldm);
+		setIsLoading(false);
+	}, []);
 
-  useEffect(() => {
-    if (isLoading) {
-      return;
-    }
-    if (darkMode) {
-      window.document.documentElement.classList.add("dark");
-      if (preferDark) {
-        // if we prefer dark then we don't need to store it
-        localStorage.removeItem("darkMode");
-      } else {
-        localStorage.setItem("darkMode", "true");
-      }
-    } else {
-      window.document.documentElement.classList.remove("dark");
-      if (preferDark) {
-        //user prefers light mode so we need to store it
-        localStorage.setItem("darkMode", "false");
-      } else {
-        // if we prefer dark then we don't need to store it
-        localStorage.removeItem("darkMode");
-      }
-    }
-  }, [darkMode]);
+	useEffect(() => {
+		if (isLoading) {
+			return;
+		}
+		if (darkMode) {
+			window.document.documentElement.classList.add("dark");
+			if (preferDark) {
+				// if we prefer dark then we don't need to store it
+				localStorage.removeItem("darkMode");
+			} else {
+				localStorage.setItem("darkMode", "true");
+			}
+		} else {
+			window.document.documentElement.classList.remove("dark");
+			if (preferDark) {
+				//user prefers light mode so we need to store it
+				localStorage.setItem("darkMode", "false");
+			} else {
+				// if we prefer dark then we don't need to store it
+				localStorage.removeItem("darkMode");
+			}
+		}
+	}, [darkMode]);
+
 
   const onClick = () => {
     setDarkMode(!darkMode);

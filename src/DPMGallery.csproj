@@ -34,35 +34,38 @@
 
 	<ItemGroup>
 		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="8.0.0" />
-		<PackageReference Include="AWSSDK.S3" Version="3.7.305.23" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.300.48" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.305.30" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.300.55" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Dapper" Version="2.1.28" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-		<PackageReference Include="FluentMigrator" Version="5.0.0" />
-		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="5.0.0" />
-		<PackageReference Include="Google.Cloud.Storage.V1" Version="4.7.0" />
-		<PackageReference Include="HtmlSanitizer" Version="8.0.838" />
-		<PackageReference Include="MailKit" Version="4.3.0" />
-		<PackageReference Include="Markdig" Version="0.34.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.1" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.1" />
+		<PackageReference Include="FluentMigrator" Version="5.1.0" />
+		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="5.1.0" />
+		<PackageReference Include="Google.Cloud.Storage.V1" Version="4.8.0" />
+		<PackageReference Include="HtmlSanitizer" Version="8.0.843" />
+		<PackageReference Include="MailKit" Version="4.4.0" />
+		<PackageReference Include="Markdig" Version="0.35.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="8.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="8.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="8.0.2" />
 		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.2" />
 		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.3.3">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
-		<PackageReference Include="nClam" Version="7.0.0" />
-		<PackageReference Include="Npgsql" Version="8.0.1" />
-		<PackageReference Include="NuGet.Versioning" Version="6.8.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.1" />
+		<PackageReference Include="nClam" Version="9.0.0" />
+		<PackageReference Include="Npgsql" Version="8.0.2" />
+		<PackageReference Include="NuGet.Common" Version="6.9.1" />
+		<PackageReference Include="NuGet.Packaging" Version="6.9.1" />
+		<PackageReference Include="NuGet.Protocol" Version="6.9.1" />
+		<PackageReference Include="NuGet.Versioning" Version="6.9.1" />
 		<PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
 		<PackageReference Include="Serilog.Formatting.Compact" Version="2.0.0" />
 	</ItemGroup>
