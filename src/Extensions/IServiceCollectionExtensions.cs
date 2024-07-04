@@ -70,7 +70,7 @@ namespace DPMGallery.Extensions
                 return config.Storage.StorageType switch
                 {
                     StorageType.FileSystem => provider.GetRequiredService<FileStorageService>(),
-                    StorageType.AwsS3 => provider.GetRequiredService<S3StorageService>(),
+                    StorageType.S3Service => provider.GetRequiredService<S3StorageService>(),
                     StorageType.GoogleCloudStorage => provider.GetRequiredService<GoogleCloudStorageService>(),
                     StorageType.BunnyCDN => provider.GetRequiredService<BunnyCDNStorageService>(),
                     _ => throw new InvalidOperationException($"Unsupported storage service: {config.Storage.StorageType}"),

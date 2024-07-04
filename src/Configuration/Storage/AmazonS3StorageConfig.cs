@@ -12,8 +12,9 @@ namespace DPMGallery.Configuration
         [Required]
         public string SecretKey { get; set; }
 
-        [Required]
         public string Region { get; set; }
+
+        public string ServiceUrl { get; set; }
 
         [Required]
         public string Bucket { get; set; }
@@ -23,5 +24,8 @@ namespace DPMGallery.Configuration
         public bool UseInstanceProfile { get; set; }
 
         public string AssumeRoleArn { get; set; }
+
+        public bool DisablePayloadSigning { get; set; }
+
     }
 }

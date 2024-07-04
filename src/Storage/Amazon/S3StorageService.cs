@@ -16,6 +16,7 @@ namespace DPMGallery.Storage
         private readonly string _prefix;
         private readonly AmazonS3Client _client;
         private readonly ILogger _logger;
+        private readonly bool _disablePayloadSigning;
 
         public S3StorageService(ILogger logger, ServerConfig serverConfig, AmazonS3Client client)
         {
@@ -25,6 +26,8 @@ namespace DPMGallery.Storage
 
             _bucket = serverConfig.Storage.S3Storage.Bucket;
             _prefix = serverConfig.Storage.S3Storage.Prefix;
+            _disablePayloadSigning = serverConfig.Storage.S3Storage.DisablePayloadSigning;
+
             _client = client ?? throw new ArgumentNullException(nameof(client));
 
             if (!string.IsNullOrEmpty(_prefix) && !_prefix.EndsWith(Separator))
@@ -94,7 +97,8 @@ namespace DPMGallery.Storage
                         InputStream = seekableContent,
                         ContentType = contentType,
                         AutoResetStreamPosition = false,
-                        AutoCloseStream = false
+                        AutoCloseStream = false,
+                        DisablePayloadSigning = _disablePayloadSigning,
                     }, cancellationToken);
 
                     _logger.Information($"S3 Put response : {putResponse.HttpStatusCode}");

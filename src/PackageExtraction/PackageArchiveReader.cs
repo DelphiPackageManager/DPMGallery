@@ -17,7 +17,8 @@ namespace DPMGallery.PackageExtraction
 
         private DSpecReader _dSpecReader;
 
-        private const string _dspecFileName = "package.dspec";
+        private const string _OlddspecFileName = "package.dspec";
+        private const string _dspecFileName = "package.manifest";
 
         protected Stream ZipReadStream { get; set; }
 
@@ -119,7 +120,13 @@ namespace DPMGallery.PackageExtraction
 
         public Stream GetDspec()
         {
-            return GetStream(_dspecFileName);
+            var stream = GetStream(_dspecFileName);
+            if (stream == null)
+            {
+                //try with old name
+                stream = GetStream(_OlddspecFileName);
+            }
+            return stream;
         }
 
         public IEnumerable<string> GetFiles()

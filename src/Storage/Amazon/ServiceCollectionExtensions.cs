@@ -16,10 +16,13 @@ namespace DPMGallery.Storage.Amazon
             {
                 var options = provider.GetRequiredService<ServerConfig>().Storage.S3Storage;
 
-                var config = new AmazonS3Config
+                AmazonS3Config config = new AmazonS3Config();
+
+                config.ServiceURL = options.ServiceUrl;
+                if (!string.IsNullOrEmpty(options.Region))
                 {
-                    RegionEndpoint = RegionEndpoint.GetBySystemName(options.Region)
-                };
+                    config.RegionEndpoint = RegionEndpoint.GetBySystemName(options.Region);
+                }
 
                 if (options.UseInstanceProfile)
                 {

@@ -6,7 +6,7 @@ namespace DPMGallery.Configuration
     public enum StorageType
     {
         FileSystem = 0,
-        AwsS3 = 1,
+        S3Service = 1,
         GoogleCloudStorage = 2,
         BunnyCDN = 3,
     }
