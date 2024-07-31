@@ -1,10 +1,14 @@
 import PageContainer from "../pageContainer";
+import PageHeader from "../pageHeader";
 const MyPackagesPage = () => {
-  return (
-    <PageContainer>
-      <h3>My Packages</h3>
-    </PageContainer>
-  );
+	return (
+		<PageContainer>
+			<PageHeader title="My Packages" />
+			<div className="pl-2">
+
+			</div>
+		</PageContainer>
+	);
 };
 
 export default MyPackagesPage;

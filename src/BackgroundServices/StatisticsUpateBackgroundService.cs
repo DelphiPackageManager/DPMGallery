@@ -31,7 +31,7 @@ namespace DPMGallery.BackgroundServices
             _logger.Information("[{category}] Started.", "StatisticsUpateBackgroundService");
             while (!stoppingToken.IsCancellationRequested)
             {
-                //_logger.Information("[{category}] Updating Statistics.", "StatisticsUpateBackgroundService");
+                _logger.Information("[{category}] Updating Statistics.", "StatisticsUpateBackgroundService");
                 try
                 {
                     using (var scope = _serviceProvider.CreateScope())

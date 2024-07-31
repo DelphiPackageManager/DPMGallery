@@ -7,7 +7,7 @@ namespace DPMGallery.Models
         public int OrgId { get; set; } //an organisation is a user with IsOrganisation set to true.
         public int MemberId { get; set; }
         public string UserName { get; set; }
-        public int Role { get; set; }
+        public MemberRole Role { get; set; }
         public string AvatarUrl { get; set; }
     }
 }

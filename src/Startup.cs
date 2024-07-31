@@ -145,22 +145,26 @@ namespace DPMGallery
             .AddDefaultTokenProviders()
             .AddDapperStores();
 
-			//services.Configure<CookiePolicyOptions>(options =>
-			//{
-			//    // This lambda determines whether user consent for non-essential 
-			//    // cookies is needed for a given request.
-			//    options.CheckConsentNeeded = context => true;
-			//    // requires using Microsoft.AspNetCore.Http;
-			//    options.MinimumSameSitePolicy = SameSiteMode.Strict;
-			//});
+            services.ConfigureApplicationCookie(opt => {
+                opt.Cookie.Name = "DPMGallery.Identity";
+            });
 
-			//services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, option =>
-			//{
-			//	option.Cookie.Name = "Hello"; // change cookie name
-			//	option.ExpireTimeSpan = TimeSpan.FromDays(7); // change cookie expire time span
-			//});
+            //services.Configure<CookiePolicyOptions>(options =>
+            //{
+            //    // This lambda determines whether user consent for non-essential 
+            //    // cookies is needed for a given request.
+            //    options.CheckConsentNeeded = context => true;
+            //    // requires using Microsoft.AspNetCore.Http;
+            //    options.MinimumSameSitePolicy = SameSiteMode.Strict;
+            //});
 
-			services.AddOutputCache(x =>
+            //services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, option =>
+            //{
+            //	option.Cookie.Name = "Hello"; // change cookie name
+            //	option.ExpireTimeSpan = TimeSpan.FromDays(7); // change cookie expire time span
+            //});
+
+            services.AddOutputCache(x =>
             {
                 x.AddPolicy("UIQuery", builder => {
                     builder.Cache()

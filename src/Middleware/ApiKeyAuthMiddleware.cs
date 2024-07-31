@@ -59,7 +59,7 @@ namespace DPMGallery.Middleware
             {
                 string hashed = key.GetHashSha256();
 
-                string q = $"select * from {T.ApiKey} where key_hashed = @hashed";
+                string q = $"select * from {T.ApiKeys} where key_hashed = @hashed";
                 apiKey = await dbContext.QueryFirstOrDefaultAsync<ApiKey>(q, new { hashed });
 
             }

@@ -259,7 +259,7 @@ namespace DPMGallery.DBMigration.Conventions
 				.WithColumn("allow_contact").AsBoolean().WithDefaultValue(true).NotNullable()
                 .WithColumn("notify_on_publish").AsBoolean().WithDefaultValue(true).NotNullable();
 
-            Create.Table(T.ApiKey)
+            Create.Table(T.ApiKeys)
 				.WithIntPrimaryKeyColumn().Identity()
 				.WithColumn("user_id").AsInt32().NotNullable()
 				.WithColumn("name").AsString(FL.Long, DB.Collation).NotNullable()
@@ -269,9 +269,9 @@ namespace DPMGallery.DBMigration.Conventions
 				.WithColumn("package_list").AsString(FL.Max).Nullable()
 				.WithColumn("scopes").AsInt32().NotNullable();
 
-			Create.Index("ix_apikeys_user_id").OnTable(T.ApiKey).OnColumn("user_id").Ascending();
-			Create.ForeignKey($"fk_{T.ApiKey}_{T.Users}_user_id").FromTable(T.ApiKey).ForeignColumn("user_id").ToTable(T.Users).PrimaryColumn("id");
-			Create.Index("ix_apikeys_user_id_name").OnTable(T.ApiKey).OnColumn("user_id").Ascending().OnColumn("name").Unique();
+			Create.Index("ix_apikeys_user_id").OnTable(T.ApiKeys).OnColumn("user_id").Ascending();
+			Create.ForeignKey($"fk_{T.ApiKeys}_{T.Users}_user_id").FromTable(T.ApiKeys).ForeignColumn("user_id").ToTable(T.Users).PrimaryColumn("id");
+			Create.Index("ix_apikeys_user_id_name").OnTable(T.ApiKeys	).OnColumn("user_id").Ascending().OnColumn("name").Unique();
 
 			Create.Table(T.Platform)
 				.WithIntPrimaryKeyColumn()

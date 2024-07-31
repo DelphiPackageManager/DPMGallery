@@ -17,9 +17,17 @@ namespace DPMGallery
             public const string ApiKeyPackages = "claim.apikey-packages";
         }
 
+        public static class ErrorMessages
+        {
+            public const string ServerError = "An error occurred on the server. See event log for details.";
+        }
+
+
         public static class Database
         {
             public const string Collation = "collat_ci";
+
+            public const string PagingSQL = " LIMIT @take OFFSET @skip";
             public static class FieldLength
             {
 
@@ -43,7 +51,7 @@ namespace DPMGallery
 
                 public const string RoleClaims = "asp_net_role_claims";
 
-                public const string ApiKey = "api_key";
+                public const string ApiKeys = "api_keys";
                 public const string OrganisationMembers = "organisation_members";
                 public const string OrganisationSettings = "organisation_settings";
                 public const string Package = "package";

@@ -20,6 +20,7 @@ namespace DPMGallery.Repositories
             _logger = logger;
         }
 
+        //used by packageindex service
         public async Task<IEnumerable<PackageOwner>> GetPackageOwners(int packageId)
         {
             string sql = $"select * from {T.PackageOwner} where package_id = @packageId";

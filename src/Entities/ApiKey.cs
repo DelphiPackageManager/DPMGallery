@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace DPMGallery.Entities
 {
-    [Table(Constants.Database.TableNames.ApiKey)]
+    [Table(Constants.Database.TableNames.ApiKeys)]
     public class ApiKey
     {
         [Column("id")]

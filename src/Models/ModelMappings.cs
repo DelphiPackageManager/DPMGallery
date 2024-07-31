@@ -55,31 +55,31 @@ namespace DPMGallery.Models
             });
 
 
-            Mapping<ApiKey, ApiKeyModel>.Configure((entity, model) =>
-            {
-                model.Id = entity.Id;
-                model.UserId = entity.UserId;
-                model.Name = entity.Name;
-                model.Packages = entity.Packages;
-                model.ExpiresUTC = entity.ExpiresUTC;
-                model.GlobPattern = entity.GlobPattern;
-                model.Scopes = (int)entity.Scopes;
-                model.Revoked = entity.Revoked;
-                //never send hashed key
-            });
+            //Mapping<ApiKey, ApiKeyModel>.Configure((entity, model) =>
+            //{
+            //    model.Id = entity.Id;
+            //    model.UserId = entity.UserId;
+            //    model.Name = entity.Name;
+            //    model.Packages = entity.Packages;
+            //    model.ExpiresUTC = entity.ExpiresUTC;
+            //    model.GlobPattern = entity.GlobPattern;
+            //    model.Scopes = (int)entity.Scopes;
+            //    model.Revoked = entity.Revoked;
+            //    //never send hashed key
+            //});
 
-            Mapping<ApiKeyModel, ApiKey>.Configure((model, entity) =>
-            {
-                entity.Id = model.Id;
-                entity.UserId = model.UserId;
-                entity.Name = model.Name;
-                entity.Packages = model.Packages;
-                entity.ExpiresUTC = model.ExpiresUTC;
-                entity.GlobPattern = model.GlobPattern;
-                entity.Scopes = (ApiKeyScope)model.Scopes;
-                entity.Revoked = model.Revoked;
-                entity.Key = model.Key;
-            });
+            //Mapping<ApiKeyModel, ApiKey>.Configure((model, entity) =>
+            //{
+            //    entity.Id = model.Id;
+            //    entity.UserId = model.UserId;
+            //    entity.Name = model.Name;
+            //    entity.Packages = model.Packages;
+            //    entity.ExpiresUTC = model.ExpiresUTC;
+            //    entity.GlobPattern = model.GlobPattern;
+            //    entity.Scopes = (ApiKeyScope)model.Scopes;
+            //    entity.Revoked = model.Revoked;
+            //    entity.Key = model.Key;
+            //});
 
             Mapping<UserOrganisation, UserOrganisationModel>.Configure((entity, model) =>
             {
@@ -87,7 +87,7 @@ namespace DPMGallery.Models
                 model.UserId = entity.UserId;
                 model.Name = entity.OrganisationName;
                 model.Email = entity.Email;
-                model.Role = (int)entity.Role;
+                model.Role = entity.Role.ToString();
                 model.PackageCount = entity.PackageCount;
                 model.CollaboratorCount = entity.CollaboratorCount;
                 model.AdminCount = entity.AdminCount;
@@ -103,45 +103,45 @@ namespace DPMGallery.Models
             });
 
 
-            Mapping<UserOrganisationModel, UserOrganisation>.Configure((model, entity) =>
-            {
-                entity.OrgId = model.Id;
-                entity.UserId = model.UserId;
-                entity.OrganisationName = model.Name;
-                entity.Email = model.Email;
-                entity.Role = (MemberRole)model.Role;
-                entity.PackageCount = model.PackageCount;
-                entity.CollaboratorCount = model.CollaboratorCount;
-                entity.AdminCount = model.AdminCount;
-                entity.AllowContact = model.AllowContact;
-                entity.NotifyOnPublish = model.NotifyOnPublish;
-                foreach (var memberModel in model.Members)
-                {
-                    var member = Mapping<OrganisationMemberModel, OrganisationMember>.Map(memberModel);
-                    entity.Members.Add(member);
-                }
+            //Mapping<UserOrganisationModel, UserOrganisation>.Configure((model, entity) =>
+            //{
+            //    entity.OrgId = model.Id;
+            //    entity.UserId = model.UserId;
+            //    entity.OrganisationName = model.Name;
+            //    entity.Email = model.Email;
+            //    entity.Role = (MemberRole)model.Role;
+            //    entity.PackageCount = model.PackageCount;
+            //    entity.CollaboratorCount = model.CollaboratorCount;
+            //    entity.AdminCount = model.AdminCount;
+            //    entity.AllowContact = model.AllowContact;
+            //    entity.NotifyOnPublish = model.NotifyOnPublish;
+            //    foreach (var memberModel in model.Members)
+            //    {
+            //        var member = Mapping<OrganisationMemberModel, OrganisationMember>.Map(memberModel);
+            //        entity.Members.Add(member);
+            //    }
 
-            });
-
-
-            Mapping<OrganisationMember, OrganisationMemberModel>.Configure((entity, model) => 
-            {
-                model.OrgId = entity.OrgId;
-                model.MemberId = entity.MemberId;
-                model.UserName = entity.UserName;
-                model.Role = (int)entity.Role;
-                var hash = entity.Email.ToLower().ToMd5();
-                model.AvatarUrl = $"https://www.gravatar.com/avatar/{hash}";
-            });
+            //});
 
 
-            Mapping<OrganisationMemberModel, OrganisationMember>.Configure((model, entity) =>
-            {
-                entity.OrgId = model.OrgId;
-                entity.MemberId = model.MemberId;
-                entity.UserName = model.UserName;
-                entity.Role = (MemberRole)model.Role;
-            });
+            //Mapping<OrganisationMember, OrganisationMemberModel>.Configure((entity, model) => 
+            //{
+            //    model.OrgId = entity.OrgId;
+            //    model.MemberId = entity.MemberId;
+            //    model.UserName = entity.UserName;
+            //    model.Role = (int)entity.Role;
+            //    var hash = entity.Email.ToLower().ToMd5();
+            //    model.AvatarUrl = $"https://www.gravatar.com/avatar/{hash}";
+            //});
+
+
+            //Mapping<OrganisationMemberModel, OrganisationMember>.Configure((model, entity) =>
+            //{
+            //    entity.OrgId = model.OrgId;
+            //    entity.MemberId = model.MemberId;
+            //    entity.UserName = model.UserName;
+            //    entity.Role = (MemberRole)model.Role;
+            //});
 
 
             Mapping<EditableOrganisation, EditableOrganisationModel>.Configure((entity, model) =>

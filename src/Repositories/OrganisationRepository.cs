@@ -13,8 +13,10 @@ namespace DPMGallery.Repositories
     public class OrganisationRepository : RepositoryBase
     {
         private readonly ILogger _logger;
+        private readonly IUnitOfWork _unitOfWork;
         public OrganisationRepository(ILogger logger, IDbContext dbContext) : base(dbContext)
         {
+            _unitOfWork = dbContext as IUnitOfWork;
             _logger = logger;
         }
 
@@ -67,9 +69,9 @@ namespace DPMGallery.Repositories
         /// <returns></returns>
         public async Task<bool> GetIsOrgAdminAsync(int userId, int orgId, CancellationToken cancellationToken)
         {
-            string sql = $"select * from {T.OrganisationMembers} where user_id = @userId and org_id = @orgId and member_role = 1";
+            string sql = $"select * from {T.OrganisationMembers} where user_id = @userId and org_id = @orgId";
             var result = await Context.QueryFirstOrDefaultAsync<OrganisationMember>(sql, new { userId, orgId }, cancellationToken: cancellationToken); ;
-            return result != null;
+            return result != null && result.Role == MemberRole.Administrator;
         }
 
         private class PackageCount
@@ -92,7 +94,7 @@ namespace DPMGallery.Repositories
         /// <param name="userId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public async Task<IEnumerable<UserOrganisation>> GetOrganisationsForMember(int userId, CancellationToken cancellationToken)
+        public async Task<PagedList<UserOrganisation>> GetOrganisationsForMember(int userId, CancellationToken cancellationToken)
         {
             string sql = $@"select u.id as org_id, u.user_name as org_name, u.email as email, m.member_id, m.member_role, s.allow_contact, s.notify_on_publish from
                             {T.Users} u 
@@ -161,7 +163,19 @@ namespace DPMGallery.Repositories
                     }
                 }
             }
-            return result;
+
+            //Note for now we are cheating - the datatable react component expects PagedList so thats what we will return.
+
+            Paging paging = new Paging()
+            {
+                Page = 1,
+                PageSize = 99999,
+                Skip = 0,
+
+            };
+
+            return new PagedList<UserOrganisation>(result, result.Count, paging);
+
         }
 
         public async Task<bool> CheckUserExists(string userName, CancellationToken cancellationToken)
@@ -195,6 +209,66 @@ namespace DPMGallery.Repositories
         //    return result;
         //}
 
+        public async Task<bool> AddMemberToOrganisation(OrganisationMember member, CancellationToken cancellationToken)
+        {
+            string  insertSql = $@"insert into {T.OrganisationMembers} 
+                VALUES(@OrgId, @MemberId, @Role)";
 
+            try
+            {
+                var sqlParams = new
+                {
+                    member.OrgId,
+                    member.MemberId,
+                    member.Role
+                };
+
+                var rowsAffected = await Context.ExecuteAsync(insertSql, sqlParams, cancellationToken: cancellationToken);
+                _unitOfWork.Commit();
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
+                _logger.Error(ex, "[OrganisationRepository] AddMemberToOrganisation failed for Org : {orgId}  User : {userId}", [member.OrgId, member.MemberId]);
+                throw;
+            }
+        }        
+
+        public async Task<IEnumerable<OrganisationMember>> GetMembersAsync(int orgId, CancellationToken cancellationToken)
+        {
+            var membersSql = $@"select m.*, u.user_name, u.email from {T.OrganisationMembers} m
+                                    left join {T.Users} u ON u.id = m.member_id
+                                    where org_id = @orgId
+                                    order by u.user_name";
+
+            try
+            {
+                var members = await Context.QueryAsync<OrganisationMember>(membersSql, new { orgId }, cancellationToken: cancellationToken);
+                return members;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "[OrganisationRepository] GetMembersAsync failed for Org : {orgId}", [orgId]);
+                throw;
+            }
+        }
+
+        public async Task<UserOrganisation> GetOrganisationAsync(int orgId, CancellationToken cancellationToken)
+        {
+            string sql = $@"select u.id as org_id, u.user_name as org_name, u.email as email, m.member_id, m.member_role, s.allow_contact, s.notify_on_publish from
+                            {T.Users} u 
+                            left join {T.OrganisationSettings} s on u.org_id = s.org_id
+                            where 
+                            u.id = @orgId";
+
+            var org =  await Context.QueryFirstOrDefaultAsync<UserOrganisation>(sql, new { orgId }, cancellationToken: cancellationToken);
+
+            var members = await GetMembersAsync(orgId, cancellationToken: cancellationToken);
+
+            org.Members = members.ToList();
+            return org;
+        }
     }
 }

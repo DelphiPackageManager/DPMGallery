@@ -1,6 +1,9 @@
-import { GlobeAltIcon } from "@heroicons/react/24/outline";
+import RepositoryLogo from '@/assets/git.svg?react';
+import { FlagIcon, GlobeAltIcon, ScaleIcon } from "@heroicons/react/24/outline";
+
 import { StopwatchIcon } from "@radix-ui/react-icons";
-import { NavLink } from "react-router-dom";
+import { ReactNode } from "react";
+import { Link, NavLink } from "react-router-dom";
 import { PackageDetailsModel, PackageVersionModel } from "./packageTypes";
 
 export type PackageSideBarProps = {
@@ -13,11 +16,11 @@ const PackageSideBar = ({ packageDetails, currentVersion }: PackageSideBarProps)
     if (!packageDetails) return <></>;
 
     return (
-      <div className="flex flex-col mb-2">
+      <div className="mb-2 flex flex-col">
         {packageDetails.owners.map((owner, index) => {
           return (
-            <div key={index} className="flex flex-row mt-2 ">
-              <div className="w-10 h-10 mr-2">
+            <div key={index} className="mt-2 flex flex-row">
+              <div className="mr-2 h-10 w-10">
                 <img src={`https://www.gravatar.com/avatar/${owner.emailHash}`} className="rounded-lg object-cover" />
               </div>
               <div className="py-2">
@@ -33,7 +36,7 @@ const PackageSideBar = ({ packageDetails, currentVersion }: PackageSideBarProps)
   };
 
   return (
-    <div className="md:min-w-[16rem] md:mb-2 md:mt-6 px-2">
+    <div className="px-2 md:mb-2 md:mt-6 md:min-w-[16rem]">
       <div>
         <h2 className="text-base font-medium">Owners</h2>
       </div>
@@ -60,7 +63,7 @@ const PackageSideBar = ({ packageDetails, currentVersion }: PackageSideBarProps)
         <div className="mt-2 flex items-center">
           <GlobeAltIcon className="mr-2 h-4 w-4" />
           <span className="text-sm">
-            <a href={packageDetails?.projectUrl} className="hover:underline">
+            <a href={packageDetails?.projectUrl} target="_blank" className="hover:underline">
               Project Website
             </a>
           </span>
@@ -68,14 +71,39 @@ const PackageSideBar = ({ packageDetails, currentVersion }: PackageSideBarProps)
       )}
       {packageDetails?.repositoryUrl && (
         <div className="mt-2 flex items-center">
-          <GlobeAltIcon className="mr-2 h-4 w-4" />
+          <RepositoryLogo className="mr-2 h-4 w-4" />
           <span className="text-sm">
-            <a href={packageDetails?.repositoryUrl} className="hover:underline">
+            <a href={packageDetails?.repositoryUrl} target="_blank" className="hover:underline">
               Source Respository
             </a>
           </span>
         </div>
       )}
+      {packageDetails?.licenses &&
+        <div className="mt-2 flex items-center">
+          {packageDetails?.licenses?.map((value: string, index: number): ReactNode => {
+            return (
+              <div key={index} className="flex items-center">
+                <ScaleIcon className="mr-2 h-4 w-4" />
+                <span className="text-sm">
+                  <a href={`https://spdx.org/licenses/${value}.html`} target="_blank" className="hover:underline">
+                    {value} License
+                  </a>
+                </span>
+              </div>
+            )
+          })}
+        </div>
+
+      }
+      <div className="mt-2 flex items-center">
+        <FlagIcon className="mr-2 h-4 w-4" />
+        <span className="text-sm">
+          <Link to={`/packages/${packageDetails?.packageId}/${packageDetails?.packageVersion}/report`} className="hover:underline" >
+            Report Package
+          </Link>
+        </span>
+      </div>
     </div>
   );
 };

@@ -1,11 +1,11 @@
-import { ApiKey } from "../../../types";
+import { ApiKey } from "@/types/apiKeys";
 
 export type EditApiKeyProps = {
-  apiKey: ApiKey;
+	apiKey: ApiKey;
 };
 
 const EditApiKey = (props: EditApiKeyProps) => {
-  return <h3>Edit</h3>;
+	return <h3>Edit</h3>;
 };
 
 export default EditApiKey;

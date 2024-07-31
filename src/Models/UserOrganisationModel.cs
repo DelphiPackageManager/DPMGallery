@@ -15,7 +15,7 @@ namespace DPMGallery.Models
 
         public string Email { get; set; }
         public int UserId { get; set; }
-        public int Role { get; set; }
+        public string Role { get; set; }
         public int AdminCount { get; set; }
         public int CollaboratorCount { get; set; }
         public int PackageCount { get; set; }
@@ -23,6 +23,8 @@ namespace DPMGallery.Models
         public bool AllowContact { get; set;}
 
         public bool NotifyOnPublish { get; set;}
+
+        public string AvatarUrl { get; set; }
 
         public List<OrganisationMemberModel> Members { get; set; }
     }

@@ -19,7 +19,7 @@ namespace DPMGallery.DBMigration.Migrations
 
         public override void Up()
         {
-            Alter.Table(T.ApiKey).AddColumn("revoked").AsBoolean().WithDefaultValue(false).SetExistingRowsTo(false);
+            Alter.Table(T.ApiKeys).AddColumn("revoked").AsBoolean().WithDefaultValue(false).SetExistingRowsTo(false);
         }
     }
 }

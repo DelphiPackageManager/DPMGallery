@@ -1,0 +1,52 @@
+import { ApiKey, ApiKeyScopes } from "../../../types/types";
+import { UTCNow } from "../../../utils";
+
+export type ApiKeyCardProps = {
+	apiKey: ApiKey;
+};
+
+const ApiKeyCard = (props: ApiKeyCardProps) => {
+	let scopes: ApiKeyScopes = props.apiKey.scopes as ApiKeyScopes;
+	const revokedOrExpired = () => {
+		if (props.apiKey.revoked) return <div className="text-red-700 dark:text-red-600 mr-2 w-42">Revoked</div>;
+		let expires_utc: Date = new Date(props.apiKey.expiresUTC + "Z"); //
+		let now = new Date();
+		if (expires_utc < now) return <div className="mr-2 w-14">Expired</div>;
+		return <div className="mr-2 w-14"></div>;
+	};
+
+	const hasScopes = (scopes: ApiKeyScopes, testScopes: ApiKeyScopes) => {
+		if ((scopes & testScopes) === testScopes) return true;
+		return false;
+	};
+
+	const scopesToString = () => {
+		let x = "";
+		if (hasScopes(scopes, ApiKeyScopes.pushNewPackage)) x = "Push new Packages and Package Versions";
+		else if (hasScopes(scopes, ApiKeyScopes.pushPackageVersion)) x = "Push new Package Versions";
+		if ((scopes & ApiKeyScopes.unlistPackage) === ApiKeyScopes.unlistPackage) {
+			if (x !== "") x += ", ";
+			x += "Unlist Packages";
+		}
+		return <div>{x}</div>;
+	};
+
+	return (
+		<div className="w-full mt-4 p-4 border-t first:border-t-0 border-gray-300 dark:border-gray-500">
+			<div className="flex flex-row gap-4 items-start text-left">
+				<div className="w-12 h-full">
+					<p>Img</p>
+				</div>
+				<div className="flex flex-col">
+					<h3 className="text-lg">{props.apiKey.name}</h3>
+					<div className="flex flex-row items-start">
+						{revokedOrExpired()}
+						{scopesToString()}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+};
+
+export default ApiKeyCard;

@@ -9,6 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using T = DPMGallery.Constants.Database.TableNames;
 using Serilog;
+using System.Data.Common;
+using Dapper;
 
 namespace DPMGallery.Repositories
 {
@@ -17,75 +19,144 @@ namespace DPMGallery.Repositories
         //using this to ensure we never get the hashed value
         private const string allowedColumns = "id, user_id, name, expires_utc, glob_pattern, package_list, scopes, revoked";
         private readonly ILogger _logger;
+        private readonly IUnitOfWork _unitOfWork;
         public ApiKeyRepository(IDbContext dbContext, ILogger logger) : base(dbContext)
         {
+            _unitOfWork = dbContext as IUnitOfWork;
             _logger = logger;
+
         }
 
         public async Task<ApiKey> GetApiKeyByKey(string unhashed)
         {
             string hashed = unhashed.GetHashSha256();
-            string q = $"select {allowedColumns} from {T.ApiKey} where key_hashed = @hashed";
+            string q = $"select {allowedColumns} from {T.ApiKeys} where key_hashed = @hashed";
             return await Context.QueryFirstOrDefaultAsync<ApiKey>(q, new { hashed });
         }
 
         public async Task<ApiKey> GetApiKeyById(int id, CancellationToken cancellationToken)
         {
-            string q = $"select {allowedColumns} from {T.ApiKey} where id = @id";
+            string q = $"select {allowedColumns} from {T.ApiKeys} where id = @id";
             return await Context.QueryFirstOrDefaultAsync<ApiKey>(q, new { id }, cancellationToken : cancellationToken);
         }
 
 
-        public async Task<PageableEnumeration<ApiKey>> GetApiKeys(Paging paging, CancellationToken cancellationToken)
-        {
-            string cq = $"select count(*) from {T.ApiKey}";
-            string q = $"select {allowedColumns} from {T.ApiKey} order by id " + PagingSQL; //sql server paging requires order by
+        //public async Task<PageableEnumeration<ApiKey>> GetApiKeys(Paging paging, CancellationToken cancellationToken)
+        //{
+        //    string cq = $"select count(*) from {T.ApiKeys}";
+        //    string q = $"select {allowedColumns} from {T.ApiKeys} order by id " + PagingSQL; //sql server paging requires order by
 
-            int totalCount = await Context.ExecuteScalarAsync<int>(cq, cancellationToken : cancellationToken);
+        //    int totalCount = await Context.ExecuteScalarAsync<int>(cq, cancellationToken : cancellationToken);
 
-            List<ApiKey> keys;
+        //    List<ApiKey> keys;
 
-            if (totalCount > 0)
-            {
-                keys = (await Context.QueryAsync<ApiKey>(q, new { skip = paging.Skip, take = paging.Take })).ToList();
-            }
-            else
-            {
-                keys = new List<ApiKey>();
-            }
+        //    if (totalCount > 0)
+        //    {
+        //        keys = (await Context.QueryAsync<ApiKey>(q, new { skip = paging.Skip, take = paging.Take })).ToList();
+        //    }
+        //    else
+        //    {
+        //        keys = new List<ApiKey>();
+        //    }
 
-            return new PageableEnumeration<ApiKey>(keys, totalCount);
+        //    return new PageableEnumeration<ApiKey>(keys, totalCount);
 
-        }
+        //}
 
         //not doing paging for now.
-        public async Task<IEnumerable<ApiKey>> GetApiKeysForUser(int userId, CancellationToken cancellationToken)
+        //      public async Task<PagedList<ApiKey>> GetApiKeysForUser(int userId, Paging paging, CancellationToken cancellationToken)
+        //      {
+
+        //          //            string cq = $"select count(*) from {T.ApiKeys} where user_id = @userId";
+        //          string q = $"select {allowedColumns} from {T.ApiKeys} where user_id = @userId order by revoked asc, expires_utc desc  ";// + PagingSQL;
+        ////          int totalCount = await Context.ExecuteScalarAsync<int>(cq, new { userId });
+
+        //          //List<ApiKey> keys;
+
+        //          //if (totalCount > 0)
+        //          //{
+        //              return  (await Context.QueryAsync<ApiKey>(q, new { userId /*, skip = paging.Skip, take = paging.Take */}, cancellationToken: cancellationToken)).ToList();
+        //          //}
+        //          //else
+        //          //{
+        //          //    keys = new List<ApiKey>();
+        //          //}
+
+        //          //return new PageableEnumeration<ApiKey>(keys, totalCount);
+
+        //      }
+
+        private static string PagingSortToDbColumn(string sort)
+        {
+            string lcSort = sort?.Trim().ToLowerInvariant() ?? string.Empty;
+
+            string columnName = lcSort switch
+            {
+                "id" => "id",
+                "name" => "name",
+                "expiresutc" => "expires_utc",
+                _ => "name"
+            };
+            return columnName;
+        }
+        private async Task<List<ApiKey>> FetchApiKeysForUser(int userId, Paging paging, CancellationToken cancellationToken)
+        {
+            string sortField = PagingSortToDbColumn(paging.Sort);
+            string sortDirection = paging.SortDirection == SortDirection.Default ? "ASC" : paging.SortDirection.ToString().ToUpper();
+            string orderByClause = $"ORDER BY {sortField} {sortDirection}";
+
+            string fetchSql =
+                    $"""
+					SELECT {allowedColumns} FROM {T.ApiKeys}
+					WHERE user_id = @userId
+					{orderByClause} 
+					{Constants.Database.PagingSQL}
+					""";
+            IEnumerable<ApiKey> query = await Context.QueryAsync<ApiKey>(fetchSql, new { userId, skip = paging.Skip, take = paging.Take, filter = paging.Filter }, cancellationToken: cancellationToken);
+
+            List<ApiKey> keys = query.ToList();
+
+            return keys;
+        }
+
+        public async Task<PagedList<ApiKey>> GetApiKeysForUser(int userId, Paging paging, CancellationToken cancellationToken)
         {
 
-            //            string cq = $"select count(*) from {T.ApiKey} where user_id = @userId";
-            string q = $"select {allowedColumns} from {T.ApiKey} where user_id = @userId order by revoked asc, expires_utc desc  ";// + PagingSQL;
-  //          int totalCount = await Context.ExecuteScalarAsync<int>(cq, new { userId });
+            string countSql = $"SELECT COUNT(*) FROM {T.ApiKeys} WHERE user_id = @userId";
 
-            //List<ApiKey> keys;
+            int totalCount = await Context.ExecuteScalarAsync<int>(countSql, new { userId });
 
-            //if (totalCount > 0)
-            //{
-                return  (await Context.QueryAsync<ApiKey>(q, new { userId /*, skip = paging.Skip, take = paging.Take */}, cancellationToken: cancellationToken)).ToList();
-            //}
-            //else
-            //{
-            //    keys = new List<ApiKey>();
-            //}
+            List<ApiKey> keys;
+            if (totalCount == 0)
+                keys = [];
+            else
+            {
+                paging.EnsureValidPage(totalCount);
+                keys = await FetchApiKeysForUser(userId, paging, cancellationToken);
+            }
 
-            //return new PageableEnumeration<ApiKey>(keys, totalCount);
+            //if (Context is IUnitOfWork unitOfWork)
+            //    await unitOfWork.CommitAsync();
+
+            return new PagedList<ApiKey>(keys, totalCount, paging);
 
         }
+
+
+        public async Task<bool> ApiKeyNameExists(string name)
+        {
+            string lcName = name.ToLowerInvariant();
+            string sql = $"SELECT count(*) FROM {T.ApiKeys} WHERE lower(name) = @name";
+            int count = await Context.ExecuteScalarAsync<int>(sql, new { name = lcName });
+            return count > 0;
+        }
+
 
         public async Task<ApiKey> Insert(ApiKey key)
         {
             key.KeyHashed = key.Key.GetHashSha256();
 
-            const string insertSql = "INSERT INTO " + Constants.Database.TableNames.ApiKey + " " +
+            const string insertSql = "INSERT INTO " + T.ApiKeys + " " +
                 "VALUES(@KeyHashed, @UserId, @ExpiresUTC, @GlobPattern, @Packages, @Scopes ) RETURNING id";
 
             try
@@ -99,9 +170,11 @@ namespace DPMGallery.Repositories
                     key.Packages,
                     key.Scopes,
                 });
+                _unitOfWork.Commit();
             }
             catch(Exception ex)
             {
+                _unitOfWork.Rollback();
                 _logger.Error(ex, "[ApiKeyRepository] AddNewKey failed for User: {key.UserId}  Key Name : {key.Name}");
                 throw;
             }
@@ -110,9 +183,63 @@ namespace DPMGallery.Repositories
 
         }
 
+        public async Task<bool> UpdateApiKeyRevoked(int id, bool revoked, CancellationToken cancellationToken = default)
+        {
+            const string sql = $"UPDATE {T.ApiKeys} SET Revoked = @revoked WHERE id = @id";
+            try
+            {
+                int affectedRows = await Context.ExecuteAsync(sql, new { revoked, id }, cancellationToken: cancellationToken);
+                _unitOfWork.Commit();
+                return affectedRows > 0;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
+                _logger.Error(ex, "[ApiKeyRepository] UpdateApiKeyRevoked failed for Key id : {id}", [id]);
+                throw;
+            }
+        }
+
+        public async Task<bool> UpdateApiKey(int keyId, DateTime? expiresUtc, string key, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(key))
+                throw new ArgumentException("Key cannot be empty", nameof(key));
+
+            string keyHashed = key.ToLower().GetHashSha256();
+
+            string sql;
+            object param;
+
+            //if expiresInDays is null, we don't update it
+            if (expiresUtc.HasValue)
+            {
+                sql = $"UPDATE {T.ApiKeys} SET key_hashed = @keyHashed, expires_utc = @expiresUtc WHERE id = @keyId";
+                param = new { keyId, keyHashed, expiresUtc };
+            }
+            else
+            {
+                sql = $"UPDATE {T.ApiKeys} SET key_hashed = @keyHashed WHERE id = @keyId";
+                param = new { keyId, keyHashed };
+            }
+
+            try
+            {
+                int affectedRows = await Context.ExecuteAsync(sql, param, cancellationToken: cancellationToken);
+                _unitOfWork.Commit();
+                return affectedRows > 0;
+            }
+            catch (Exception ex)
+            {
+                _unitOfWork.Rollback();
+                _logger.Error(ex, "[ApiKeyRepository] UpdateApiKey failed for Key id : {id}", [keyId]);
+                throw;
+            }
+        }
+
+
         public async Task<ApiKey> Update(ApiKey key)
         {
-            const string updateSql = "UPDATE " + T.ApiKey + " " +
+            const string updateSql = "UPDATE " + T.ApiKeys + " " +
                         "SET package_list = @Packages, glob_pattern = @GlobPattern, scopes = @Scopes, expires_utc = @ExpiresUTC " +
                         " WHERE id = @Id";
             try
@@ -126,28 +253,33 @@ namespace DPMGallery.Repositories
                     key.Scopes
 
                 });
+                _unitOfWork.Commit();
             }
             catch (Exception ex)
             {
+                _unitOfWork.Rollback();
                 _logger.Error(ex, "[ApiKeyRepository] UpdateKey failed for Key Id {key.Id}");
                 throw;
             }
             return key;
         }
 
-        public async Task Delete(ApiKey key)
+        public async Task<bool> Delete(int id, CancellationToken cancellationToken = default)
         {
-            const string deleteSql = "DELETE FROM " + T.ApiKey + " WHERE id = @id";
             try
             {
-                await Context.ExecuteAsync(deleteSql, new { key.Id });
+
+                const string sql = $"DELETE FROM {T.ApiKeys} WHERE id = @id";
+                int affectedRows = await Context.ExecuteAsync(sql, new { id }, cancellationToken: cancellationToken);
+                _unitOfWork.Commit();
+                return affectedRows > 0;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "[ApiKeyRepository] DeleteKey failed for Key {key.Id}");
+                _unitOfWork.Rollback();
+                _logger.Error(ex, $"[ApiKeyRepository] Api key deletion failed for key with id {id}");
                 throw;
             }
         }
     }
 }
-

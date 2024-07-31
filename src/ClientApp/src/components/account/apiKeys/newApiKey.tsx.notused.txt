@@ -1,0 +1,227 @@
+import { Button } from "@/components/ui/button";
+import { ApiKey, ApiKeyScopes } from "@/types/apiKeys";
+import { minimatch } from "minimatch";
+import { useState } from "react";
+import useEscapeKey from "../../../hooks/useEscapeKey";
+import CheckList, { CheckListItem } from "./checkList";
+
+export type NewApiKeyProps = {
+	//hidden: boolean;
+	onNewApiKey: (apiKey: ApiKey) => void;
+	hide: () => void;
+};
+
+let dummyItems: CheckListItem[] = [
+	{
+		value: "VSoft.Awaitable",
+		checked: false,
+	},
+	{
+		value: "Sprin4D.Persistence",
+		checked: false,
+	},
+	{
+		value: "Three",
+		checked: false,
+	},
+	{
+		value: "Four",
+		checked: false,
+	},
+];
+
+const NewApiKey = (props: NewApiKeyProps) => {
+	const [keyName, setKeyName] = useState("");
+	const [expires, setExpires] = useState(365);
+	const [glob, setGlob] = useState("");
+
+	const [owner, setOwner] = useState("");
+	const [canPush, setCanPush] = useState(false);
+	const [pushScopes, setPushScopes] = useState(ApiKeyScopes.pushPackageVersion);
+	const [unlistScope, setUnlistScope] = useState(ApiKeyScopes.none);
+
+	const [packages, setPackages] = useState<CheckListItem[]>(dummyItems);
+
+	const onPackageSelectionChange = (selectedId: number, value: boolean) => {
+		let newItem: CheckListItem = {
+			value: packages[selectedId].value,
+			checked: value,
+		};
+		let newPackages = packages.map((item, index) => {
+			return index == selectedId ? newItem : item;
+		});
+		setPackages(newPackages);
+	};
+
+	function addDays(date: Date, days: number): Date {
+		date.setDate(date.getDate() + days);
+		return date;
+	}
+
+	const onCreateClick = () => {
+		var date = new Date();
+		date = addDays(date, expires);
+		var expires_utc = date.toUTCString();
+		let scopes: ApiKeyScopes = unlistScope;
+		if (canPush) scopes |= pushScopes;
+
+		props.hide();
+		let newKey: ApiKey = {
+			name: keyName,
+			globPattern: glob,
+			expiresUTC: expires_utc,
+			revoked: false,
+			packageList: "",
+			scopes: scopes,
+		};
+		props.onNewApiKey(newKey);
+		return true;
+	};
+
+	useEscapeKey(props.hide);
+
+	return (
+		<form className="my-4 w-full border border-gray-500 p-4 dark:border-gray-700">
+			<div className="flex flex-row items-center gap-2">
+				<div className="flex flex-col">
+					<div className="mr-2">
+						<label htmlFor="newKeyName">Key Name</label>
+					</div>
+					<div className="">
+						<input
+							type="text"
+							className="rounded bg-gray-200 p-1 text-gray-900 dark:bg-gray-700 dark:text-gray-50"
+							size={64}
+							value={keyName}
+							onChange={(e) => setKeyName(e.target.value)}
+							id="newKeyName"
+							name="newKeyName"></input>
+					</div>
+				</div>
+				<div className="flex flex-col">
+					<div className="mr-4">
+						<label htmlFor="newKeyExpires">Expires</label>
+					</div>
+					<div className="">
+						<select
+							id="newKeyExpires"
+							value={expires}
+							onChange={(e) => setExpires(+e.target.value)}
+							className="rounded bg-gray-200 p-1 text-gray-900 dark:bg-gray-700 dark:text-gray-50">
+							<option value={1}>1 day</option>
+							<option value={90}>90 days</option>
+							<option value={180}>180 day</option>
+							<option value={270}>270 days</option>
+							<option value={365}>365 days</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div className="mt-6 flex flex-row gap-2">
+				<div className="flex flex-col">
+					<div className="mr-4">
+						<label htmlFor="newKeyPackageOwner">Package Owner</label>
+					</div>
+					<div className="">
+						<select
+							id="newKeyPackageOwner"
+							size={1}
+							className="w-56 rounded bg-gray-200 p-1 text-gray-900 dark:bg-gray-700 dark:text-gray-50"
+							value={owner}
+							onChange={(e) => setOwner(e.target.value)}>
+							<option value={""}>Select an owner</option>
+							<option value={"vincent"}>vincent</option>
+							<option value={"vsoft"}>vsoft</option>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div className="mt-4">
+				<h3>Select Scopes</h3>
+				<div className="mt-2 flex flex-col items-start">
+					<label htmlFor="canPush" className="flex flex-row">
+						<input type="checkbox" id="canPush" name="canPush" className="mr-2" onChange={(e) => setCanPush(e.target?.checked)} />
+						Push
+					</label>
+					<div className="ml-6 mt-1">
+						<div className="flex items-center py-1">
+							<input
+								type="radio"
+								id="scopeNewAndVersion"
+								name="pushScopes"
+								className="mr-2 w-5"
+								checked={(pushScopes & ApiKeyScopes.pushNewPackage) === ApiKeyScopes.pushNewPackage}
+								onChange={(e) => {
+									setPushScopes(ApiKeyScopes.pushNewPackage);
+								}}
+								disabled={!canPush}
+							/>
+							<label htmlFor="scopeNewAndVersion" className="">
+								Push new packages and package versions
+							</label>
+						</div>
+						<div className="flex items-center py-1">
+							<input
+								type="radio"
+								id="scopeVersion"
+								name="pushScopes"
+								className="mr-2 w-5"
+								checked={(pushScopes & ApiKeyScopes.pushPackageVersion) === ApiKeyScopes.pushPackageVersion}
+								onChange={(e) => {
+									setPushScopes(ApiKeyScopes.pushPackageVersion);
+								}}
+								disabled={!canPush}
+							/>
+							<label htmlFor="scopeVersion" className="">
+								Push new package versions
+							</label>
+						</div>
+					</div>
+					<label htmlFor="scopeUnlist" className="flex flex-row">
+						<input
+							type="checkbox"
+							id="scopeUnlist"
+							name="scopeUnlist"
+							className="mr-2"
+							checked={(unlistScope & ApiKeyScopes.unlistPackage) === ApiKeyScopes.unlistPackage}
+							onChange={(e) => {
+								setUnlistScope(e.target.checked ? ApiKeyScopes.unlistPackage : ApiKeyScopes.none);
+							}}
+						/>
+						Unlist
+					</label>
+				</div>
+			</div>
+			<div className="mt-6 flex flex-col">
+				<h3>Select Packages</h3>
+				<p>To select which packages to associate with a key, use a glob pattern, select individual packages, or both.</p>
+				<label className="mt-2" htmlFor="globPattern">
+					Glob Pattern
+				</label>
+				<div className="mt-2 flex items-start gap-6">
+					<div className="flex-1">
+						<input type="text" id="globPattern" value={glob} onChange={(e) => setGlob(e.target.value)} />
+						<h3 className="mt-2">Available Packages</h3>
+						<div className="border border-gray-700 p-2">
+							<CheckList height="h-40" items={packages} onItemChanged={onPackageSelectionChange} />
+						</div>
+					</div>
+					<div className="flex-1 border border-gray-700 p-3">
+						<p>A glob pattern allows you to replace any sequence of characters with '*'.</p>
+						<p className="mt-2">Example glob patterns:</p>
+					</div>
+				</div>
+			</div>
+			<div className="mt-4 flex flex-row items-center justify-around">
+				<Button variant="default" size="sm" className="w-48" onClick={() => props.hide()}>
+					Create
+				</Button>
+				<Button variant="outline" size="sm" className="w-48" onClick={() => onCreateClick()}>
+					Cancel
+				</Button>
+			</div>
+		</form>
+	);
+};
+
+export default NewApiKey;
