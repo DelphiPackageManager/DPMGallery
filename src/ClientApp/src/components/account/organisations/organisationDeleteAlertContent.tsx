@@ -3,7 +3,7 @@ import { AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDia
 import { ApiResult } from "@/types/api";
 import { deleteOrganisation } from "./organisationApi";
 
-export default function OrganisatoonDeleteAlertContent(props: { orgId: number, onComplete: (result: ApiResult) => void }) {
+export default function OrganisationDeleteAlertContent(props: { orgId: number, onComplete: (result: ApiResult) => void }) {
 
 	const { orgId, onComplete } = props;
 

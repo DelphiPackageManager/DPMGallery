@@ -5,6 +5,7 @@ import { ApiResult } from "@/types/api";
 import { UserOrganisation } from "@/types/organisations";
 import { Pencil, X } from "lucide-react";
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import OrganisationDeleteAlertContent from "./organisationDeleteAlertContent";
 import OrganisationEditDialogContent from "./organisationDialogEditContent";
 
@@ -38,20 +39,14 @@ export default function OrganisationRowActions(props: { org: UserOrganisation, o
 
 	return (<div className="flex">
 		{org?.id &&
-			<>
-				<Dialog open={editOpen} onOpenChange={onEditOpenChange}>
-					<DialogTrigger asChild>
-						<Button title="Edit Organisation" size="vsm_icon" variant="ghost"><Pencil size={16} strokeWidth={1.5} /></Button>
-					</DialogTrigger>
-					<OrganisationEditDialogContent id={orgDialogId} editOrg={org} onSuccess={onEditSuccess} />
-				</Dialog>
+			<div className="flex flex-row items-center gap-1">
+				<Link to={`/account/organisation/${org.name.toLowerCase()}`} className="rounded-md p-1.5 hover:bg-primary hover:text-white" ><Pencil size={16} strokeWidth={1.5} /></Link>
 				<AlertDialog>
-
 					<AlertDialogTrigger asChild>
-						<Button className="enabled:hover:bg-red-100 disabled:pointer-events-auto" title="Delete Organisation" size="vsm_icon" variant="ghost"><X size={16} strokeWidth={1.5} /></Button>
+						<Button className="hover:text-white enabled:hover:bg-red-500 disabled:pointer-events-auto dark:hover:bg-red-600" title="Delete Organisation" size="vsm_icon" variant="ghost"><X size={16} strokeWidth={1.5} /></Button>
 					</AlertDialogTrigger>
 					<OrganisationDeleteAlertContent orgId={org.id} onComplete={onDeleteComplete} />
 				</AlertDialog>
-			</>}
+			</div>}
 	</div>)
 }

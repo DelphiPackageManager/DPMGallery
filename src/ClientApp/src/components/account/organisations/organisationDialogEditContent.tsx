@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 
-export default function OrganisationEditContent(props: { id: number, editOrg: UserOrganisation, onSuccess: (data: UserOrganisation) => void }) {
+export default function OrganisationEditDialogContent(props: { id: number, editOrg: UserOrganisation, onSuccess: (data: UserOrganisation) => void }) {
 
 	const { onSuccess, id, editOrg } = props;
 
@@ -32,12 +32,11 @@ export default function OrganisationEditContent(props: { id: number, editOrg: Us
 	}, [id]);
 
 
-	const title = "Create new Organisation";
 
 	return (
 		<DialogContent>
 			<DialogHeader>
-				<DialogTitle>{title}</DialogTitle>
+				<DialogTitle>Edit Organisation</DialogTitle>
 			</DialogHeader>
 			<div>
 				<Form {...form}>

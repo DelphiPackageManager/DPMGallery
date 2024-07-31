@@ -4,7 +4,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-const labelVariants = cva("text-md font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+const labelVariants = cva("text-base font-medium leading-none my-1 peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
 	{
 		variants: {
 			variant: {
@@ -13,8 +13,9 @@ const labelVariants = cva("text-md font-medium leading-none peer-disabled:cursor
 				form_checkbox: "inline-block text-sm font-medium text-gray-900 dark:text-white mb-0 pb-0",
 			},
 			size: {
-				default: "text-md",
+				default: "text-sm",
 				sm: "text-sm",
+				md: "text-md",
 				lg: "text-lg",
 			},
 		},

@@ -178,7 +178,7 @@ namespace DPMGallery.Repositories
 
         }
 
-        public async Task<bool> CheckUserExists(string userName, CancellationToken cancellationToken)
+        public async Task<bool> CheckUserOrOrgExists(string userName, CancellationToken cancellationToken)
         {
             string normalizedUser = userName.ToUpper();
             string sql = $@"select count(*) from {T.Users}
@@ -259,7 +259,8 @@ namespace DPMGallery.Repositories
         {
             string sql = $@"select u.id as org_id, u.user_name as org_name, u.email as email, m.member_id, m.member_role, s.allow_contact, s.notify_on_publish from
                             {T.Users} u 
-                            left join {T.OrganisationSettings} s on u.org_id = s.org_id
+                            left join {T.OrganisationMembers} m ON m.org_id = u.id 
+                            left join {T.OrganisationSettings} s on u.id = s.org_id
                             where 
                             u.id = @orgId";
 

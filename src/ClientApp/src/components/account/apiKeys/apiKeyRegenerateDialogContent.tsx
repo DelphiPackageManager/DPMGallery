@@ -113,7 +113,7 @@ export default function ApiKeyRegenerateDialogContent(props: { id: number, apiKe
 									<FormLabel>Expires</FormLabel>
 									<FormControl>
 										<Select name="expires" onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value.toString()}>
-											<SelectTrigger className="w-[60px]">
+											<SelectTrigger className="w-fit">
 												<SelectValue placeholder="0" />
 											</SelectTrigger>
 											<SelectContent>

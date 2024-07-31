@@ -11,13 +11,9 @@ import OrganisationsTableActions from "./organisationsTableActions";
 export default function OrganisationsTable() {
 	const [error, setError] = useState("");
 	const [organisations, setOrganisations] = useState<PagedList<UserOrganisation>>();
-	const [newOrganisation, setNewOrganisation] = useState<UserOrganisation | null>(null);
 
 
 	function onUpdate(org?: UserOrganisation | null) {
-		if (org)
-			setNewOrganisation(org);
-
 		fetchTableContent();
 	}
 
@@ -27,8 +23,7 @@ export default function OrganisationsTable() {
 		if (!organisations)
 			return;
 
-		//store key for display
-		setNewOrganisation(newOrganisation);
+		fetchTableContent();
 	}
 
 

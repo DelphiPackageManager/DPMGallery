@@ -61,16 +61,16 @@ namespace DPMGallery.Controllers.UI
             return Ok(result);
         }
 
-        [HttpPost]
-        [Authorize]
-        [Route("/ui/account/check-member/{userName}")]
-        //used when adding members
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("/ui/account/check-unique/{userName}")]
         public async Task<IActionResult> CheckUserOrOrExists([FromRoute] string userName, CancellationToken cancellationToken = default)
         {
-            bool exists = await _organisationRepository.CheckUserExists(userName, cancellationToken);
+            bool exists = await _organisationRepository.CheckUserOrOrgExists(userName, cancellationToken);
             return Ok(new
             {
-                exists
+                succeeded = true,
+                data = exists
             });
         }
 
@@ -91,7 +91,7 @@ namespace DPMGallery.Controllers.UI
                 if (user == null)
                     return Unauthorized();
 
-                bool exists = await _organisationRepository.CheckUserExists(model.Name, cancellationToken);
+                bool exists = await _organisationRepository.CheckUserOrOrgExists(model.Name, cancellationToken);
 
                 if (exists)
                     return Conflict($"An Organisation or user with the name {model.Name} already exists.");
@@ -101,13 +101,13 @@ namespace DPMGallery.Controllers.UI
                 User organisation = new User()
                 {
                     UserName = model.Name,
-                    NormalizedUserName = userName.ToUpper(),
+                    NormalizedUserName = model.Name.ToUpper(),
                     Email = model.Email,
                     NormalizedEmail = model.Email.ToUpper(),
                     IsOrganisation = true
                 };
 
-                var result = await _userManager.CreateAsync(user);
+                var result = await _userManager.CreateAsync(organisation);
                 if (!result.Succeeded)
                 {
                     return GetIdentityResultAsResponse(_userManager, nameof(CreateOrganisation), result);

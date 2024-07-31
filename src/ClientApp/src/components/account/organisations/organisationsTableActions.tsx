@@ -5,7 +5,7 @@ import { useState } from "react";
 import OrganisationCreateDialogContent from "./organisationDialogCreateContent";
 
 interface OrganisationsTableActionsProps {
-	onCreate: (newOrg: UserOrganisationCreateModel) => void
+	onCreate: (newOrg: UserOrganisation) => void
 }
 
 export default function OrganisationsTableActions(props: OrganisationsTableActionsProps) {
@@ -14,7 +14,7 @@ export default function OrganisationsTableActions(props: OrganisationsTableActio
 	const [createOpen, setCreateOpen] = useState(false)
 	const [dialogId, setDialogId] = useState(0);
 
-	function onSuccess(data: UserOrganisationCreateModel): void {
+	function onSuccess(data: UserOrganisation): void {
 		setCreateOpen(false);
 		onCreate(data);
 	}

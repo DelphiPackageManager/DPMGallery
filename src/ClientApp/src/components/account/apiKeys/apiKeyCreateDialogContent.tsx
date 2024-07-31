@@ -13,7 +13,7 @@ import { ApiKey, ApiKeyCreateModel, ApiKeyScope } from "@/types/apiKeys";
 import { Constants } from "@/types/constants";
 import { UserOrganisation } from "@/types/organisations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { createApiKey } from "./apiKeysApi";
@@ -87,20 +87,28 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 		setErrors([]);
 	}
 
+	// timeout reference to be used in onChange event of the username field
+	// to trigger the validation after 1 second of inactivity
+	const timeOutRef = useRef<ReturnType<typeof setTimeout>>();
+
 	return (
 		<DialogContent>
 			<DialogHeader>
 				<DialogTitle>Create API key</DialogTitle>
 				<DialogDescription>Enter details of new API key and click Save.</DialogDescription>
 			</DialogHeader>
-			<div className="m-2 mt-0 rounded-md border border-gray-100 p-4 pt-1 text-base font-normal dark:border-gray-900">
+			<div className="rounded-md border border-gray-100 p-4 pt-1 text-base font-normal dark:border-gray-900">
 				<Form {...form}>
 					<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col" autoComplete="off">
 						<FormField control={form.control} name="name" render={({ field }) => (
 							<FormItem>
-								<FormLabel>Name</FormLabel>
+								<FormLabel >Name</FormLabel>
 								<FormControl>
-									<Input type="text" id="name" size={60} {...field} onChange={(event) => inputOnChange(event, field)} />
+									<Input type="text" id="name" size={60} {...field} onChange={
+										(event) => {
+											inputOnChange(event, field);
+										}
+									} />
 								</FormControl>
 								<FormDescription />
 								<FormMessage />
@@ -129,18 +137,20 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 							<FormItem>
 								<FormControl>
 									<>
-										<Checkbox id="push" checked={(pushScopes & ApiKeyScope.pushNewPackage) === ApiKeyScope.pushNewPackage}
-											onCheckedChange={(e) => {
-												setCanPush(e == true);
-												if (!canPush) {
-													var value = pushScopes;
-													value &= ~ApiKeyScope.pushNewPackage;
-													value &= ~ApiKeyScope.pushPackageVersion;
-													setPushScopes(value);
-													field.onChange(value);
-												}
-											}} />
-										<Label htmlFor="push">Push</Label>
+										<div className="align-baseline">
+											<Checkbox id="push" checked={canPush}
+												onCheckedChange={(e) => {
+													setCanPush(e == true);
+													if (!canPush) {
+														var value = pushScopes;
+														value &= ~ApiKeyScope.pushNewPackage;
+														value &= ~ApiKeyScope.pushPackageVersion;
+														setPushScopes(value);
+														field.onChange(value);
+													}
+												}} />
+											<Label htmlFor="push" size="sm" className="ml-2">Push</Label>
+										</div>
 										<div className="p-2">
 											<RadioGroup defaultValue="comfortable" disabled={!canPush}>
 												<div className="flex items-center space-x-2">
@@ -170,10 +180,10 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 							</FormItem>
 						)} />
 
-						<DialogFooter className="pt-4 sm:justify-start">
+						<DialogFooter className="pt-4 sm:justify-end">
 							<ErrorDisplayCard errors={errors} errorDescription={errorDescription} clearErrors={clearErrors} >
-								<Button size="default" variant="default" disabled={!changeEnabled} type="submit" className="mr-2">Save</Button>
 							</ErrorDisplayCard>
+							<Button size="default" variant="default" disabled={!changeEnabled} type="submit" className="mr-2">Save</Button>
 						</DialogFooter>
 					</form>
 

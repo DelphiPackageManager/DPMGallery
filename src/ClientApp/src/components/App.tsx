@@ -31,6 +31,7 @@ import ConfirmEmailChangePage from "./account/confirmEmailChange";
 import EmailSettingsPage from "./account/email";
 import ExternalLoginsPage from "./account/externalLogins";
 import MyPackagesPage from "./account/myPackages";
+import EditOrganisationPage from "./account/organisations/editOrganisationPage";
 import OrganisationsPage from "./account/organisations/organisationsPage";
 import Layout, { LayoutLoader } from "./layout";
 import PrivacyPage from "./policies/privacyPage";
@@ -86,6 +87,7 @@ const App = () => {
 						<Route path="/account/showrecoverycodes" element={<ShowRecoveryCodesPage />} />
 						<Route path="/account/generaterecoverycodes" element={<GenerateRecoveryCodesPage />} />
 						<Route path="/account/organisations" element={<OrganisationsPage />} />
+						<Route path="/account/organisation/:orgName" element={<EditOrganisationPage />} />
 						<Route path="/account/confirmemailchange" element={<ConfirmEmailChangePage />} />
 					</Route>
 				</Route>
