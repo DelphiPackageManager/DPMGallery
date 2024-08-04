@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AngleSharp.Html;
 using DPMGallery.Entities;
 using DPMGallery.Extensions;
+using DPMGallery.Extensions.Mapping;
 using DPMGallery.Models;
 using DPMGallery.Types;
 using DPMGallery.Utils;
@@ -154,13 +155,9 @@ namespace DPMGallery.Repositories
 
                     foreach (var owner in owners)
                     {
-                        var newOwner = new PackageOwnerModel()
-                        {
-                            UserName = (string)owner.owner,
-                          
-                        };
-						string email = (string)owner.email;
-						newOwner.EmailHash = email.ToLower().ToMd5();
+                        string email = (string)owner.email;
+                        string emailHash = email.ToLower().ToMd5();
+                        var newOwner = new PackageOwnerModel(email, emailHash);
 						model.Owners.Add(newOwner);
                     }
 
@@ -191,7 +188,7 @@ namespace DPMGallery.Repositories
                             var dependencies = packageDependencies.Where(x => x.PackageVersionId == item.VersionId).ToList();
                             if (dependencies.Any())
                             {
-                                currentPlatform.Dependencies.AddRange(Mapping<PackageDependency, PackageDependencyModel>.Map(dependencies));
+                                currentPlatform.Dependencies.AddRange(dependencies.ToModel());
                             }
                         }
                     }

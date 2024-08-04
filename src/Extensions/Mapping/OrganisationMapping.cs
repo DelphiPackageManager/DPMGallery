@@ -18,15 +18,16 @@ namespace DPMGallery.Extensions.Mapping
             var model = new UserOrganisationModel()
             {
                 Id = entity.OrgId,
-                UserId = entity.UserId,
+                //MemberId = entity.MemberId,
                 Name = entity.OrganisationName,
                 AdminCount = entity.AdminCount,
                 CollaboratorCount = entity.CollaboratorCount,
                 Email = entity.Email,
+                EmailConfirmed = entity.EmailConfirmed,
                 AllowContact = entity.AllowContact,
                 NotifyOnPublish = entity.NotifyOnPublish,
                 PackageCount = entity.PackageCount,
-                Role = entity.Role.ToString(),
+                Role = (int)entity.Role,
                 AvatarUrl = $"https://www.gravatar.com/avatar/{hash}",
                 Members = entity.Members.Select(x => x.ToModel()).ToList()
             };
@@ -34,7 +35,7 @@ namespace DPMGallery.Extensions.Mapping
             return model;
         }
 
-        public static OrganisationMemberModel ToModel(this OrganisationMember entity)
+        public static OrganisationMemberModel ToModel(this OrganisationMemberDetail entity)
         {
             var hash = entity.Email.ToLower().ToMd5();
 

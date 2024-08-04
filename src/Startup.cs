@@ -250,8 +250,6 @@ namespace DPMGallery
 
 
 			DTOMappings.Configure();
-            ModelMappings.Configure();
-
         }
 
         private Func<HttpContext, Func<Task>, Task> RemoveCacheControlHeadersForNon200s()

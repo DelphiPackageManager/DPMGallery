@@ -14,6 +14,7 @@ using static DPMGallery.Constants;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using DPMGallery.Statistics;
+using DPMGallery.Extensions.Mapping;
 
 namespace DPMGallery.Services
 {
@@ -40,7 +41,7 @@ namespace DPMGallery.Services
         {
             var searchResponse = await _searchRepository.UISearchAsync(query, skip, take, includePrerelease, includeCommercial,
                                                                      includeTrial, cancellationToken);
-            PackagesListModel model = Mapping<UISearchResponse, PackagesListModel>.Map(searchResponse);
+            PackagesListModel model = searchResponse.ToModel();
             return model;
         }
 

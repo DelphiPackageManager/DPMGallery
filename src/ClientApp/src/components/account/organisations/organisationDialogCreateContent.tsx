@@ -68,7 +68,7 @@ export default function OrganisationCreateDialogContent(props: { id: number, onS
 	}
 
 
-	const errorDescription = errors.length > 1 ? "Error occurred while creating a new API key:" : "An error occurred while creating a new API key:";
+	const errorDescription = "Error occurred while creating a new Organisation:";
 	function clearErrors() {
 		setErrors([]);
 	}

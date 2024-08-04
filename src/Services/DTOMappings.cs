@@ -11,6 +11,7 @@ using DPMGallery.Types;
 
 namespace DPMGallery.Services
 {
+    //TODO : move to extension methods - they are easier to navigate.
     public static class DTOMappings
     {
         public static void Configure()

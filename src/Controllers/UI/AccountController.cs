@@ -468,6 +468,8 @@ namespace DPMGallery.Controllers.UI
                 return Unauthorized();
             }
 
+            //TODO : move this to separate class as we need to use it elsewhere.
+
             //var userId = await _userManager.GetUserIdAsync(user);
             var email = await _userManager.GetEmailAsync(user);
             var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -480,7 +482,6 @@ namespace DPMGallery.Controllers.UI
 
             try
             {
-
                 await _emailSender.SendEmailAsync(
                     email,
                     "[DPM Gallery] - Verify your email",

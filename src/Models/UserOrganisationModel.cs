@@ -14,8 +14,9 @@ namespace DPMGallery.Models
         public string Name { get; set; }
 
         public string Email { get; set; }
-        public int UserId { get; set; }
-        public string Role { get; set; }
+        
+        public bool EmailConfirmed { get; set; }
+        public int Role { get; set; }
         public int AdminCount { get; set; }
         public int CollaboratorCount { get; set; }
         public int PackageCount { get; set; }

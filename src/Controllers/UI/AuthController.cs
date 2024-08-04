@@ -510,7 +510,7 @@ namespace DPMGallery.Controllers.UI
                         callbackUrl += "?" + parameters.ToString();
                         try
                         {
-                            await _emailSender.SendEmailAsync(model.Email, "[DPM Gallery] - Vefify your email address",
+                            await _emailSender.SendEmailAsync(model.Email, "[DPM Gallery] - Verify your email address",
                                 $"Please verify your email address by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                         } catch

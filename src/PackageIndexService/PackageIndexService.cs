@@ -51,7 +51,7 @@ namespace DPMGallery.Services
 
         private async Task<bool> GetIsOwner(int packageId, int userId, CancellationToken cancellationToken)
         {
-            var owners = await _packageOwnerRepository.GetPackageOwners(packageId);
+            var owners = await _packageOwnerRepository.GetPackageOwnersAsync(packageId);
             if (!owners.Any())
                 return false;
 

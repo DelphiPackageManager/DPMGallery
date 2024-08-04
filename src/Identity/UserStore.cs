@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Serilog;
 using System.Xml.Linq;
+using T = DPMGallery.Constants.Database.TableNames;
 
 namespace DPMGallery.Identity
 {
@@ -148,19 +149,19 @@ namespace DPMGallery.Identity
 
 				//await _dbContext.DeleteAsync<User>(user); //doesn't work with postgresql
 
-				const string deleteUserRolesSql = "delete from " + Constants.Database.TableNames.UserRoles + " where user_id = @userId";
+				const string deleteUserRolesSql = "delete from " + T.UserRoles + " where user_id = @userId";
 				await _dbContext.ExecuteAsync(deleteUserRolesSql, new { userId = user.Id }, cancellationToken: cancellationToken);
 
-				const string deleteUserClaimsSql = "delete from " + Constants.Database.TableNames.UserClaims + " where user_id = @userId";
+				const string deleteUserClaimsSql = "delete from " + T.UserClaims + " where user_id = @userId";
 				await _dbContext.ExecuteAsync(deleteUserClaimsSql, new { userId = user.Id }, cancellationToken: cancellationToken);
 
-				const string deleteUserLoginsSql = "delete from " + Constants.Database.TableNames.UserLogins + " where user_id = @userId";
+				const string deleteUserLoginsSql = "delete from " + T.UserLogins + " where user_id = @userId";
 				await _dbContext.ExecuteAsync(deleteUserLoginsSql, new { userId = user.Id }, cancellationToken: cancellationToken);
 
-				const string deleteUserTokensSql = "delete from " + Constants.Database.TableNames.UserTokens + " where user_id = @userId";
+				const string deleteUserTokensSql = "delete from " + T.UserTokens + " where user_id = @userId";
 				await _dbContext.ExecuteAsync(deleteUserTokensSql, new { userId = user.Id }, cancellationToken: cancellationToken);
 
-				const string deleteUserSql = "delete from " + Constants.Database.TableNames.Users + " where id = @Id";
+				const string deleteUserSql = "delete from " + T.Users + " where id = @Id";
 				await _dbContext.ExecuteAsync(deleteUserSql, new { user.Id }, cancellationToken: cancellationToken);
 
 

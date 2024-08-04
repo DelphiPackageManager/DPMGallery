@@ -32,7 +32,9 @@ namespace DPMGallery.Extensions
 
             services.AddScoped<IUnitOfWork>((s) =>
             {
-                return s.GetRequiredService<IDbContext>() as IUnitOfWork;
+                if (s.GetRequiredService<IDbContext>() is not IUnitOfWork unitOfWork)
+                    throw new Exception("IUnitOfWork not found in service provider");
+                return unitOfWork;
             });
 
             //repositories

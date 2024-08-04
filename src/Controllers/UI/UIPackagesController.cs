@@ -45,6 +45,9 @@ namespace DPMGallery.Controllers.UI
             [FromQuery] int pageSize = 12, 
             CancellationToken cancellationToken = default)
         {
+#if DEBUG
+            System.Threading.Thread.Sleep(1000); //so we can test the skeleton rendering
+#endif
             CompilerVersion compilerVersion = CompilerVersion.UnknownVersion;
             if (!string.IsNullOrEmpty(compiler))
             {

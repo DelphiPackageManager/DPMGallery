@@ -13,7 +13,7 @@ export default function OrganisationsTable() {
 	const [organisations, setOrganisations] = useState<PagedList<UserOrganisation>>();
 
 
-	function onUpdate(org?: UserOrganisation | null) {
+	function onUpdate() {
 		fetchTableContent();
 	}
 
@@ -68,7 +68,8 @@ export default function OrganisationsTable() {
 				<DataTableColumnHeader column={column} title="Role" />
 			),
 			cell: ({ row }) => {
-				const roleName = row.getValue<string>("role");
+				const role = row.getValue<MemberRole>("role");
+				const roleName = memberRoleToString(role);
 				return <div>{roleName}</div>
 			}
 		},

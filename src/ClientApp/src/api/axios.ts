@@ -1,4 +1,4 @@
-import { ApiResult } from "@/types/api";
+import { ApiResult, ProblemDetails } from "@/types/api";
 import axios, { AxiosError, AxiosInstance, isAxiosError } from "axios";
 
 export default axios.create({
@@ -17,6 +17,8 @@ export const createAxiosInitial = () => {
 	const axiosInit = axios.create({
 		headers: { "Content-Type": "application/json" },
 		withCredentials: true,
+		timeout: 1000 * 10,
+		timeoutErrorMessage: "timedOut"
 	});
 
 	axiosInit.interceptors.request.use(
@@ -53,25 +55,33 @@ export const createAxiosInitial = () => {
 
 
 export function errorToResult(error: any): ApiResult {
-	let message: string;
+	let message: string[] = [];
 
 	if (isAxiosError(error)) {
 		const axiosErr = error as AxiosError;
 		const response = axiosErr.response;
-		if (response && response?.status == 400 && response.data && typeof response.data === "string")
-			message = response.data as string;
+		if (response?.data) {
+			if (response?.status == 400 && typeof response.data === "string")
+				message.push(response.data as string);
+			else {
+				let problemDetails = (response.data as ProblemDetails);
+				if (problemDetails) {
+					message.push(problemDetails.title);
+					message.push(problemDetails.detail);
+				}
+			}
+		}
 		else
-			message = axiosErr.message;
+			message.push(axiosErr.message);
 	}
 	else if (error instanceof Error)
-		message = error.message;
-
+		message.push(error.message);
 	else
-		message = String(error);
+		message.push(String(error));
 
 	let result = {
 		succeeded: false,
-		errors: [message]
+		errors: message
 	};
 	return result;
 }

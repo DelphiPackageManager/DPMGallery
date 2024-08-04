@@ -24,17 +24,18 @@ namespace DPMGallery.Controllers.UI
     {
         private readonly UserManager<User> _userManager;
         private readonly ApiKeyRepository _apiKeyRepository;
-
-        public ApiKeyController(UserManager<User> userManager, ApiKeyRepository apiKeyRepository, ILogger logger) : base(logger)
+        private readonly IUnitOfWork _unitOfWork;
+        public ApiKeyController(UserManager<User> userManager, ApiKeyRepository apiKeyRepository, IUnitOfWork unitOfWork, ILogger logger) : base(logger)
         {
             _userManager = userManager;
             _apiKeyRepository = apiKeyRepository;
+            _unitOfWork = unitOfWork;
         }
 
         [Authorize]
         [HttpGet]
         [Route("")]
-        public async Task<IActionResult> GetApiKeys([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string? sort = null, [FromQuery] SortDirection sortDirection = SortDirection.Default, [FromQuery] string? filter = null, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> GetApiKeys([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string sort = null, [FromQuery] SortDirection sortDirection = SortDirection.Default, [FromQuery] string filter = null, CancellationToken cancellationToken = default)
         {
             string userName = HttpContext.User.Identity?.Name;
             try
@@ -59,11 +60,11 @@ namespace DPMGallery.Controllers.UI
 
                 PagedList<ApiKey> apiKeys = await _apiKeyRepository.GetApiKeysForUser(user.Id, paging, cancellationToken);
 
-                PagedList<ApiKeyModel>? apiKeyModels = apiKeys.ToPagedModel();
+                PagedList<ApiKeyModel> apiKeyModels = apiKeys.ToPagedModel();
 
                 if (apiKeyModels == null)
                 {
-                    var additionalInformation = new Dictionary<string, object?> { { "userName", userName } };
+                    var additionalInformation = new Dictionary<string, object> { { "userName", userName } };
                     return GetProblemResponse("Failed to get list of API keys", detail: "Null list of API key models returned", additionalInformation: additionalInformation);
                 }
 
@@ -71,7 +72,7 @@ namespace DPMGallery.Controllers.UI
             }
             catch (Exception ex)
             {
-                var additionalInformation = new Dictionary<string, object?> { { "Page", page }, { "PageSize", pageSize }, { "Sort", sort }, { "SortDirection", sortDirection }, { "Filter", filter }, { "UserName", userName } };
+                var additionalInformation = new Dictionary<string, object> { { "Page", page }, { "PageSize", pageSize }, { "Sort", sort }, { "SortDirection", sortDirection }, { "Filter", filter }, { "UserName", userName } };
                 return GetProblemResponse($"Error getting list of API keys", exception: ex, additionalInformation: additionalInformation);
             }
         }
@@ -100,13 +101,13 @@ namespace DPMGallery.Controllers.UI
         {
             try
             {
-                string? userName = HttpContext.User.Identity?.Name;
+                string userName = HttpContext.User.Identity?.Name;
                 if (userName == null)
                 {
                     //just return nothing
                     return Unauthorized();
                 }
-                User? user = await _userManager.FindByNameAsync(userName);
+                User user = await _userManager.FindByNameAsync(userName);
                 if (user == null)
                     return Unauthorized();
 
@@ -125,16 +126,18 @@ namespace DPMGallery.Controllers.UI
                     return Conflict("An API key with that name already exists");
 
                 ApiKey result = await _apiKeyRepository.Insert(apiKey);
+                _unitOfWork.Commit();
                 ApiKeyModel apiKeyModel = ApiKeyMappings.ToModel(result);
 
                 string url = $"/ui/admin/apikeys/{apiKeyModel.Id}";
-                if (!Uri.TryCreate(url, UriKind.Relative, out Uri? uri))
+                if (!Uri.TryCreate(url, UriKind.Relative, out Uri uri))
                     return BadRequest("Failed to create URL to created API key");
 
                 return Created(uri, apiKeyModel);
             }
             catch (Exception ex)
             {
+                _unitOfWork.Rollback();
                 Log.Error("{CurrentAction} failed: {Message}", nameof(CreateApiKey), ex.Message);
                 return BadRequest(Constants.ErrorMessages.ServerError);
             }
@@ -155,15 +158,15 @@ namespace DPMGallery.Controllers.UI
 
                 bool revoked = !enabled;
                 bool updated = await _apiKeyRepository.UpdateApiKeyRevoked(keyId, revoked, cancellationToken);
-
+                _unitOfWork.Commit();
                 var resultModel = new { Succeeded = true, Updated = updated };
                 return Ok(resultModel);
-
             }
             catch (Exception ex)
             {
-                Log.Error("{CurrentAction} failed: {Message}", nameof(UpdateApiKeyEnabled), ex.Message);
 
+                Log.Error("{CurrentAction} failed: {Message}", nameof(UpdateApiKeyEnabled), ex.Message);
+                _unitOfWork.Commit();
                 //TODO: return ProblemDetails instead of BadRequest for all actions
                 return BadRequest(Constants.ErrorMessages.ServerError);
             }
@@ -182,7 +185,7 @@ namespace DPMGallery.Controllers.UI
                 if (!int.TryParse(id, out int keyId))
                     return BadRequest("Invalid API key id");
 
-                ApiKey? existing = await _apiKeyRepository.GetApiKeyById(keyId, cancellationToken);
+                ApiKey existing = await _apiKeyRepository.GetApiKeyById(keyId, cancellationToken);
                 if (existing == null)
                     return BadRequest($"An API key does not exist with id: {id}");
 
@@ -192,7 +195,7 @@ namespace DPMGallery.Controllers.UI
                     expiresUtc = DateTime.UtcNow.AddDays(expiresInDays.Value);
 
                 bool updated = await _apiKeyRepository.UpdateApiKey(keyId, expiresUtc, newKey, cancellationToken);
-
+                _unitOfWork.Commit();
                 ApiKeyModel apiKeyModel = ApiKeyMappings.ToModel(existing);
                 ApiKeyModel result;
                 if (updated)
@@ -213,7 +216,7 @@ namespace DPMGallery.Controllers.UI
             catch (Exception ex)
             {
                 Log.Error("{CurrentAction} failed: {Message}", nameof(UpdateApiKeyEnabled), ex.Message);
-
+                _unitOfWork.Rollback();
                 //TODO: return ProblemDetails instead of BadRequest for all actions
                 return BadRequest(Constants.ErrorMessages.ServerError);
             }
@@ -233,7 +236,7 @@ namespace DPMGallery.Controllers.UI
                     return BadRequest("Invalid api key id");
 
                 bool deleted = await _apiKeyRepository.Delete(keyId, cancellationToken);
-
+                _unitOfWork.Commit();
                 var resultModel = new { Succeeded = true, Deleted = deleted };
                 return Ok(resultModel);
 
@@ -241,6 +244,7 @@ namespace DPMGallery.Controllers.UI
             catch (Exception ex)
             {
                 Log.Error("{CurrentAction} failed: {Message}", nameof(Delete), ex.Message);
+                _unitOfWork.Rollback();
                 return BadRequest(Constants.ErrorMessages.ServerError);
             }
 

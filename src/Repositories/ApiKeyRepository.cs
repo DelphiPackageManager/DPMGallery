@@ -170,11 +170,10 @@ namespace DPMGallery.Repositories
                     key.Packages,
                     key.Scopes,
                 });
-                _unitOfWork.Commit();
+                
             }
             catch(Exception ex)
             {
-                _unitOfWork.Rollback();
                 _logger.Error(ex, "[ApiKeyRepository] AddNewKey failed for User: {key.UserId}  Key Name : {key.Name}");
                 throw;
             }
@@ -189,12 +188,10 @@ namespace DPMGallery.Repositories
             try
             {
                 int affectedRows = await Context.ExecuteAsync(sql, new { revoked, id }, cancellationToken: cancellationToken);
-                _unitOfWork.Commit();
                 return affectedRows > 0;
             }
             catch (Exception ex)
             {
-                _unitOfWork.Rollback();
                 _logger.Error(ex, "[ApiKeyRepository] UpdateApiKeyRevoked failed for Key id : {id}", [id]);
                 throw;
             }
@@ -225,12 +222,10 @@ namespace DPMGallery.Repositories
             try
             {
                 int affectedRows = await Context.ExecuteAsync(sql, param, cancellationToken: cancellationToken);
-                _unitOfWork.Commit();
                 return affectedRows > 0;
             }
             catch (Exception ex)
             {
-                _unitOfWork.Rollback();
                 _logger.Error(ex, "[ApiKeyRepository] UpdateApiKey failed for Key id : {id}", [keyId]);
                 throw;
             }
@@ -253,11 +248,9 @@ namespace DPMGallery.Repositories
                     key.Scopes
 
                 });
-                _unitOfWork.Commit();
             }
             catch (Exception ex)
             {
-                _unitOfWork.Rollback();
                 _logger.Error(ex, "[ApiKeyRepository] UpdateKey failed for Key Id {key.Id}");
                 throw;
             }
@@ -271,12 +264,10 @@ namespace DPMGallery.Repositories
 
                 const string sql = $"DELETE FROM {T.ApiKeys} WHERE id = @id";
                 int affectedRows = await Context.ExecuteAsync(sql, new { id }, cancellationToken: cancellationToken);
-                _unitOfWork.Commit();
                 return affectedRows > 0;
             }
             catch (Exception ex)
             {
-                _unitOfWork.Rollback();
                 _logger.Error(ex, $"[ApiKeyRepository] Api key deletion failed for key with id {id}");
                 throw;
             }

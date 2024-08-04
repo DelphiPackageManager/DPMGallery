@@ -13,46 +13,46 @@ namespace DPMGallery.Models
     {
         public static void Configure()
         {
-            Mapping<PackageOwnerInfo, PackageOwnerModel>.Configure((e, model) =>
-            {
-                model.UserName = e.UserName;
-                model.EmailHash = e.EmailHash;
-            });
+            //Mapping<PackageOwnerInfo, PackageOwnerModel>.Configure((e, model) =>
+            //{
+            //    model.UserName = e.UserName;
+            //    model.EmailHash = e.EmailHash;
+            //});
 
-            Mapping<UISearchResult, PackageListItemModel>.Configure((r, model) =>
-            {
-                model.PackageId = r.PackageId;
-                model.Version = r.Version;
-                model.LatestVersion = r.LatestVersion;
-                model.IsPrerelease = r.IsPreRelease;
-                model.IsCommercial = r.IsCommercial;
-                model.IsTrial = r.IsTrial;
-                model.IsReservedPrefix = r.IsReservedPrefix;
-                model.Description = r.Description;
-                model.Owners = r.Owners;
-                model.OwnerInfos = Mapping<PackageOwnerInfo, PackageOwnerModel>.Map(r.OwnerInfos);
-				model.Icon = r.Icon;
-                model.PublishedUtc = r.PublishedUtc;
-                model.Published = r.PublishedUtc.ToPrettyDate();
-                //some older packages have comma separated tags
-                model.Tags = string.IsNullOrEmpty(r.Tags) ? null : r.Tags.Replace(',', ' ').Split(' ').Select(x => x.Trim().ToLower()).ToList();
-                model.TotalDownloads = r.TotalDownloads;
-                model.CompilerVersions = r.CompilerVersions;
-                model.Platforms = r.Platforms;
-            });
+    //        Mapping<UISearchResult, PackageListItemModel>.Configure((r, model) =>
+    //        {
+    //            model.PackageId = r.PackageId;
+    //            model.Version = r.Version;
+    //            model.LatestVersion = r.LatestVersion;
+    //            model.IsPrerelease = r.IsPreRelease;
+    //            model.IsCommercial = r.IsCommercial;
+    //            model.IsTrial = r.IsTrial;
+    //            model.IsReservedPrefix = r.IsReservedPrefix;
+    //            model.Description = r.Description;
+    //            model.Owners = r.Owners;
+    //            model.OwnerInfos = Mapping<PackageOwnerInfo, PackageOwnerDetailsModel>.Map(r.OwnerInfos);
+				//model.Icon = r.Icon;
+    //            model.PublishedUtc = r.PublishedUtc;
+    //            model.Published = r.PublishedUtc.ToPrettyDate();
+    //            //some older packages have comma separated tags
+    //            model.Tags = string.IsNullOrEmpty(r.Tags) ? null : r.Tags.Replace(',', ' ').Split(' ').Select(x => x.Trim().ToLower()).ToList();
+    //            model.TotalDownloads = r.TotalDownloads;
+    //            model.CompilerVersions = r.CompilerVersions;
+    //            model.Platforms = r.Platforms;
+    //        });
 
-            Mapping<UISearchResponse, PackagesListModel>.Configure((r, model) =>
-            {
-                model.TotalPackages = r.TotalCount;
+            //Mapping<UISearchResponse, PackagesListModel>.Configure((r, model) =>
+            //{
+            //    model.TotalPackages = r.TotalCount;
 
-                model.Packages = Mapping<UISearchResult, PackageListItemModel>.Map(r.searchResults);
-            });
+            //    model.Packages = Mapping<UISearchResult, PackageListItemModel>.Map(r.searchResults);
+            //});
 
-            Mapping<PackageDependency, PackageDependencyModel>.Configure((entity, model) =>
-            {
-                model.PackageId = entity.PackageId;
-                model.VersionRange = entity.VersionRange;
-            });
+            //Mapping<PackageDependency, PackageDependencyModel>.Configure((entity, model) =>
+            //{
+            //    model.PackageId = entity.PackageId;
+            //    model.VersionRange = entity.VersionRange;
+            //});
 
 
             //Mapping<ApiKey, ApiKeyModel>.Configure((entity, model) =>
@@ -81,26 +81,6 @@ namespace DPMGallery.Models
             //    entity.Key = model.Key;
             //});
 
-            Mapping<UserOrganisation, UserOrganisationModel>.Configure((entity, model) =>
-            {
-                model.Id = entity.OrgId;
-                model.UserId = entity.UserId;
-                model.Name = entity.OrganisationName;
-                model.Email = entity.Email;
-                model.Role = entity.Role.ToString();
-                model.PackageCount = entity.PackageCount;
-                model.CollaboratorCount = entity.CollaboratorCount;
-                model.AdminCount = entity.AdminCount;
-                model.AllowContact = entity.AllowContact;
-                model.NotifyOnPublish = entity.NotifyOnPublish;
-
-                foreach (var member in entity.Members)
-                {
-                    var memberModel = Mapping<OrganisationMember, OrganisationMemberModel>.Map(member);
-                    model.Members.Add(memberModel);
-                }
-                
-            });
 
 
             //Mapping<UserOrganisationModel, UserOrganisation>.Configure((model, entity) =>
@@ -144,15 +124,15 @@ namespace DPMGallery.Models
             //});
 
 
-            Mapping<EditableOrganisation, EditableOrganisationModel>.Configure((entity, model) =>
-            {
-                model.OrgId = entity.OrgId;
-                model.OrganisationName = entity.OrganisationName;
-                model.Email = entity.Email;
-                model.CanContact = entity.CanContact;
-                model.NotifyOnPublish = entity.NotifyOnPublish;
-                model.Members = Mapping<OrganisationMember, OrganisationMemberModel>.Map(entity.Members);
-            });
+            //Mapping<EditableOrganisation, EditableOrganisationModel>.Configure((entity, model) =>
+            //{
+            //    model.OrgId = entity.OrgId;
+            //    model.OrganisationName = entity.OrganisationName;
+            //    model.Email = entity.Email;
+            //    model.CanContact = entity.CanContact;
+            //    model.NotifyOnPublish = entity.NotifyOnPublish;
+            //    model.Members = Mapping<OrganisationMember, OrganisationMemberModel>.Map(entity.Members);
+            //});
         }
     }
 }

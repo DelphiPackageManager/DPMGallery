@@ -8,6 +8,7 @@ import Meta from "../../components/meta";
 import PackageSearchBar from "../../components/packageSearchBar";
 import PageContainer from "../../components/pageContainer";
 import PackageItemRow from "./packageItemRow";
+import PackageRowSkeleton from "./packageRowSkeleton";
 
 const PackagesPage = () => {
 	const navigate = useNavigate();
@@ -72,6 +73,8 @@ const PackagesPage = () => {
 		setQuery(value);
 	};
 
+	const skeletonRows = Array(12).fill(0);
+
 	return (
 		<>
 			<Meta title="DPM - Packages" description="DPM Package List" canonical={`${SITE_URL}/packages`} />
@@ -81,7 +84,23 @@ const PackagesPage = () => {
 				</div>
 			</div>
 			<PageContainer>
-				{isLoading && <Loader />}
+				{isLoading &&
+					<div className="mt-2 text-center text-2xl">
+						<h1 role="alert" className="">
+							Loading...
+						</h1>
+					</div>
+
+				}
+				{isLoading &&
+					<div className="z-0">
+						{skeletonRows.map(() =>
+							<PackageRowSkeleton />
+						)}
+
+					</div>
+
+				}
 
 				{packages && (
 					<div className="mt-2 text-center text-2xl">
@@ -98,7 +117,9 @@ const PackagesPage = () => {
 				)}
 				{packages &&
 					packages?.packages.map((pkg, index) => {
-						return <PackageItemRow key={index} index={index} pkg={pkg} onTagClick={onTagClick} />;
+						return (
+							<PackageItemRow key={index} index={index} pkg={pkg} onTagClick={onTagClick} />
+						)
 					})}
 				{packages && (
 					<div className="flex flex-row justify-center py-4 text-xl">

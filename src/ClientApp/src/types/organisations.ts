@@ -16,7 +16,7 @@ export type UserOrganisation = {
 	id: number;
 	name: string;
 	email: string;
-	userId: number;
+	memberId: number;
 	role: MemberRole;
 	adminCount: number;
 	collaboratorCount: number;
@@ -32,6 +32,10 @@ export type UserOrganisationCreateModel = {
 	email: string;
 }
 
+export type UpdateOrganisationEmailModel = {
+	id: number;
+	email: string;
+}
 
 
 export type UserOrganisationsResult = {

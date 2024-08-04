@@ -13,7 +13,7 @@ namespace DPMGallery.Extensions.Mapping
             return model;
         }
 
-        public static List<ApiKeyModel>? ToModels(this IList<ApiKey>? entities)
+        public static List<ApiKeyModel> ToModels(this IList<ApiKey> entities)
         {
             if (entities == null)
                 return null;
@@ -24,12 +24,12 @@ namespace DPMGallery.Extensions.Mapping
             return items;
         }
 
-        public static PagedList<ApiKeyModel>? ToPagedModel(this PagedList<ApiKey>? entities)
+        public static PagedList<ApiKeyModel> ToPagedModel(this PagedList<ApiKey> entities)
         {
             if (entities == null)
                 return null;
 
-            List<ApiKeyModel>? items = entities.Items.ToModels();
+            List<ApiKeyModel> items = entities.Items.ToModels();
 
             if (items == null)
                 return null;

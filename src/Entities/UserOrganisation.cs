@@ -8,7 +8,7 @@ namespace DPMGallery.Entities
     {
         public UserOrganisation()
         {
-            Members = new List<OrganisationMember>();
+            Members = new List<OrganisationMemberDetail>();
         }
 
         [Column("org_id")]
@@ -20,8 +20,11 @@ namespace DPMGallery.Entities
         [Column("email")]
         public string Email{ get; set; }
 
-        [Column("member_id")]
-        public int UserId { get; set; }
+        [Column("email_confirmed")]
+        public bool EmailConfirmed { get; set; }
+
+        //[Column("member_id")]
+        //public int MemberId { get; set; }
 
         [Column("member_role")]
         public MemberRole Role { get; set; }
@@ -37,7 +40,7 @@ namespace DPMGallery.Entities
         [Column("notify_on_publish")]
         public bool NotifyOnPublish { get; set; }
 
-        public List<OrganisationMember> Members { get; set; }
+        public List<OrganisationMemberDetail> Members { get; set; }
 
     }
 }

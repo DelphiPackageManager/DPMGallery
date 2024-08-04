@@ -1,7 +1,7 @@
 import { createAxiosInitial, errorToResult } from "@/api/axios";
 import { PagedList } from "@/lib/paging";
 import { ApiResult } from "@/types/api";
-import { UserOrganisation, UserOrganisationCreateModel, UserOrganisationsResult } from "@/types/organisations";
+import { UpdateOrganisationEmailModel, UserOrganisation, UserOrganisationCreateModel, UserOrganisationsResult } from "@/types/organisations";
 import { AxiosError, isAxiosError } from "axios";
 
 
@@ -40,6 +40,35 @@ export async function fetchOrganisations(): Promise<UserOrganisationsResult> {
 	}
 };
 
+export async function fetchOrganisationByName(name: string): Promise<ApiResult> {
+
+	const axiosInitial = createAxiosInitial();
+
+	try {
+		const response = await axiosInitial.get<ApiResult>(`/ui/account/organisation/${name}`);
+		let data = response?.data;
+		let result: ApiResult;
+		if (!data) {
+			result = {
+				succeeded: false,
+				errors: ["No data returned from server"]
+			};
+		}
+		else {
+			result = {
+				succeeded: true,
+				data: data,
+				errors: []
+			};
+		}
+
+		return result;
+
+	} catch (error: any) {
+		return errorToResult(error);
+	}
+};
+
 
 export async function createOrganisation(org: UserOrganisationCreateModel): Promise<ApiResult> {
 
@@ -47,7 +76,37 @@ export async function createOrganisation(org: UserOrganisationCreateModel): Prom
 
 		const axiosInitial = createAxiosInitial();
 
-		const url = `/ui/account/organisations`;
+		const url = "/ui/account/organisations";
+		const response = await axiosInitial.post<ApiResult>(url, org);
+		let data = response?.data;
+		let result: ApiResult;
+		if (!data) {
+			result = {
+				succeeded: false,
+				errors: ["No data returned from server"]
+			};
+		}
+		else {
+			result = {
+				succeeded: true,
+				data: data,
+				errors: []
+			};
+		}
+
+		return result;
+
+	} catch (error: any) {
+		return errorToResult(error);
+	}
+}
+
+export async function UpdateOrganisationEmail(org: UpdateOrganisationEmailModel): Promise<ApiResult> {
+	try {
+
+		const axiosInitial = createAxiosInitial();
+
+		const url = "/ui/account/organisation/update-email";
 		const response = await axiosInitial.post<ApiResult>(url, org);
 		let data = response?.data;
 		let result: ApiResult;
@@ -92,11 +151,30 @@ export async function checkOrgNameUnique(orgName: string): Promise<ApiResult> {
 	}
 }
 
+export async function checkEmailUnique(email: string): Promise<ApiResult> {
+	try {
+		const axiosInitial = createAxiosInitial();
+		const url = `/ui/account/check-email-unique/${email}`;
+		const response = await axiosInitial.get<ApiResult>(url);
+		let result = response?.data;
+		if (!result)
+			result = {
+				succeeded: false,
+				errors: ["No result returned from server"]
+			};
+
+		return result;
+
+	} catch (error: any) {
+		return errorToResult(error);
+	}
+}
+
 export async function deleteOrganisation(id: number): Promise<ApiResult> {
 
 	try {
 		const axiosInitial = createAxiosInitial();
-		const url = `/ui/account/organisations/${id}`;
+		const url = `/ui/account/organisation/${id}`;
 		const response = await axiosInitial.delete<ApiResult>(url);
 		let result = response?.data;
 		if (!result)
