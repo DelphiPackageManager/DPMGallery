@@ -193,6 +193,20 @@ namespace DPMGallery.Repositories
 
         }
 
+
+        public async Task<bool> CheckUserExists(string userName, CancellationToken cancellationToken)
+        {
+            string normalizedUser = userName.ToUpper();
+            string sql = $@"select count(*) from {T.Users}
+                            where normalized_user_name = @normalizedUser
+                            and is_organisation = 0";
+
+            var count = await Context.ExecuteScalarAsync<int>(sql, new { normalizedUser }, cancellationToken: cancellationToken);
+
+            return count > 0;
+
+        }
+
         public async Task<bool> CheckEmailInUse(string email, CancellationToken cancellationToken)
         {
             string normalizedEmail = email.ToUpper();
@@ -397,5 +411,18 @@ namespace DPMGallery.Repositories
             var rowsAffected = await Context.ExecuteAsync(sql, new { email, normEmail, orgId }, cancellationToken: cancellationToken);
             return rowsAffected > 0;
         }
+
+        public async Task<bool> UpdateOrgSettingsAsync(int orgId, bool allowContact, bool notifyOnPublish, CancellationToken cancellationToken)
+        {
+//            string insertSql = $@"insert into {T.OrganisationSettings} values (@orgId, @allowContact, @notifyOnPublish)";
+
+            string updateSql = $@"INSERT INTO {T.OrganisationSettings} (org_id, allow_contact, notify_on_publish)
+                                  VALUES (@orgId, @allowContact, @notifyOnPublish)
+                                  ON CONFLICT (org_id)
+                                  DO UPDATE SET allow_contact = @allowContact, notify_on_publish = @notifyOnPublish";
+            var rowsAffected = await Context.ExecuteAsync(updateSql, new { allowContact, notifyOnPublish, orgId }, cancellationToken: cancellationToken);
+            return rowsAffected > 0;
+        }
+
     }
 }

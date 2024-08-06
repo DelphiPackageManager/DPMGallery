@@ -70,9 +70,22 @@ namespace DPMGallery.Controllers.UI
         [HttpGet]
         [AllowAnonymous]
         [Route("/ui/account/check-unique/{userName}")]
-        public async Task<IActionResult> CheckUserOrOrExists([FromRoute] string userName, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CheckUserOrOrgExists([FromRoute] string userName, CancellationToken cancellationToken = default)
         {
             bool exists = await _organisationRepository.CheckUserOrOrgExists(userName, cancellationToken);
+            return Ok(new
+            {
+                succeeded = true,
+                data = exists
+            });
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("/ui/account/check-user-exists/{userName}")]
+        public async Task<IActionResult> CheckUserExists([FromRoute] string userName, CancellationToken cancellationToken = default)
+        {
+            bool exists = await _organisationRepository.CheckUserExists(userName, cancellationToken);
             return Ok(new
             {
                 succeeded = true,
@@ -124,6 +137,27 @@ namespace DPMGallery.Controllers.UI
             {
                 var additionalInformation = new Dictionary<string, object> { { "OrganisationId", model.Id}, { "Email", model.Email }  };
                 return GetProblemResponse($"Error updating Organisation email", exception: ex, additionalInformation: additionalInformation);
+            }
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        [Route("/ui/account/organisation/update-settings")]
+        public async Task<IActionResult> UpdateOrganisationSettings([FromBody] UpdateOrganisationNotifyModel model, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var result = await _organisationRepository.UpdateOrgSettingsAsync(model.id, model.allowContact, model.notifyOnPublish, cancellationToken);
+                _unitOfWork.Commit();
+                var resultModel = new { Succeeded = true };
+                return Ok(resultModel);
+
+            }
+            catch (Exception ex)
+            {
+                var additionalInformation = new Dictionary<string, object> { { "OrganisationId", model.id } };
+                return GetProblemResponse($"Error updating Organisation settings", exception: ex, additionalInformation: additionalInformation);
             }
         }
 

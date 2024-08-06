@@ -39,7 +39,6 @@ const EditOrganisationPage = () => {
 				const result = await fetchOrganisationByName(orgName);
 				if (result.succeeded) {
 					setCurrentOrg(result.data.orgModel);
-
 				}
 				else {
 					setErrors(result.errors);
@@ -47,16 +46,6 @@ const EditOrganisationPage = () => {
 			}
 		}
 		fetchOrg();
-		// //if we got here from the edit link the org will be in the state
-		// if (location.state) {
-		// 	console.log("using location.state");
-		// 	setCurrentOrg(location.state);
-
-		// } else {
-		// 	//otherwise we need to fetch the organisation
-		// 	fetchOrg();
-		// }
-
 	}, [])
 
 	if (errors.length > 0) {

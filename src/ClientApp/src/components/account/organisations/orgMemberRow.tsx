@@ -6,18 +6,21 @@ import { X } from "lucide-react";
 type MemberRowProps = {
 	member: OrganisationMember;
 	currentUserName?: string;
-	canDeleteAdmin: boolean;
 	onDelete: (member: OrganisationMember) => void;
+	adminCount: number;
 };
 
-const MemberRow = ({ member, currentUserName, canDeleteAdmin, onDelete }: MemberRowProps) => {
+const MemberRow = ({ member, currentUserName, adminCount, onDelete }: MemberRowProps) => {
 	const thatsYou = member.userName === currentUserName ? " (thats you)" : "";
 
+	const canDeleteMember: boolean = adminCount > 1;// || member.role === MemberRole.Collaborator;
+
 	const onDeleteClick = (member: OrganisationMember) => {
-		onDelete(member);
+		alert(member.userName);
+		//onDelete(member);
 	};
 
-	const canDeleteMember = member.role !== MemberRole.Administrator || canDeleteAdmin;
+
 
 	return (
 		<tr key={member.id} className="my-1 py-3">

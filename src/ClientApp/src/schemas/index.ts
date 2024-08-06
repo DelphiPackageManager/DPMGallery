@@ -55,3 +55,9 @@ export const UpdateEmailSchema = z.object({
 			return true;
 	}, "Email is in use by another account or org"),
 })
+
+export const UpdateNotificationSchema = z.object({
+	allowContact: z.boolean(),
+	notifyOnPublish: z.boolean()
+
+})

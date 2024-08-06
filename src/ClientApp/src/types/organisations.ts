@@ -16,7 +16,6 @@ export type UserOrganisation = {
 	id: number;
 	name: string;
 	email: string;
-	memberId: number;
 	role: MemberRole;
 	adminCount: number;
 	collaboratorCount: number;
@@ -35,6 +34,12 @@ export type UserOrganisationCreateModel = {
 export type UpdateOrganisationEmailModel = {
 	id: number;
 	email: string;
+}
+
+export type UpdateOrganisationSettingsModel = {
+	id: number;
+	allowContact: boolean;
+	notifyOnPublish: boolean;
 }
 
 
@@ -66,3 +71,8 @@ export const memberRoleToString = (role: MemberRole): string => {
 			return "Collaborator";
 	}
 };
+
+
+export type EditOrganisationProps = {
+	organisation: UserOrganisation;
+}

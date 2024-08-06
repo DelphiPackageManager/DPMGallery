@@ -53,43 +53,6 @@ const Layout = () => {
 		})();
 	}, [isPageVisible]);
 
-	// const fetchData = async () => {
-	//   try {
-	//     if (currentUser !== null) return;
-
-	//     //using axios private so we get the new refresh token.
-	//     const response = await axios.post(
-	//       IDENTITY_URL,
-	//       {},
-	//       {
-	//         withCredentials: true,
-	//       }
-	//     );
-	//     if (!response.data) {
-	//       return;
-	//     }
-
-	//     const username = response?.data?.userName;
-	//     const email = response?.data?.email;
-	//     const emailConfirmed = response?.data?.emailConfirmed;
-	//     const roles = response?.data?.roles;
-	//     const avatarUrl = response?.data?.avatarUrl;
-	//     const twoFactorEnabled = response?.data?.twoFactorEnabled;
-
-	//     const user: User = {
-	//       userName: username,
-	//       email: email,
-	//       emailConfirmed: emailConfirmed,
-	//       roles: roles,
-	//       avatarUrl: avatarUrl,
-	//       twoFactorEnabled: twoFactorEnabled,
-	//     };
-	//     login(user);
-	//   } catch (err) {
-	//     logout();
-	//   }
-	// };
-
 	return (
 		<>
 			<Meta title="DPM - Delphi Package Manager" />
