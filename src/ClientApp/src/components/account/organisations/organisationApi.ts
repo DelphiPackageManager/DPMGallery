@@ -1,7 +1,7 @@
 import { createAxiosInitial, errorToResult } from "@/api/axios";
 import { PagedList } from "@/lib/paging";
 import { ApiResult } from "@/types/api";
-import { UpdateOrganisationEmailModel, UpdateOrganisationSettingsModel, UserOrganisation, UserOrganisationCreateModel, UserOrganisationsResult } from "@/types/organisations";
+import { AddOrganisationMemberModel, UpdateOrganisationEmailModel, UpdateOrganisationSettingsModel, UserOrganisation, UserOrganisationCreateModel, UserOrganisationsResult } from "@/types/organisations";
 import { AxiosError, isAxiosError } from "axios";
 
 
@@ -131,6 +131,57 @@ export async function UpdateOrganisationSettings(org: UpdateOrganisationSettings
 	}
 }
 
+export async function AddOrganisationMember(model: AddOrganisationMemberModel): Promise<ApiResult> {
+	try {
+
+		const axiosInitial = createAxiosInitial();
+
+		const url = "/ui/account/organisation/add-member";
+		const response = await axiosInitial.post<ApiResult>(url, model);
+		let data = response?.data;
+		let result: ApiResult;
+		if (!data) {
+			result = {
+				succeeded: false,
+				errors: ["No data returned from server"]
+			};
+		}
+		else {
+			result = {
+				succeeded: true,
+				data: data,
+				errors: []
+			};
+		}
+
+		return result;
+
+	} catch (error: any) {
+		return errorToResult(error);
+	}
+}
+
+export async function DeleteOrganisationMember(orgId: number, userName: string): Promise<ApiResult> {
+
+	try {
+		const axiosInitial = createAxiosInitial();
+		const url = `/ui/account/organisation/delete-member/${orgId}/${userName}`;
+		const response = await axiosInitial.delete<ApiResult>(url);
+		let result = response?.data;
+		if (!result)
+			result = {
+				succeeded: false,
+				errors: ["No result returned from server"]
+			};
+
+		return result;
+
+	} catch (error: any) {
+		return errorToResult(error);
+
+	}
+}
+
 
 export async function UpdateOrganisationEmail(org: UpdateOrganisationEmailModel): Promise<ApiResult> {
 	try {
@@ -213,7 +264,6 @@ export async function checkUserExists(userName: string): Promise<ApiResult> {
 				succeeded: false,
 				errors: ["No result returned from server"]
 			};
-
 		return result;
 
 	} catch (error: any) {

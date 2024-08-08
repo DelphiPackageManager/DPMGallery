@@ -1,5 +1,6 @@
-import { checkEmailUnique, checkOrgNameUnique } from "@/components/account/organisations/organisationApi";
+import { checkEmailUnique, checkOrgNameUnique, checkUserExists } from "@/components/account/organisations/organisationApi";
 import { Constants } from "@/types/constants";
+import { MemberRole } from "@/types/organisations";
 import AwesomeDebouncePromise from "awesome-debounce-promise";
 import { z } from "zod";
 
@@ -18,6 +19,14 @@ export const checkUniqueEmailDebounced =
 		500, {
 		leading: true
 	});
+
+export const checkUserExistsDebounced =
+	AwesomeDebouncePromise(
+		checkUserExists,
+		500, {
+		leading: true
+	});
+
 
 
 
@@ -59,5 +68,7 @@ export const UpdateEmailSchema = z.object({
 export const UpdateNotificationSchema = z.object({
 	allowContact: z.boolean(),
 	notifyOnPublish: z.boolean()
-
 })
+
+
+

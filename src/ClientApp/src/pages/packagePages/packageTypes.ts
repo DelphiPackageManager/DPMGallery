@@ -1,4 +1,3 @@
-import _default from "@headlessui/tailwindcss";
 import { CompilerVersion, Platform } from "../../types/types";
 
 export type PackageOwnerModel = {

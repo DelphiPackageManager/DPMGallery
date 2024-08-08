@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -199,7 +200,7 @@ namespace DPMGallery.Repositories
             string normalizedUser = userName.ToUpper();
             string sql = $@"select count(*) from {T.Users}
                             where normalized_user_name = @normalizedUser
-                            and is_organisation = 0";
+                            and is_organisation = false";
 
             var count = await Context.ExecuteScalarAsync<int>(sql, new { normalizedUser }, cancellationToken: cancellationToken);
 
@@ -311,21 +312,46 @@ namespace DPMGallery.Repositories
                 _logger.Error(ex, "[DeleteOrganisationAsync] Error Deleting User");
                 return false;
             }
-           
+
         }
 
-        public async Task<bool> AddMemberToOrganisation(OrganisationMember member, CancellationToken cancellationToken)
+        public async Task<bool> RemoveMemberFromOrganisation(int orgId, int memberId, CancellationToken cancellationToken)
         {
-            string  insertSql = $@"insert into {T.OrganisationMembers} 
-                VALUES(@OrgId, @MemberId, @Role)";
+            string deleteSql = $@"delete from {T.OrganisationMembers} 
+                where org_id = @orgId
+                and member_id = @memberId";
 
             try
             {
                 var sqlParams = new
                 {
-                    member.OrgId,
-                    member.MemberId,
-                    member.Role
+                    orgId,
+                    memberId,
+                };
+
+                var rowsAffected = await Context.ExecuteAsync(deleteSql, sqlParams, cancellationToken: cancellationToken);
+                return rowsAffected > 0;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "[OrganisationRepository] RemoveMemberFromOrganisation failed for Org : {orgId}  User : {userId}", [orgId, memberId]);
+                throw;
+            }
+        }
+
+
+        public async Task<bool> AddMemberToOrganisation(int orgId, int memberId, MemberRole role, CancellationToken cancellationToken)
+        {
+            string insertSql = $@"insert into {T.OrganisationMembers} 
+                VALUES(@orgId, @memberId, @role)";
+
+            try
+            {
+                var sqlParams = new
+                {
+                    orgId,
+                    memberId,
+                    role
                 };
 
                 var rowsAffected = await Context.ExecuteAsync(insertSql, sqlParams, cancellationToken: cancellationToken);
@@ -333,10 +359,32 @@ namespace DPMGallery.Repositories
             }
             catch (Exception ex)
             {
-                _logger.Error(ex, "[OrganisationRepository] AddMemberToOrganisation failed for Org : {orgId}  User : {userId}", [member.OrgId, member.MemberId]);
+                _logger.Error(ex, "[OrganisationRepository] AddMemberToOrganisation failed for Org : {orgId}  User : {userId}", [orgId, memberId]);
                 throw;
             }
-        }        
+        }
+
+        public async Task<OrganisationMemberDetail> GetMemberAsync(int orgId, int memberId, CancellationToken cancellationToken)
+        {
+            var membersSql = $@"select m.*, u.user_name, u.email from {T.OrganisationMembers} m
+                                    left join {T.Users} u ON u.id = m.member_id
+                                    where org_id = @orgId
+                                    and u.id = @memberId
+                                    order by u.user_name";
+
+            try
+            {
+                var member = await Context.QueryFirstOrDefaultAsync<OrganisationMemberDetail>(membersSql, new { orgId, memberId }, cancellationToken: cancellationToken);
+                return member;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex, "[OrganisationRepository] GetMembersAsync failed for Org : {orgId}", [orgId]);
+                throw;
+            }
+        }
+
 
         public async Task<IEnumerable<OrganisationMemberDetail>> GetMembersAsync(int orgId, CancellationToken cancellationToken)
         {
@@ -391,7 +439,7 @@ namespace DPMGallery.Repositories
                             where 
                             u.id = @orgId";
 
-            var org =  await Context.QueryFirstOrDefaultAsync<UserOrganisation>(sql, new { orgId }, cancellationToken: cancellationToken);
+            var org = await Context.QueryFirstOrDefaultAsync<UserOrganisation>(sql, new { orgId }, cancellationToken: cancellationToken);
 
             var members = await GetMembersAsync(orgId, cancellationToken: cancellationToken);
 
@@ -414,7 +462,7 @@ namespace DPMGallery.Repositories
 
         public async Task<bool> UpdateOrgSettingsAsync(int orgId, bool allowContact, bool notifyOnPublish, CancellationToken cancellationToken)
         {
-//            string insertSql = $@"insert into {T.OrganisationSettings} values (@orgId, @allowContact, @notifyOnPublish)";
+            //            string insertSql = $@"insert into {T.OrganisationSettings} values (@orgId, @allowContact, @notifyOnPublish)";
 
             string updateSql = $@"INSERT INTO {T.OrganisationSettings} (org_id, allow_contact, notify_on_publish)
                                   VALUES (@orgId, @allowContact, @notifyOnPublish)
@@ -424,5 +472,26 @@ namespace DPMGallery.Repositories
             return rowsAffected > 0;
         }
 
+        public async Task<bool> UpdateMemberRole(int orgId, int memberId, MemberRole role, CancellationToken cancellationToken)
+        {
+            string updateSql = $@"update {T.OrganisationMembers} 
+                            set member_role = @role
+                            WHERE org_id = @orgId
+                            and member_id = @memberId";
+            var rowsAffected = await Context.ExecuteAsync(updateSql, new { orgId, memberId, role }, cancellationToken: cancellationToken);
+            return rowsAffected > 0;
+        }
+
+        public async Task<bool> AddOrUpdateMember(int orgId, int memberId, MemberRole role, CancellationToken cancellationToken)
+        {
+            string insertSql = $@"INSERT INTO {T.OrganisationMembers} 
+                            (org_id, member_id, member_role) 
+                            values (@orgId, @memberId, @role)
+                            ON CONFLICT (org_id, member_id)
+                            DO UPDATE SET member_role = @role";
+
+            var rowsAffected = await Context.ExecuteAsync(insertSql, new { orgId, memberId, role }, cancellationToken: cancellationToken);
+            return rowsAffected > 0;
+        }
     }
 }

@@ -1,6 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { MemberRole, memberRoleToString, OrganisationMember } from "@/types/organisations";
 import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 
 type MemberRowProps = {
@@ -12,23 +14,23 @@ type MemberRowProps = {
 
 const MemberRow = ({ member, currentUserName, adminCount, onDelete }: MemberRowProps) => {
 	const thatsYou = member.userName === currentUserName ? " (thats you)" : "";
-
-	const canDeleteMember: boolean = adminCount > 1;// || member.role === MemberRole.Collaborator;
+	const [canDeleteMember, setCanDeleteMember] = useState(false)
 
 	const onDeleteClick = (member: OrganisationMember) => {
-		alert(member.userName);
-		//onDelete(member);
+		onDelete(member);
 	};
 
+	useEffect(() => {
+		setCanDeleteMember(adminCount > 1 || member.role === MemberRole.Collaborator);
+	}, [adminCount])
 
 
 	return (
-		<tr key={member.id} className="my-1 py-3">
+		<tr key={member.userName} className="my-1 py-3">
 			<td className="py-1 text-left">
 				<div className="flex items-center">
 					<img src={member.avatarUrl} className="mr-2 h-10 w-10 rounded-md" />
-					{member.userName}
-					{thatsYou}
+					<Link to={`/profiles/${member.userName}`} className="mr-2 text-sky-600 hover:underline dark:text-sky-600">{member.userName}</Link>{thatsYou}
 				</div>
 			</td>
 			<td className="py-1 text-left">{memberRoleToString(member.role)}</td>

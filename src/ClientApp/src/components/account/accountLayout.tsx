@@ -23,13 +23,13 @@ const AccountLayout = () => {
 								<NavLink to="/account/twofactorauth">Two-factor authentication</NavLink>
 							</li>
 							<li>
+								<NavLink to="/account/organisations">Manage Organisations</NavLink>
+							</li>
+							<li>
 								<NavLink to="/account/apikeys">API Keys</NavLink>
 							</li>
 							<li>
 								<NavLink to="/account/packages">My Packages</NavLink>
-							</li>
-							<li>
-								<NavLink to="/account/organisations">Manage Organisations</NavLink>
 							</li>
 						</ul>
 					</div>

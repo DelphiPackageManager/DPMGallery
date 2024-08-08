@@ -19,12 +19,9 @@ import { UpdateOrganisationEmail, UpdateOrganisationSettings } from "./organisat
 import MemberRow from "./orgMemberRow";
 
 
-const EditOrganisation = ({ organisation }: EditOrganisationProps) => {
+const EditOrganisation = ({ organisation, updateOrganisation }: EditOrganisationProps) => {
 
 	const [errors, setErrors] = useState<string[]>([]);
-
-
-
 
 	if (errors.length > 0) {
 		return <>
@@ -38,13 +35,10 @@ const EditOrganisation = ({ organisation }: EditOrganisationProps) => {
 		</>
 	}
 
-
-
-
 	return (
 		<div>
-
-			<div>
+			<h1 className="py=2" >Edit Organisation : <span className="font-medium">{organisation.name}</span></h1>
+			<div className="mt-2">
 				<Tabs defaultValue="email" className="flex flex-col">
 					<TabsList className="w-full items-start border-b border-primary bg-white text-base dark:bg-gray-800">
 						<TabsTrigger value="email">Email</TabsTrigger>
@@ -58,14 +52,13 @@ const EditOrganisation = ({ organisation }: EditOrganisationProps) => {
 						<EditOrganisationNotify organisation={organisation} setErrors={setErrors} />
 					</TabsContent>
 					<TabsContent value="members">
-						<EditOrganisationMembers organisation={organisation} setErrors={setErrors} />
+						<EditOrganisationMembers organisation={organisation} setErrors={setErrors} updateOrganisation={updateOrganisation} />
 					</TabsContent>
 				</Tabs>
 			</div>
 
 		</div >
 	)
-
 };
 
 export default EditOrganisation;

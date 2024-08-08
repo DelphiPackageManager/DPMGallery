@@ -86,19 +86,19 @@ export default function NavBar() {
 						</li>
 						<li className="divider"></li>
 						<li>
+							<Link to={`/profiles/${currentUser?.userName}`}>My Profile</Link>
+						</li>
+						<li>
 							<Link to="/account/email">Account Settings</Link>
 						</li>
 						<li>
-							<Link to={`/profiles/${currentUser?.userName}`}>My Profile</Link>
+							<Link to="/account/organisations">Manage Organisations</Link>
 						</li>
 						<li>
 							<Link to="/account/apikeys">API Keys</Link>
 						</li>
 						<li>
 							<Link to="/account/packages">Manage Packages</Link>
-						</li>
-						<li>
-							<Link to="/account/organisations">Manage Organisations</Link>
 						</li>
 						<li className="divider"></li>
 						<li>
@@ -167,11 +167,6 @@ export default function NavBar() {
 						<li>
 							<NavLink to="/stats" className={navStyle} aria-current="page">
 								Statistics
-							</NavLink>
-						</li>
-						<li>
-							<NavLink to="/upload" className={navStyle} aria-current="page">
-								Upload
 							</NavLink>
 						</li>
 						<li>

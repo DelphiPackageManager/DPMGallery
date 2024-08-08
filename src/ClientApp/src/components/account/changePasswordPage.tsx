@@ -4,6 +4,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import PageContainer from "../pageContainer";
 import PageHeader from "../pageHeader";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
 import SetPasswordPage from "./setPasswordPage";
 
 const CHECKPWDSTATUS_URL = "/ui/account/haspassword";
@@ -98,10 +100,10 @@ const ChangePasswordPage = () => {
 				{!loading && hasPassword && (
 					<form className="mt-4 w-full" onSubmit={handleSubmit}>
 						<div className="mt-4">
-							<label htmlFor="currentPassword" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+							<Label htmlFor="currentPassword" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
 								Please enter your Current Password.
-							</label>
-							<input
+							</Label>
+							<Input
 								type="password"
 								name="currentPassword"
 								id="currentPassword"
@@ -111,13 +113,13 @@ const ChangePasswordPage = () => {
 								onChange={(e) => setCurrentPassword(e.target.value)}
 								value={currentPassword}
 								className=" "
-								placeholder=""></input>
+								placeholder="" />
 						</div>
 						<div className="mt-4">
-							<label htmlFor="newPassword" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+							<Label htmlFor="newPassword" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
 								Please enter your New Password.
-							</label>
-							<input
+							</Label>
+							<Input
 								type="password"
 								name="newPassword"
 								id="newPassword"
@@ -127,13 +129,13 @@ const ChangePasswordPage = () => {
 								onChange={(e) => setNewPassword(e.target.value)}
 								value={newPassword}
 								ref={passwordRef}
-								className="" placeholder=""></input>
+								className="" placeholder="" />
 						</div>
 						<div className="mt-4">
-							<label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+							<Label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
 								Please confirm your New Password.
-							</label>
-							<input
+							</Label>
+							<Input
 								type="password"
 								name="confirmPassword"
 								id="confirmPassword"
@@ -142,7 +144,7 @@ const ChangePasswordPage = () => {
 								maxLength={256}
 								onChange={(e) => setConfirmPassword(e.target.value)}
 								value={confirmPassword}
-								className="" placeholder=""></input>
+								className="" placeholder="" />
 						</div>
 						<div className="mt-4">
 							<Button type="submit" className="w-60" disabled={disabled}>

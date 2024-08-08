@@ -17,7 +17,7 @@ export const createAxiosInitial = () => {
 	const axiosInit = axios.create({
 		headers: { "Content-Type": "application/json" },
 		withCredentials: true,
-		timeout: 1000 * 10,
+		timeout: 1000 * 100,
 		timeoutErrorMessage: "timedOut"
 	});
 

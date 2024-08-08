@@ -1,10 +1,12 @@
 import axios from "@/api/axios";
+import { Label } from "@radix-ui/react-label";
 import { useEffect, useRef, useState } from "react";
 import useAuth from "../../hooks/useAuth";
 import { validateEmail } from "../../utils";
 import PageContainer from "../pageContainer";
 import PageHeader from "../pageHeader";
 import { Button } from "../ui/button";
+import { Input } from "../ui/input";
 
 const SENDVERIFYEMAIL_URL = "/ui/account/send-verify-email";
 
@@ -31,7 +33,7 @@ const EmailSettingsPage = () => {
 				setStatusMessage(response?.data);
 			}
 		} catch (err: any) {
-			setStatusMessage(err?.statusText);
+			setStatusMessage(err?.message);
 		}
 	};
 
@@ -53,9 +55,10 @@ const EmailSettingsPage = () => {
 
 		try {
 			const response = await axios.post(CHANGEEMAIL_URL, { newEmail: email });
-			if (response?.status == 200) {
-				setStatusMessage(response?.data);
-			}
+			setStatusMessage(response?.data);
+			setChangeEnabled(false);
+			setCurrentEmail(email);
+			setEmail("");
 		} catch (err: any) {
 			setStatusMessage(err?.statusText);
 		}
@@ -71,7 +74,7 @@ const EmailSettingsPage = () => {
 					</label>
 
 					<div className="flex flex-row items-center">
-						<input
+						<Input
 							type="text"
 							name="currentEmail"
 							id="currentEmail"
@@ -79,7 +82,7 @@ const EmailSettingsPage = () => {
 							className="block rounded-lg border border-gray-300 bg-gray-200 p-2.5 text-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-300 sm:text-sm"
 							placeholder=""
 							disabled
-							defaultValue={currentEmail}></input>
+							defaultValue={currentEmail} />
 						<div className="ml-2 w-10">{emailConfirmed && <a title="Email Verified">✓</a>}</div>
 					</div>
 				</div>
@@ -101,18 +104,14 @@ const EmailSettingsPage = () => {
 							Your new email address
 						</label>
 						<div className="flex flex-row items-center">
-							<input
-								type="email"
-								name="email"
-								id="email"
-								size={60}
-								className="focus:ring-primary-600 focus:border-primary-600 block rounded-lg border border-gray-300 p-2.5 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-sm"
+							<Input name="email" id="email" size={60}
+								className=""
 								onChange={(e) => handleNewEmailChanged(e)}
 								placeholder="name@company.com"
 								pattern="/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i"
 								ref={newEmailRef}
 								value={email}
-								required></input>
+								required />
 							<div className="ml-2 w-10"></div>
 						</div>
 					</div>
@@ -121,6 +120,8 @@ const EmailSettingsPage = () => {
 					</Button>
 					<div className="ml-2 w-10"></div>
 				</form>
+				<p className="mt-6 italic text-muted-foreground">We use the organization's name and its verified email address to get its publicly visible Gravatar profile picture (or a default image if it does not have a Gravatar profile picture).
+					Please go to <a className="not-italic text-primary" href="gravatar.com">gravatar.com</a> to change the profile picture for your organization.</p>
 			</div>
 		</PageContainer>
 	);

@@ -3,7 +3,7 @@ import { CheckedState } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { UpdateEmailSchema } from "@/schemas";
-import { EditOrganisationProps, UserOrganisation } from "@/types/organisations";
+import { UserOrganisation } from "@/types/organisations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ChangeEvent, useState } from "react";
 import { useForm } from "react-hook-form";

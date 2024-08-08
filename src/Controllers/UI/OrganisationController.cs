@@ -1,4 +1,5 @@
-﻿using AngleSharp.Html;
+﻿using AngleSharp.Dom;
+using AngleSharp.Html;
 using DPMGallery.Data;
 using DPMGallery.Entities;
 using DPMGallery.Extensions.Mapping;
@@ -16,6 +17,7 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Policy;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -135,7 +137,7 @@ namespace DPMGallery.Controllers.UI
             }
             catch (Exception ex)
             {
-                var additionalInformation = new Dictionary<string, object> { { "OrganisationId", model.Id}, { "Email", model.Email }  };
+                var additionalInformation = new Dictionary<string, object> { { "OrganisationId", model.Id }, { "Email", model.Email } };
                 return GetProblemResponse($"Error updating Organisation email", exception: ex, additionalInformation: additionalInformation);
             }
         }
@@ -161,7 +163,152 @@ namespace DPMGallery.Controllers.UI
             }
         }
 
+        [Authorize]
+        [HttpPost]
+        [Route("/ui/account/organisation/update-member")]
+        public async Task<IActionResult> UpdateMemberRole([FromBody] AddUpdateOrganisationMemberModel model, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var members = await _organisationRepository.GetMembersAsync(model.orgId, cancellationToken);
+                var existing = members.FirstOrDefault(x => x.UserName == model.userName);
+                if (existing == null)
+                    throw new Exception($"User {model.userName} is not a member.");
+                var result = await _organisationRepository.AddOrUpdateMember(existing.OrgId,existing.MemberId, model.role , cancellationToken);
+                _unitOfWork.Commit();
+                var resultModel = new { Succeeded = result };
+                return Ok(resultModel);
 
+            }
+            catch (Exception ex)
+            {
+                var additionalInformation = new Dictionary<string, object> { { "OrganisationId", model.orgId } };
+                return GetProblemResponse($"Error updating Organisation settings", exception: ex, additionalInformation: additionalInformation);
+            }
+        }
+
+        [Authorize]
+        [HttpDelete]
+        [Route("/ui/account/organisation/delete-member/{orgId}/{userName}")]
+        public async Task<IActionResult> DeleteOrganisationMember([FromRoute] int orgId, [FromRoute] string userName, CancellationToken cancellationToken = default)
+        {
+            string currentUserName = HttpContext.User.Identity?.Name;
+            if (currentUserName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var currentUser = await _userManager.FindByNameAsync(currentUserName);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var members = await _organisationRepository.GetMembersAsync(orgId, cancellationToken);
+                //check current user is admin of org
+                var currentMember = members.FirstOrDefault(x => x.MemberId == currentUser.Id);
+                if (currentMember == null || currentMember.Role != MemberRole.Administrator)
+                {
+                    return Unauthorized();
+                }
+
+                var userToDelete = await _userManager.FindByNameAsync(userName);
+                if (userToDelete == null)
+                {
+                    throw new Exception($"User {userName} is not a member.");
+                }
+
+                var existing = members.FirstOrDefault(x => x.MemberId == userToDelete.Id);
+                if (existing == null)
+                    throw new Exception($"User {userName} is not a member.");
+
+                //if they are an admin then make sure there will still be other admins
+                if (existing.Role == MemberRole.Administrator)
+                {
+                    if (!members.Any(x => x.MemberId != userToDelete.Id && x.Role == MemberRole.Administrator))
+                    {
+                        throw new Exception("Cannot remove last admin from organisation");
+                    }
+                }
+
+                var result = await _organisationRepository.RemoveMemberFromOrganisation(orgId, userToDelete.Id, cancellationToken);
+                _unitOfWork.Commit();
+
+                var resultModel = new { Succeeded = result };
+                return Ok(resultModel);
+            }
+            catch (Exception ex)
+            {
+                var additionalInformation = new Dictionary<string, object> { { "OrganisationId",   orgId }, { "MemberName", userName } };
+                return GetProblemResponse($"Error removing member from organisation", exception: ex, additionalInformation: additionalInformation);
+            }
+        }
+
+        [Authorize]
+        [HttpPost]
+        [Route("/ui/account/organisation/add-member")]
+        public async Task<IActionResult> AddOrganisationMember([FromBody] AddUpdateOrganisationMemberModel model, CancellationToken cancellationToken = default)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var currentUser = await _userManager.FindByNameAsync(userName);
+            if (currentUser == null)
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                var members = await _organisationRepository.GetMembersAsync(model.orgId, cancellationToken);
+                //check current user is admin of org
+                var currentMember = members.FirstOrDefault(x => x.MemberId == currentUser.Id);
+                if (currentMember == null || currentMember.Role != MemberRole.Administrator)
+                {
+                    return Unauthorized(); 
+                }
+
+                var existing = members.FirstOrDefault(x => x.UserName == model.userName);
+                if (existing != null)
+                    throw new Exception($"User {model.userName} is already a member.");
+
+                var user = await _userManager.FindByNameAsync(model.userName);
+                if (user == null)
+                    throw new Exception($"User {model.userName} does not exist.");
+
+                var result = await _organisationRepository.AddMemberToOrganisation(model.orgId, user.Id, model.role, cancellationToken);
+                _unitOfWork.Commit();
+
+                if (!result) {
+                    return Ok(
+                        new
+                        {
+                            Succeeded = false
+                        });
+                }
+
+                var member = await _organisationRepository.GetMemberAsync(model.orgId, user.Id, cancellationToken);
+
+                var memberModel = member.ToModel();
+
+
+                var resultModel = new { 
+                    Succeeded = result,
+                    Data = memberModel
+                };
+                return Ok(resultModel);
+            }
+            catch (Exception ex)
+            {
+                var additionalInformation = new Dictionary<string, object> { { "OrganisationId", model.orgId } };
+                return GetProblemResponse($"Error updating Organisation settings", exception: ex, additionalInformation: additionalInformation);
+            }
+        }
 
         [Authorize]
         [HttpPost]
@@ -205,20 +352,7 @@ namespace DPMGallery.Controllers.UI
                     return BadRequest();
                 }
 
-
-                //if (!result.Succeeded)
-                //{
-                //    return GetIdentityResultAsResponse(_userManager, nameof(CreateOrganisation), result);
-                //}
-
-                OrganisationMember member = new OrganisationMember()
-                {
-                    MemberId = user.Id,
-                    OrgId = organisation.Id,
-                    Role = MemberRole.Administrator
-                };
-
-                await _organisationRepository.AddMemberToOrganisation(member, cancellationToken);
+                await _organisationRepository.AddMemberToOrganisation(organisation.Id,user.Id, MemberRole.Administrator, cancellationToken);
                 _unitOfWork.Commit();
 
                 UserOrganisation newOrg = await _organisationRepository.GetOrganisationByIdAsync(organisation.Id, cancellationToken);

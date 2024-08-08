@@ -9,9 +9,9 @@ const DownloadsPage: React.FunctionComponent<IDownloadsPageProps> = (props) => {
 	return (
 		<PageContainer>
 			<Meta title="DPM - Downloads" canonical={`${SITE_URL}/downloads`} description="Download the DPM Package Manager client" />
-			<h1>Downloads</h1>
+			<h1 className="text-lg">Downloads</h1>
 			<p className="mt-4">
-				Download the latest DPM installer for Delphi XE2 - 11.x from{" "}
+				Download the latest DPM installer for Delphi XE2 - 12.x from{" "}
 				<a href="https://github.com/DelphiPackageManager/DPM/releases" title="Download DPM" className="text-sky-800 dark:text-sky-600">
 					GitHub
 				</a>

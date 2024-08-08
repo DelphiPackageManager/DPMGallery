@@ -3,12 +3,12 @@ import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { getPackages } from "../../api/clientApi";
-import Loader from "../../components/loader";
 import Meta from "../../components/meta";
 import PackageSearchBar from "../../components/packageSearchBar";
 import PageContainer from "../../components/pageContainer";
 import PackageItemRow from "./packageItemRow";
 import PackageRowSkeleton from "./packageRowSkeleton";
+import PackagesPaging from "./packagesPaging";
 
 const PackagesPage = () => {
 	const navigate = useNavigate();
@@ -115,45 +115,16 @@ const PackagesPage = () => {
 						)}
 					</div>
 				)}
+				<PackagesPaging packages={packages} nextPageClick={nextPageClick} prevPageClick={prevPageClick} />
+
 				{packages &&
 					packages?.packages.map((pkg, index) => {
 						return (
 							<PackageItemRow key={index} index={index} pkg={pkg} onTagClick={onTagClick} />
 						)
 					})}
-				{packages && (
-					<div className="flex flex-row justify-center py-4 text-xl">
-						<div className="mr-3">
-							{packages.prevPage > 0 ? (
-								<div>
-									<button className="text-sky-600 hover:underline" onClick={() => prevPageClick()}>
-										Previous
-									</button>
-								</div>
-							) : (
-								<div>
-									<span className="text-gray-300 dark:text-gray-600">Previous</span>
-								</div>
-							)}
-						</div>
-						<div>
-							<span className="px-1 text-gray-400">|</span>
-						</div>
-						<div className="ml-3">
-							{packages.nextPage > 0 ? (
-								<div>
-									<button className="text-sky-600 hover:underline" onClick={() => nextPageClick()}>
-										Next
-									</button>
-								</div>
-							) : (
-								<div>
-									<span className="text-gray-300 dark:text-gray-600">Next</span>
-								</div>
-							)}
-						</div>
-					</div>
-				)}
+				<PackagesPaging packages={packages} nextPageClick={nextPageClick} prevPageClick={prevPageClick} />
+
 			</PageContainer>
 		</>
 	);

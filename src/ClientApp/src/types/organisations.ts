@@ -1,4 +1,5 @@
 import { PagedList } from "@/lib/paging";
+import { SetStateAction } from "react";
 
 export enum MemberRole {
 	Collaborator = 0,
@@ -6,7 +7,7 @@ export enum MemberRole {
 }
 
 export type OrganisationMember = {
-	id: number;
+	orgId: number;
 	userName: string;
 	role: MemberRole;
 	avatarUrl: string;
@@ -42,6 +43,12 @@ export type UpdateOrganisationSettingsModel = {
 	notifyOnPublish: boolean;
 }
 
+export type AddOrganisationMemberModel = {
+	orgId: number;
+	userName: string;
+	role: MemberRole;
+}
+
 
 export type UserOrganisationsResult = {
 	result?: PagedList<UserOrganisation> | null;
@@ -75,4 +82,5 @@ export const memberRoleToString = (role: MemberRole): string => {
 
 export type EditOrganisationProps = {
 	organisation: UserOrganisation;
+	updateOrganisation: React.Dispatch<React.SetStateAction<UserOrganisation | null>>
 }

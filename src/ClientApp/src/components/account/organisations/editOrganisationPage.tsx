@@ -33,6 +33,7 @@ const EditOrganisationPage = () => {
 	//const navigate = useNavigate();
 
 
+
 	useEffect(() => {
 		const fetchOrg = async () => {
 			if (orgName) {
@@ -47,6 +48,8 @@ const EditOrganisationPage = () => {
 		}
 		fetchOrg();
 	}, [])
+
+
 
 	if (errors.length > 0) {
 		return <>
@@ -66,7 +69,7 @@ const EditOrganisationPage = () => {
 				<div>Loading...</div>
 			}
 			{currentOrg &&
-				<EditOrganisation organisation={currentOrg} />
+				<EditOrganisation organisation={currentOrg} updateOrganisation={setCurrentOrg} />
 			}
 		</PageContainer >
 	)

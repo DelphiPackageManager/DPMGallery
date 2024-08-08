@@ -11,7 +11,7 @@
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 207.087 100% 40%;
+    --primary: #0071ce;
     --primary-foreground: 210 40% 98%;
     --secondary: 210 40% 96.1%;
     --secondary-foreground: 222.2 47.4% 11.2%;
@@ -36,7 +36,7 @@
     --card-foreground: 210 40% 98%;
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
-    --primary: 207.2 100% 29%;
+    --primary: #005296;
     --primary-foreground: 210 40% 98%;
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;
@@ -69,7 +69,7 @@
 
     @apply bg-background text-foreground;
   }
-  .input-default {
+  /* .input-default {
     @apply p-2.5 border border-gray-300 text-gray-900 sm:text-sm rounded outline-none focus:ring-blue-500 focus:border-blue-500 block  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500;
   }
   input[type="text"] {
@@ -84,7 +84,7 @@
   }
   input[type="email"] {
     @apply input-default;
-  }
+  } */
 }
 
 @layer components {
@@ -110,7 +110,7 @@
   }
 
   .dropdown-content {
-    @apply hidden absolute rounded-md  border-gray-600  p-3 right-0 max-w-lg dark:shadow-none z-20 text-left shadow w-64 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 list-none;
+    @apply hidden absolute rounded-md z-40  border-gray-600  p-3 right-0 max-w-lg dark:shadow-none text-left shadow w-64 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 list-none;
   }
 
   .dropdown:hover .dropdown-content {
