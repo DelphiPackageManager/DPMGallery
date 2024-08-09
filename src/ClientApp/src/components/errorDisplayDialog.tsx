@@ -15,8 +15,8 @@ type ErrorDisplayCardType = {
 //TODO: Add close button to the card
 export default function ErrorDisplayCard(props: ErrorDisplayCardType) {
 	const { errors, errorDescription, clearErrors } = props;
-
-	return <HoverCard open={errors.length > 0}>
+	let open = errors && errors?.length > 0
+	return <HoverCard open={open}>
 		<HoverCardTrigger asChild>
 			{props.children}
 		</HoverCardTrigger>

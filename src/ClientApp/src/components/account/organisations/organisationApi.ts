@@ -69,6 +69,35 @@ export async function fetchOrganisationByName(name: string): Promise<ApiResult> 
 	}
 };
 
+export async function fetchOrganisationNames(): Promise<ApiResult> {
+
+	const axiosInitial = createAxiosInitial();
+
+	try {
+		const response = await axiosInitial.get<ApiResult>("/ui/account/organisation-names");
+		let data = response?.data;
+		let result: ApiResult;
+		if (!data) {
+			result = {
+				succeeded: false,
+				errors: ["No data returned from server"]
+			};
+		}
+		else {
+			result = {
+				succeeded: data.succeeded,
+				data: data.data,
+				errors: []
+			};
+		}
+
+		return result;
+
+	} catch (error: any) {
+		return errorToResult(error);
+	}
+};
+
 
 export async function createOrganisation(org: UserOrganisationCreateModel): Promise<ApiResult> {
 

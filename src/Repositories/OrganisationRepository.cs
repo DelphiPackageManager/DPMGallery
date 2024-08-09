@@ -97,6 +97,26 @@ namespace DPMGallery.Repositories
         /// <param name="userId"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
+        public async Task<List<OrgName>> GetOrganisationNamesForMember(int userId, CancellationToken cancellationToken)
+        {
+            string sql = $@"select u.user_name as name, u.id  from  {T.Users} u 
+                            left join {T.OrganisationMembers} m ON m.org_id = u.id 
+                            where 
+                            m.member_id = @userId
+                            order by u.user_name";
+
+            var qresult = await Context.QueryAsync<OrgName>(sql, new { userId }, cancellationToken: cancellationToken);
+            return qresult.ToList();
+        }
+
+
+
+        /// <summary>
+        /// gets all the organisations a user is a member of
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public async Task<PagedList<UserOrganisation>> GetOrganisationsForMember(int userId, CancellationToken cancellationToken)
         {
             string sql = $@"select u.id as org_id, u.user_name as org_name, u.email as email, m.member_id, m.member_role, s.allow_contact, s.notify_on_publish from

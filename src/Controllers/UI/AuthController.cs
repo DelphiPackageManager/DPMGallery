@@ -112,6 +112,7 @@ namespace DPMGallery.Controllers.UI
 
             var userProfile = new
             {
+                id = user.Id,
                 email = user.Email,
                 emailConfirmed = user.EmailConfirmed,
                 userName = user.UserName,

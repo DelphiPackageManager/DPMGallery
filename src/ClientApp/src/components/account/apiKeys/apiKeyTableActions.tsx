@@ -29,7 +29,7 @@ export default function ApiKeyTableActions(props: ApiKeyTableActionsProps) {
 
 	return (
 
-		<Dialog open={createOpen} onOpenChange={onCreateOpenChange}>
+		<Dialog open={createOpen} onOpenChange={onCreateOpenChange} >
 			<DialogTrigger asChild>
 				<Button className="ml-6" variant="default" size="sm">Create new API Key</Button>
 			</DialogTrigger>

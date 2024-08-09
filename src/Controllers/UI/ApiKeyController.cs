@@ -77,6 +77,43 @@ namespace DPMGallery.Controllers.UI
             }
         }
 
+        [Authorize]
+        [HttpGet]
+        [Route("/ui/account/apikeys/package-names")]
+        public async Task<IActionResult> GetPackageNamesForUser(CancellationToken cancellationToken = default)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            try
+            {
+                if (userName == null)
+                {
+                    //just return nothing
+                    return Unauthorized();
+                }
+                var user = await _userManager.FindByNameAsync(userName);
+                if (user == null)
+                {
+                    return Unauthorized();
+                }
+
+                List<string> names = await _apiKeyRepository.GetPackagesOwnedByUser(user.Id, cancellationToken);
+
+                var resultModel = new
+                {
+                    Succeeded = true,
+                    Data = names,
+                    errors = new string[] {}
+                };
+                
+                return Ok(resultModel);
+            }
+            catch (Exception ex)
+            {
+                var additionalInformation = new Dictionary<string, object> { { "UserName", userName }};
+                return GetProblemResponse($"Error getting list of Package names", exception: ex, additionalInformation: additionalInformation);
+            }
+        }
+
 
         //TODO: move this to a manager class
         private const int _numberOfSecureBytesToGenerate = 32;
@@ -117,7 +154,9 @@ namespace DPMGallery.Controllers.UI
                     Name = model.Name,
                     GlobPattern = model.GlobPattern,
                     Scopes = model.Scopes,
-                    ExpiresUTC = DateTime.UtcNow.AddDays(model.ExpiresInDays),
+                    ExpiresUTC = DateTimeOffset.UtcNow.AddDays(model.ExpiresInDays),
+                    Packages = model.Packages,
+                    PackageOwner = model.PackageOwner,
                     Key = GenerateApiKey()
                 };
 
@@ -125,7 +164,7 @@ namespace DPMGallery.Controllers.UI
                 if (exists)
                     return Conflict("An API key with that name already exists");
 
-                ApiKey result = await _apiKeyRepository.Insert(apiKey);
+                ApiKey result = await _apiKeyRepository.Insert(apiKey, cancellationToken);
                 _unitOfWork.Commit();
                 ApiKeyModel apiKeyModel = ApiKeyMappings.ToModel(result);
 

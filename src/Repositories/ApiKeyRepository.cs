@@ -11,6 +11,8 @@ using T = DPMGallery.Constants.Database.TableNames;
 using Serilog;
 using System.Data.Common;
 using Dapper;
+using Microsoft.AspNetCore.DataProtection.KeyManagement.Internal;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
 
 namespace DPMGallery.Repositories
 {
@@ -119,6 +121,29 @@ namespace DPMGallery.Repositories
             return keys;
         }
 
+        public async Task<List<string>> GetPackagesOwnedByUser(int userId, CancellationToken cancellationToken)
+        {
+            string fetchSql =
+                    @$"select p.packageid from {T.PackageOwner} o
+                        left join {T.Package} p on p.id = o.package_id
+                        where
+                        o.owner_id in (
+                        select @userId as id
+                        union 
+                        select u.id from {T.Users} u 
+                            left join {T.OrganisationMembers} m ON m.org_id = u.id 
+                            where 
+                            m.member_id = @userId)
+                     order by p.packageid";
+            IEnumerable<string> query = await Context.QueryAsync<string>(fetchSql, new { userId }, cancellationToken: cancellationToken);
+
+            List<string> result = query.ToList();
+
+            return result;
+        }
+
+
+
         public async Task<PagedList<ApiKey>> GetApiKeysForUser(int userId, Paging paging, CancellationToken cancellationToken)
         {
 
@@ -152,24 +177,33 @@ namespace DPMGallery.Repositories
         }
 
 
-        public async Task<ApiKey> Insert(ApiKey key)
+        public async Task<ApiKey> Insert(ApiKey key, CancellationToken cancellationToken)
         {
+            if (string.IsNullOrWhiteSpace(key.Key))
+				throw new ArgumentException("Key cannot be empty", nameof(key.Key));
+        
             key.KeyHashed = key.Key.GetHashSha256();
 
-            const string insertSql = "INSERT INTO " + T.ApiKeys + " " +
-                "VALUES(@KeyHashed, @UserId, @ExpiresUTC, @GlobPattern, @Packages, @Scopes ) RETURNING id";
+            const string insertSql = $@"INSERT INTO {T.ApiKeys} (user_id, name, key_hashed, expires_utc, glob_pattern, package_list, scopes, revoked, package_owner)
+                                      VALUES(@UserId, @Name, @KeyHashed, @ExpiresUTC, @GlobPattern, @Packages, @Scopes, @Revoked, @PackageOwner ) RETURNING id";
 
             try
             {
-                key.Id = await Context.ExecuteScalarAsync<int>(insertSql, new
+                int scopes = (int)key.Scopes;
+                var sqlParams = new
                 {
-                    key.KeyHashed,
                     key.UserId,
+                    key.Name,
+                    key.KeyHashed,
                     key.ExpiresUTC,
                     key.GlobPattern,
                     key.Packages,
-                    key.Scopes,
-                });
+                    Scopes = scopes,
+                    Revoked = false,
+                    key.PackageOwner
+                };
+
+                key.Id = await Context.ExecuteScalarAsync<int>(insertSql, sqlParams, cancellationToken:cancellationToken);
                 
             }
             catch(Exception ex)

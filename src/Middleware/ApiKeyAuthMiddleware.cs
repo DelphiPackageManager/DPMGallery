@@ -91,7 +91,7 @@ namespace DPMGallery.Middleware
                     new Claim(Claims.UserId, user.Id.ToString()),
                     new Claim(Claims.ApiKeyId, apiKey.Id.ToString()), //we need this in the packageindexservice
                     new Claim(Claims.ApiKeyScopes, apiKey.Scopes.ToString()), //we need this in the packageindexservice
-                    new Claim(Claims.ApiKeyExpires, apiKey.ExpiresUTC.ToFileTimeUtc().ToString()),
+                    new Claim(Claims.ApiKeyExpires, apiKey.ExpiresUTC.DateTime.ToFileTimeUtc().ToString()),
                 };
 
                 if (!string.IsNullOrEmpty(apiKey.GlobPattern))

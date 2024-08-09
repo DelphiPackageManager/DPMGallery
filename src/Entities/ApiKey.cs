@@ -25,7 +25,7 @@ namespace DPMGallery.Entities
         public int UserId { get; set; }
 
         [Column("expires_utc")]
-        public DateTime ExpiresUTC { get; set; }
+        public DateTimeOffset ExpiresUTC { get; set; }
 
         //either a glob pattern .
         [Column("glob_pattern")]
@@ -34,6 +34,9 @@ namespace DPMGallery.Entities
         //or a list of packages
         [Column("package_list")]
         public string Packages { get; set; }
+
+        [Column("package_owner")]
+        public int PackageOwner { get; set; }
 
         [Column("scopes")]
         public ApiKeyScope Scopes { get; set; }

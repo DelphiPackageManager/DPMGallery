@@ -25,13 +25,13 @@ export default function ApiKeyRegenerateDialogContent(props: { id: number, apiKe
 	const { onSuccess, id, apiKey } = props;
 	const [errors, setErrors] = useState([] as string[]);
 
-	const expiresUtc = new Date(apiKey.expiresUTC);
-	const expiresInDays = expiryDays(expiresUtc);
+	const expiresUTC = new Date(apiKey.expiresUTC);
+	const expiresInDays = expiryDays(expiresUTC);
 	const closestExpiryInDays = closestTo(expiresInDays, [1, 90, 180, 270, 365]);
 
 	let expiryText = expiresInDays < 0
-		? `Key expired on ${format(expiresUtc, "Pp")}`
-		: `Key is currently set to expire on ${format(expiresUtc, "Pp")}`;
+		? `Key expired on ${format(expiresUTC, "Pp")}`
+		: `Key is currently set to expire on ${format(expiresUTC, "Pp")}`;
 
 	let expiryText2;
 	if (expiresInDays === 1)

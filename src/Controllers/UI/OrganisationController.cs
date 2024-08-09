@@ -42,6 +42,41 @@ namespace DPMGallery.Controllers.UI
 
         [HttpGet]
         [Authorize]
+        [Route("/ui/account/organisation-names")]
+        public async Task<IActionResult> GetUserOrganisationNamesAsync(CancellationToken cancellationToken = default)
+        {
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
+            {
+                //just return nothing
+                return Unauthorized();
+            }
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            try { 
+
+                var userOrgs = await _organisationRepository.GetOrganisationNamesForMember(user.Id, cancellationToken);
+                return Ok(new
+                {
+                    Succeeded = true,
+                    data = userOrgs.ToModels()
+                });
+            }
+            catch (Exception ex)
+            {
+                var additionalInformation = new Dictionary<string, object> { { "UserId", user.Id } };
+                return GetProblemResponse($"Error getting user organisation names", exception: ex, additionalInformation: additionalInformation);
+            }
+
+        }
+
+
+        [HttpGet]
+        [Authorize]
         [Route("/ui/account/organisations")]
         public async Task<IActionResult> GetUserOrganisationsAsync(CancellationToken cancellationToken = default)
         {

@@ -2,9 +2,9 @@ import { PagedList } from "@/lib/paging";
 
 export enum ApiKeyScope {
 	none = 0,
-	pushNewPackage = 1 << 0, //001 = 1 
-	pushPackageVersion = 1 << 1, //010 = 2
-	unlistPackage = 1 << 2, //011 = 4
+	pushPackageVersion = 1 << 0, //001 = 1
+	pushNewPackage = 1 << 1, //010 = 2
+	unlistPackage = 1 << 2, //100 = 4
 	All = ~(~0 << 3)   // 111 = 7
 }
 
@@ -44,11 +44,12 @@ export type ApiKey = {
 	id?: number | null;
 	userId?: number | null;
 	name: string;
-	keyValue?: string | null; //only present in newly created or regenerated api keys
+	key?: string | null; //only present in newly created or regenerated api keys
 	expiresUTC: string;
 	globPattern: string | null;
 	packageList: string | null;
 	revoked: boolean;
+	packageOwner: string;
 	scopes: ApiKeyScope;
 };
 
@@ -62,9 +63,9 @@ export type PagedApiKeysResult = {
 export type ApiKeyCreateModel = {
 	name: string;
 	expiresInDays: number;
-	packageOwner: string;
+	packageOwner: number;
 	globPattern: string | null;
-	packageList: string | null;
+	packages: string | null;
 	scopes: ApiKeyScope;
 };
 

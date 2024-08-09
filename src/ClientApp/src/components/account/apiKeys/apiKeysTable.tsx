@@ -50,8 +50,8 @@ export default function ApiKeysTable() {
 			),
 			cell: ({ row }) => {
 				const name = row.getValue<string>("name");
-				const expiresUtc = row.getValue<Date>("expiresUtc");
-				const expiresInDays = expiryDays(expiresUtc);
+				const expiresUTC = row.getValue<Date>("expiresUTC");
+				const expiresInDays = expiryDays(expiresUTC);
 				let className = expiresInDays < 0 ? "line-through text-gray-400" : "";
 				return <div className={cn(className)}>{name}</div>
 			},
@@ -86,8 +86,8 @@ export default function ApiKeysTable() {
 				<DataTableColumnHeader column={column} title="Expires" allowSorting={true} />
 			),
 			cell: ({ row }) => {
-				const expiresUtc = row.getValue<Date>("expiresUTC");
-				const expiresInDays = expiryDays(expiresUtc);
+				const expiresUTC = row.getValue<Date>("expiresUTC");
+				const expiresInDays = expiryDays(expiresUTC);
 				let expiredClassName = expiresInDays < 0 ? "line-through text-gray-400" : "";
 				let titleText;
 				let iconType = null;
@@ -107,7 +107,7 @@ export default function ApiKeysTable() {
 				else
 					titleText = `Expires in ${expiresInDays} days`;
 
-				return <div title={titleText} className={cn("flex flex-row space-x-1", expiredClassName)}><span>{format(expiresUtc, "Pp")}</span> {iconType}</div>
+				return <div title={titleText} className={cn("flex flex-row space-x-1", expiredClassName)}><span>{format(expiresUTC, "Pp")}</span> {iconType}</div>
 			},
 			meta: {
 				headerClassName: "w-1/5"
@@ -194,7 +194,7 @@ export default function ApiKeysTable() {
 	if (!apiKeys)
 		return <div>Loading...</div>;
 
-	const openKeyDisplay = newApiKey?.keyValue ? true : false;
+	const openKeyDisplay = newApiKey?.key ? true : false;
 
 	const onKeyDisplayOpenChange = (open: boolean) => {
 		if (!open) {

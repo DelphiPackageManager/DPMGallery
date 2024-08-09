@@ -13,7 +13,8 @@ export type ApiKeyDisplayProps = {
 export const ApiKeyDisplay = (props: ApiKeyDisplayProps) => {
 	const { apiKey, open, onOpenChange } = props;
 
-	const keyValue = apiKey?.keyValue ?? "";
+	const keyValue = apiKey?.key ?? "";
+
 
 	return (
 

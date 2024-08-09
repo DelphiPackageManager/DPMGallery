@@ -9,7 +9,7 @@ namespace DPMGallery.Extensions.Mapping
     {
         public static ApiKeyModel ToModel(this ApiKey entity)
         {
-            var model = new ApiKeyModel(entity.Id, entity.Name, entity.Key, entity.UserId, entity.ExpiresUTC, entity.GlobPattern, entity.Packages, entity.Scopes, entity.Revoked);
+            var model = new ApiKeyModel(entity.Id, entity.Name, entity.Key, entity.UserId, entity.ExpiresUTC, entity.GlobPattern, entity.Packages, entity.PackageOwner, entity.Scopes, entity.Revoked);
             return model;
         }
 

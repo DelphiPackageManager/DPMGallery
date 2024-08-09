@@ -155,7 +155,28 @@ export async function regenerateApiKey(model: ApiKeyRegenerateModel): Promise<Ap
 	} catch (error: any) {
 		return errorToResult(error);
 
-	} finally {
-		//setLoading(false);
 	}
 }
+
+
+export async function fetchPackageNames(): Promise<ApiResult> {
+	try {
+		const axiosInitial = createAxiosInitial();
+		const url = "/ui/account/apikeys/package-names";
+		const response = await axiosInitial.get<ApiResult>(url);
+		let result = response?.data;
+		if (!result)
+			result = {
+				succeeded: false,
+				errors: ["No data returned from server"],
+				data: null
+			};
+
+		return result;
+
+	} catch (error: any) {
+		return errorToResult(error);
+
+	}
+}
+

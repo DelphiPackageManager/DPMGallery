@@ -259,13 +259,13 @@ namespace DPMGallery.DBMigration.Conventions
 				.WithColumn("allow_contact").AsBoolean().WithDefaultValue(true).NotNullable()
                 .WithColumn("notify_on_publish").AsBoolean().WithDefaultValue(true).NotNullable();
 
-            Create.Table(T.ApiKeys)
+			Create.Table(T.ApiKeys)
 				.WithIntPrimaryKeyColumn().Identity()
 				.WithColumn("user_id").AsInt32().NotNullable()
 				.WithColumn("name").AsString(FL.Long, DB.Collation).NotNullable()
 				.WithColumn("key_hashed").AsString(FL.Max).NotNullable()
 				.WithColumn("expires_utc").AsDateTime2().NotNullable()
-				.WithColumn("glob_pattern").AsString(FL.Long).WithDefaultValue("*")
+				.WithColumn("glob_pattern").AsString(FL.Long).Nullable()
 				.WithColumn("package_list").AsString(FL.Max).Nullable()
 				.WithColumn("scopes").AsInt32().NotNullable();
 
