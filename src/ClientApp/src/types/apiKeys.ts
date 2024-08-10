@@ -2,39 +2,28 @@ import { PagedList } from "@/lib/paging";
 
 export enum ApiKeyScope {
 	none = 0,
-	pushPackageVersion = 1 << 0, //001 = 1
-	pushNewPackage = 1 << 1, //010 = 2
-	unlistPackage = 1 << 2, //100 = 4
-	All = ~(~0 << 3)   // 111 = 7
+	pushPackageVersion = 1,
+	pushNewPackage = 3,
+	unlistPackage = 4,
 }
 
 export const apiKeyScopesToString = (value: ApiKeyScope): string => {
 
-	if (value & ApiKeyScope.All) {
-
-		return "New package, new versions, unlist";
-
-	}
-
 	let result = null;
-	if (value & ApiKeyScope.pushNewPackage) {
-		result = "New package";
+	if ((value & ApiKeyScope.pushNewPackage) == ApiKeyScope.pushNewPackage) {
+		result = "Push new packages and package version";
 	}
-	if (value & ApiKeyScope.pushNewPackage) {
-		if (result)
-			result = result + ", new versions";
+	if ((value & ApiKeyScope.pushPackageVersion) == ApiKeyScope.pushPackageVersion) {
+		if (!result)
+			result = "Push only new package versions"
+		// else
+		// 	result = "Push only new package versions";
 	}
-	if (value & ApiKeyScope.pushNewPackage) {
+	if ((value & ApiKeyScope.unlistPackage) == ApiKeyScope.unlistPackage) {
 		if (result)
-			result = result + ", new versions"
+			result += ", Unlist or relist package versions"
 		else
-			result = "New versions"
-	}
-	if (value & ApiKeyScope.unlistPackage) {
-		if (result)
-			result = result + ", unlist"
-		else
-			result = "Unlist";
+			result = "Unlist or relist package versions";
 	}
 
 	return result ? result : "no scopes set";
@@ -47,7 +36,7 @@ export type ApiKey = {
 	key?: string | null; //only present in newly created or regenerated api keys
 	expiresUTC: string;
 	globPattern: string | null;
-	packageList: string | null;
+	packages: string | null;
 	revoked: boolean;
 	packageOwner: string;
 	scopes: ApiKeyScope;

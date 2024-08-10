@@ -7,9 +7,9 @@ namespace DPMGallery.Entities
     public enum ApiKeyScope : uint
     {
         None = 0,
-        PushPackageVersion = 1 << 0, //1
-        PushNewPackage = 1 << 1, //2
-        UnlistPackage = 1 << 2, //4
-        All = ~(~0 << 3)
+        PushPackageVersion = 1, //011
+        PushNewPackage = 3, //011 - includes push new version
+        UnlistPackage = 4, //100
+        All = 7 //111
     }
 }

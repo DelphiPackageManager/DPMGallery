@@ -3,7 +3,7 @@ import { createContext, ReactNode, useState } from "react";
 //Note - this type should mirror the type created in GenerateProfileObject on the server
 
 export type User = {
-	id: number;
+	id?: number;
 	userName: string;
 	email: string;
 	emailConfirmed: boolean;

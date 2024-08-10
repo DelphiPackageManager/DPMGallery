@@ -67,9 +67,9 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 			name: "",
 			expires: 365,
 			packageOwner: auth.currentUser?.id,
-			pushScope: "2",
+			pushScope: "3",
 			unlistScope: ApiKeyScope.none,
-			globPattern: "",
+			globPattern: "*",
 			packageList: ""
 		},
 		mode: "onChange"
@@ -260,7 +260,7 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 												setCanPush(e == true);
 												form.setValue("pushScope", "1", { shouldTouch: true })
 											}} />
-										<Label htmlFor="push" size="sm" className="">Push</Label>
+										<Label htmlFor="push" size="sm" variant="form_checkbox">Push</Label>
 									</div>
 
 									<FormField control={form.control} name="pushScope" render={({ field }) => (
@@ -270,14 +270,14 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 												<RadioGroup disabled={!canPush} onValueChange={field.onChange} value={field.value} >
 													<FormControl>
 														<div className="flex items-center space-x-2">
-															<RadioGroupItem value="2" id="pushNewPackage" />
-															<Label htmlFor="pushNewPackage">Push new packages and package versions</Label>
+															<RadioGroupItem value="3" id="pushNewPackage" />
+															<Label htmlFor="pushNewPackage" variant="form_checkbox">Push new packages and package versions</Label>
 														</div>
 													</FormControl>
 													<FormControl>
 														<div className="flex items-center space-x-2">
 															<RadioGroupItem value="1" id="pushPackageVersion" />
-															<Label htmlFor="pushPackageVersion">Push new package versions</Label>
+															<Label htmlFor="pushPackageVersion" variant="form_checkbox">Push new package versions</Label>
 														</div>
 													</FormControl>
 												</RadioGroup>
@@ -299,7 +299,7 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 															}
 															field.onChange(value);
 														}} />
-													<Label htmlFor="unlist" className="">
+													<Label htmlFor="unlist" variant="form_checkbox" >
 														Unlist or relist package versions
 													</Label>
 												</div>
@@ -324,7 +324,7 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 									</FormItem>
 
 								)} />
-								<div className="max-w-full border border-gray-200 p-2">
+								<div className="max-w-full border border-gray-200 p-2 dark:border-gray-700">
 									<CheckList height="h-56" items={selectedPackages} onItemChanged={onPackageSelectionChange} />
 								</div>
 							</div>

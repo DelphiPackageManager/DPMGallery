@@ -1,3 +1,6 @@
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { SITE_URL } from "@/types/constants";
 import * as React from "react";
 import { useEffect, useRef, useState } from "react";
@@ -59,6 +62,7 @@ const LoginPage = () => {
 			const twoFactorEnabled = response?.data?.twoFactorEnabled;
 
 			const loginUser: User = {
+				id: -1,
 				userName: username,
 				email: email,
 				emailConfirmed: emailConfirmed,
@@ -106,44 +110,44 @@ const LoginPage = () => {
 							<h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 dark:text-white md:text-2xl">Log In to your account</h1>
 							<form className="space-y-4 md:space-y-6" onSubmit={handleSubmit}>
 								<div>
-									<label htmlFor="userName" className="mb-2 block text-sm font-medium text-gray-800 dark:text-white">
+									<Label htmlFor="userName" className="">
 										UserName or Email Address
-									</label>
-									<input
+									</Label>
+									<Input
 										type="text"
 										name="userName"
 										id="userName"
 										autoComplete="username"
 										onChange={(e) => setUser(e.target.value)}
 										value={user}
-										className="focus:ring-primary-600 focus:border-primary-600 block w-full rounded-lg border border-gray-300 p-2.5 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-sm"
+										className="w-full"
+										size={50}
 										required
-										autoFocus></input>
+										autoFocus />
 								</div>
 								<div>
-									<label htmlFor="password" className="mb-2 block text-sm font-medium text-gray-900 dark:text-white">
+									<Label htmlFor="password" className="">
 										Password
-									</label>
-									<input
+									</Label>
+									<Input
 										type="password"
 										name="password"
 										id="password"
 										autoComplete="current-password"
 										onChange={(e) => setPwd(e.target.value)}
 										value={pwd}
-										className="focus:ring-primary-600 focus:border-primary-600 block w-full rounded-lg border border-gray-300 p-2.5 text-gray-900 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-500 dark:focus:ring-blue-500 sm:text-sm"
-										required></input>
+										className="w-full"
+										required></Input>
 								</div>
 								<div className="flex items-center justify-between">
 									<div className="flex items-start">
 										<div className="flex h-5 items-center">
-											<input
+											<Checkbox
 												id="remember"
 												aria-describedby="remember"
-												type="checkbox"
-												onChange={(e) => setRememberMe(e.target.checked)}
+												onCheckedChange={(e) => setRememberMe(e == "indeterminate" ? false : e)}
 												value={rememberMe ? "checked" : "unchecked"}
-												className="focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 h-4 w-4 rounded border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800"></input>
+												className="focus:ring-3 focus:ring-primary-300 dark:focus:ring-primary-600 h-4 w-4 rounded border border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:ring-offset-gray-800" />
 										</div>
 										<div className="ml-3 text-sm">
 											<label htmlFor="remember" className="text-gray-500 dark:text-gray-300">

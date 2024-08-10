@@ -56,7 +56,8 @@ export default function ApiKeysTable() {
 				return <div className={cn(className)}>{name}</div>
 			},
 			meta: {
-				headerClassName: "w-4/2"
+				headerClassName: "w-36",
+
 			}
 		},
 		{
@@ -67,7 +68,29 @@ export default function ApiKeysTable() {
 			cell: ({ row }) => {
 				const globPattern = row.getValue<string>("globPattern");
 				return <div>{globPattern}</div>
+			},
+			meta: {
+				headerClassName: "w-40",
+
 			}
+		},
+		{
+			accessorKey: "packages",
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title="Packages" />
+			),
+			cell: ({ row }) => {
+				let packages = row.getValue<string>("packages").split(",");
+
+				return <div>{packages.map((x: string) => {
+					return (<><span>{x}</span><br /></>)
+				})}</div>
+			},
+			meta: {
+				headerClassName: "w-40",
+				cellClassName: ""
+			}
+
 		},
 		{
 			accessorKey: "scopes",
@@ -107,25 +130,28 @@ export default function ApiKeysTable() {
 				else
 					titleText = `Expires in ${expiresInDays} days`;
 
-				return <div title={titleText} className={cn("flex flex-row space-x-1", expiredClassName)}><span>{format(expiresUTC, "Pp")}</span> {iconType}</div>
+				return <div title={format(expiresUTC, "Pp")} className={cn("flex flex-row space-x-1", expiredClassName)}><span>{titleText}</span> {iconType}</div>
 			},
 			meta: {
-				headerClassName: "w-1/5"
+				headerClassName: "w-40",
 			}
 		},
 		{
 			accessorKey: "enabled",
 			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title="Enabled" allowSorting={true} />
+				<DataTableColumnHeader column={column} title="" allowSorting={false} />
 			),
 			cell: ({ row }) => {
 				const revoked = row.original.revoked;
 				const enabled = !revoked;
 				const id = (row.original.id ?? "").toString();
-				return <div className="flex items-center justify-center"><Checkbox id={id} name="enabled" onCheckedChange={(checked: CheckedState) => onRowEnableToggle(checked, row)} defaultChecked={enabled} /></div>;
+				return <div className="flex items-center justify-center"><Checkbox id={id} name="enabled" title="Enable/disable" onCheckedChange={(checked: CheckedState) => onRowEnableToggle(checked, row)} defaultChecked={enabled} /></div>;
 
 			},
-			maxSize: 3
+			meta: {
+
+			}
+
 		},
 		{
 			id: "actions",
@@ -204,8 +230,8 @@ export default function ApiKeysTable() {
 	};
 
 	return (
-		<div className="container mx-auto py-5">
-			<DataTable columns={columns} data={apiKeys} showRowCount={true} showPageCount={false} showPageLinks={false} showFilter={false} allowGoToPage={false} updatePaging={updatePaging} padEndRows={true} renderTableActions={() => <ApiKeyTableActions onCreate={onApiKeyCreate} />} />
+		<div className="mt-4">
+			<DataTable className="w-full" columns={columns} data={apiKeys} showRowCount={true} showPageCount={false} showPageLinks={false} showFilter={false} allowGoToPage={false} updatePaging={updatePaging} padEndRows={true} renderTableActions={() => <ApiKeyTableActions onCreate={onApiKeyCreate} />} />
 			<ApiKeyDisplay apiKey={newApiKey} open={openKeyDisplay} onOpenChange={onKeyDisplayOpenChange} />
 			<div>{error}</div>
 		</div>
