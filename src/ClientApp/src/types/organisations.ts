@@ -13,6 +13,12 @@ export type OrganisationMember = {
 	avatarUrl: string;
 };
 
+export type OrgName = {
+	id: number;
+	name: string;
+}
+
+
 export type UserOrganisation = {
 	id: number;
 	name: string;

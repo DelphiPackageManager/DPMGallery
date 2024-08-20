@@ -1,63 +1,62 @@
 /// <reference types="vite-plugin-svgr/client" />
-import { CompilerVersion } from "@/types/types";
-
-import D10 from '@/assets/Delphi-10.0.svg?react';
-import D10_1 from '@/assets/Delphi-10.1.svg?react';
-import D10_2 from '@/assets/Delphi-10.2.svg?react';
-import D10_3 from '@/assets/Delphi-10.3.svg?react';
-import D10_4 from '@/assets/Delphi-10.4.svg?react';
-import D11 from '@/assets/Delphi-11.x.svg?react';
-import D12 from '@/assets/Delphi-12.x.svg?react';
-import XE2 from '@/assets/Delphi-XE2.svg?react';
-import XE3 from '@/assets/Delphi-XE3.svg?react';
-import XE4 from '@/assets/Delphi-XE4.svg?react';
-import XE5 from '@/assets/Delphi-XE5.svg?react';
-import XE6 from '@/assets/Delphi-XE6.svg?react';
-import XE7 from '@/assets/Delphi-XE7.svg?react';
-import XE8 from '@/assets/Delphi-XE8.svg?react';
 import { cn } from "@/lib/utils";
+import { CompilerVersion, CompilerVersionString, CompilerVersionTitle } from "@/types/types";
 
 export type DelphiIconProps = {
 	compilerVersion: CompilerVersion;
 	className?: string;
+
+}
+
+
+const DIcon = ({ version, title, className }: { title: string, version: string, className?: string }) => {
+	let clsName = cn("flex h-7 w-7 items-center text-white  justify-center rounded-full bg-[#f32735]", className)
+	return (
+		<div className={clsName} title={title}>
+			<span className="p-1 text-xs">{version}</span>
+		</div>
+	)
+	// return (
+	// 	<svg
+	// 		xmlns="http://www.w3.org/2000/svg"
+	// 		fillRule="evenodd"
+	// 		strokeLinejoin="round"
+	// 		strokeMiterlimit="2"
+	// 		clipRule="evenodd"
+	// 		className={className}
+	// 		viewBox="0 0 100 100"
+	// 	>
+	// 		<title>{title}</title>
+	// 		<circle
+	// 			cx="7099"
+	// 			cy="798"
+	// 			r="80"
+	// 			fill="#f32735"
+	// 			transform="matrix(.625 0 0 .625 -4386.88 -448.75)"
+	// 		></circle>
+	// 		<text
+	// 			x="122.13"
+	// 			y="101.042"
+	// 			fill="#fff"
+	// 			fontFamily="'ArialNarrow-Bold', 'Arial', sans-serif"
+	// 			fontSize="75"
+	// 			fontStretch="condensed"
+	// 			fontWeight="700"
+	// 			transform="translate(-100 -50) matrix(.63756 0 0 .6473 34.137 52.03)"
+	// 		>
+	// 			{version}
+	// 		</text>
+	// 	</svg>
+	//);
+
 }
 
 const DelphiIcon = ({ compilerVersion, className }: DelphiIconProps) => {
 	let clsName = cn('', className);
+	let compilerTitle = CompilerVersionTitle(compilerVersion);
+	let compilerName = CompilerVersionString(compilerVersion);
 
-	switch (compilerVersion) {
-		case CompilerVersion.RSXE2:
-			return (<XE2 className={clsName} />)
-		case CompilerVersion.RSXE3:
-			return (<XE3 className={clsName} />)
-		case CompilerVersion.RSXE4:
-			return (<XE4 className={clsName} />)
-		case CompilerVersion.RSXE5:
-			return (<XE5 className={clsName} />)
-		case CompilerVersion.RSXE6:
-			return (<XE6 className={clsName} />)
-		case CompilerVersion.RSXE7:
-			return (<XE7 className={clsName} />)
-		case CompilerVersion.RSXE8:
-			return (<XE8 className={clsName} />)
-		case CompilerVersion.RS10_0:
-			return (<D10 className={clsName} />)
-		case CompilerVersion.RS10_1:
-			return (<D10_1 className={clsName} />)
-		case CompilerVersion.RS10_2:
-			return (<D10_2 className={clsName} />)
-		case CompilerVersion.RS10_3:
-			return (<D10_3 className={clsName} />)
-		case CompilerVersion.RS10_4:
-			return (<D10_4 className={clsName} />)
-		case CompilerVersion.RS11_0:
-			return (<D11 className={clsName} />)
-		case CompilerVersion.RS12_0:
-			return (<D12 className={clsName} />)
-		default:
-			throw new Error(`Invalid compilerVerison ${compilerVersion}`);
-	}
-
+	return (<DIcon className={className} version={compilerName} title={compilerTitle} />)
 }
 
 export default DelphiIcon;

@@ -5,24 +5,12 @@ import { useWindowSize } from "usehooks-ts";
 import useAuth from "../hooks/useAuth";
 import DarkModeToggle from "./darkModeToggle";
 
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuPortal,
-	DropdownMenuSeparator,
-	DropdownMenuShortcut,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
 // import useAuth so we can tell if logged in
 export default function NavBar() {
 	const [isNavExpanded, setIsNavExpanded] = useState(false);
+	const [menuOpen, setMenuOpen] = useState(false);
 	const { currentUser } = useAuth();
 
 	let { state, pathname } = useLocation();
@@ -70,48 +58,99 @@ export default function NavBar() {
 			);
 		} else {
 			return (
-				<div className="dropdown dropdown-hover dropdown-end">
-					<label tabIndex={0} className="m-1 p-2">{`${currentUser?.userName}`}</label>
-					<ul tabIndex={0} className="dropdown-content w-72">
-						<li className="dropdown-header">
-							<div className="flex flex-row items-center gap-3">
-								<div className="w-18 h-18">
-									<img className="rounded-md" src={`${currentUser?.avatarUrl}`} alt="" />
+				<HoverCard openDelay={200} closeDelay={50000}>
+					<HoverCardTrigger asChild>
+						<div>
+							<label tabIndex={0} className="m-1 px-1 pl-2">{`${currentUser?.userName}`}</label>
+							<span className="caret"></span>
+						</div>
+					</HoverCardTrigger>
+					<HoverCardContent className="dropdown-content z-20 w-80" align="end" >
+						<ul tabIndex={0} className="w-72">
+							<li className="dropdown-header">
+								<div className="flex flex-row items-center gap-3 py-1">
+									<div className="h-16 w-16">
+										<img className="rounded-lg" src={`${currentUser?.avatarUrl}`} alt="" />
+									</div>
+									<div className="">
+										<div>{`${currentUser?.userName}`}</div>
+										<div className="text-sm text-gray-400">{`${currentUser?.email}`}</div>
+									</div>
 								</div>
-								<div className="">
-									<div>{`${currentUser?.userName}`}</div>
-									<div className="text-sm text-gray-400">{`${currentUser?.email}`}</div>
+							</li>
+							<li className="divider"></li>
+							<li>
+								<Link to={`/profiles/${currentUser?.userName}`}>My Profile</Link>
+							</li>
+							<li>
+								<Link to="/account/email">Account Settings</Link>
+							</li>
+							<li>
+								<Link to="/account/organisations">Manage Organisations</Link>
+							</li>
+							<li>
+								<Link to="/account/apikeys">API Keys</Link>
+							</li>
+							<li>
+								<Link to="/account/packages">Manage Packages</Link>
+							</li>
+							<li className="divider"></li>
+							<li>
+								<Link to="/account/packages/upload">Upload Packages</Link>
+							</li>
+							<li className="divider"></li>
+							<li>
+								<div className="link" onClick={handlClick}>
+									Log Out
 								</div>
-							</div>
-						</li>
-						<li className="divider"></li>
-						<li>
-							<Link to={`/profiles/${currentUser?.userName}`}>My Profile</Link>
-						</li>
-						<li>
-							<Link to="/account/email">Account Settings</Link>
-						</li>
-						<li>
-							<Link to="/account/organisations">Manage Organisations</Link>
-						</li>
-						<li>
-							<Link to="/account/apikeys">API Keys</Link>
-						</li>
-						<li>
-							<Link to="/account/packages">Manage Packages</Link>
-						</li>
-						<li className="divider"></li>
-						<li>
-							<Link to="/upload">Upload Packages</Link>
-						</li>
-						<li className="divider"></li>
-						<li>
-							<div className="link" onClick={handlClick}>
-								Log Out
-							</div>
-						</li>
-					</ul>
-				</div>
+							</li>
+						</ul>
+					</HoverCardContent>
+				</HoverCard>
+
+
+				// <div className="dropdown dropdown-hover">
+				// 	<label tabIndex={0} className="m-1 p-2">{`${currentUser?.userName}`}</label>
+				// 	<ul tabIndex={0} className="dropdown-content w-72">
+				// 		<li className="dropdown-header">
+				// 			<div className="flex flex-row items-center gap-3">
+				// 				<div className="w-18 h-18">
+				// 					<img className="rounded-md" src={`${currentUser?.avatarUrl}`} alt="" />
+				// 				</div>
+				// 				<div className="">
+				// 					<div>{`${currentUser?.userName}`}</div>
+				// 					<div className="text-sm text-gray-400">{`${currentUser?.email}`}</div>
+				// 				</div>
+				// 			</div>
+				// 		</li>
+				// 		<li className="divider"></li>
+				// 		<li>
+				// 			<Link to={`/profiles/${currentUser?.userName}`}>My Profile</Link>
+				// 		</li>
+				// 		<li>
+				// 			<Link to="/account/email">Account Settings</Link>
+				// 		</li>
+				// 		<li>
+				// 			<Link to="/account/organisations">Manage Organisations</Link>
+				// 		</li>
+				// 		<li>
+				// 			<Link to="/account/apikeys">API Keys</Link>
+				// 		</li>
+				// 		<li>
+				// 			<Link to="/account/packages">Manage Packages</Link>
+				// 		</li>
+				// 		<li className="divider"></li>
+				// 		<li>
+				// 			<Link to="/account/packages/upload">Upload Packages</Link>
+				// 		</li>
+				// 		<li className="divider"></li>
+				// 		<li>
+				// 			<div className="link" onClick={handlClick}>
+				// 				Log Out
+				// 			</div>
+				// 		</li>
+				// 	</ul>
+				// </div>
 			);
 		}
 	};

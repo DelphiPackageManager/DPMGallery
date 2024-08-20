@@ -44,8 +44,8 @@ namespace DPMGallery.Extensions
             services.AddScoped<PackageVersionRepository>();
             services.AddScoped<PackageOwnerRepository>();
             services.AddScoped<PackageVersionProcessRepository>();
-            services.AddScoped<ReservedPrefixRepository>();
             services.AddScoped<OrganisationRepository>();
+            services.AddScoped<ReservedPrefixRepository>();
             services.AddScoped<SearchRepository>();
             services.AddScoped<StatsRepository>();
 

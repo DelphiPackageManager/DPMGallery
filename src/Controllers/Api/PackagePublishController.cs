@@ -1,6 +1,9 @@
-﻿using DPMGallery.Extensions;
+﻿using DPMGallery.Entities;
+using DPMGallery.Extensions;
 using DPMGallery.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Serilog;
@@ -20,27 +23,21 @@ namespace DPMGallery.Controllers
     {
         private readonly IPackageIndexService _packageIndexService;
         private readonly ILogger _logger;
-        public PackagePublishController(ILogger logger, IPackageIndexService packageService)
+        private readonly UserManager<User> _userManager;
+        public PackagePublishController(ILogger logger, IPackageIndexService packageService, UserManager<User> userManager)
         {
             _logger = logger;
             _packageIndexService = packageService;
+            _userManager = userManager;
         }
 
 
-        private async Task<Stream> GetRequestStream(CancellationToken cancellationToken)
+        private async Task<Stream> GetRequestStream(int idx, CancellationToken cancellationToken)
         {
             Stream rawUploadStream = null;
             try
             {
-                if (Request.HasFormContentType && Request.Form.Files.Count > 0)
-                {
-                    rawUploadStream = Request.Form.Files[0].OpenReadStream();
-                }
-                else
-                {
-                    rawUploadStream = Request.Body;
-                }
-
+                rawUploadStream = Request.Form.Files[idx].OpenReadStream();
                 // Convert the upload stream into a temporary file stream to
                 // minimize memory usage.
                 return await rawUploadStream?.CopyToTemporaryFileStreamAsync(cancellationToken);
@@ -56,7 +53,7 @@ namespace DPMGallery.Controllers
         {
             if (Request.HasFormContentType && Request.Form.Files.Count > 0)
             {
-                return Request.Form.Files[0].FileName;
+                return Path.GetFileName(Request.Form.Files[0].FileName); // remove any path info from filename in case of malicious uploads.
             }
             else
             {
@@ -73,51 +70,71 @@ namespace DPMGallery.Controllers
         [Route(Constants.RoutePatterns.PackagePublish)]
         public async Task<IActionResult> PushPackage(CancellationToken cancellationToken)
         {
+            if (!Request.HasFormContentType || Request.Form.Files.Count == 0)
+            {
+                return BadRequest("no files");
+            }
+
             ClaimsPrincipal claimsPrincipal = HttpContext.User;
             if (claimsPrincipal == null) //shouldn't be possible to get here in this state!
             {
                 return Unauthorized();
             }
 
-            //we added the apikeyid as a claim in the apikey auth middleware
-            var claim = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == Constants.Claims.ApiKeyId);
-            if (claim == null)
+            string userName = HttpContext.User.Identity?.Name;
+            if (userName == null)
             {
+                //just return nothing
                 return Unauthorized();
             }
+
+            var user = await _userManager.FindByNameAsync(userName);
+            if (user == null)
+            {
+                return NotFound($"Unable to load user with name '{userName}'.");
+            }
+
+            //we add the apikeyid as a claim in the apikey auth middleware
+            var claim = claimsPrincipal.Claims.FirstOrDefault(x => x.Type == Constants.Claims.ApiKeyId);
+            // claim can be null if uploading using the website
+
             string packageFileName = GetUploadFileName();
             _logger.Information($"Processing file : {packageFileName}");
             try
             {
-                int apiKeyId = int.Parse(claim.Value);
+                int apiKeyId = claim != null ? int.Parse(claim.Value) : -1;
 
-                using (Stream uploadStream = await GetRequestStream(cancellationToken))
+                for (int i = 0; i < Request.Form.Files.Count; i++)
                 {
-                    if (uploadStream == null)
+                    using (Stream uploadStream = await GetRequestStream(i, cancellationToken))
                     {
-                        return BadRequest();
-                    }
+                        if (uploadStream == null)
+                        {
+                            return BadRequest();
+                        }
 
-                    var result = await _packageIndexService.IndexAsync(uploadStream, apiKeyId, cancellationToken);
-                    switch (result.Status)
-                    {
-                        case PackageIndexingStatus.InvalidPackage:
-                            return BadRequest(result.Message);
-                        case PackageIndexingStatus.Forbidden:
-                            return StatusCode(403, result.Message);
-                        case PackageIndexingStatus.PackageAlreadyExists:
-                            return StatusCode(409, "Package already exists");
-                        case PackageIndexingStatus.Error:
-                            return StatusCode(500, result.Message);
-                        case PackageIndexingStatus.FailedAVScan:
-                            return StatusCode(400, "Package failed Antivirus Scan");
-                        case PackageIndexingStatus.Success:
-                            return StatusCode(201);
-                        default:
-                            return StatusCode(500, "Unknown error"); 
-                    }
+                        var result = await _packageIndexService.IndexAsync(uploadStream, user.Id, apiKeyId, cancellationToken);
+                        switch (result.Status)
+                        {
+                            case PackageIndexingStatus.InvalidPackage:
+                                return BadRequest(result.Message);
+                            case PackageIndexingStatus.Forbidden:
+                                return StatusCode(403, result.Message);
+                            case PackageIndexingStatus.PackageAlreadyExists:
+                                return StatusCode(409, "Package already exists");
+                            case PackageIndexingStatus.Error:
+                                return StatusCode(500, result.Message);
+                            case PackageIndexingStatus.FailedAVScan:
+                                return StatusCode(400, "Package failed Antivirus Scan");
+                            case PackageIndexingStatus.Success:                               
+                                break; //just continue
+                            default:
+                                return StatusCode(500, "Unknown error");
+                        }
 
+                    }
                 }
+                return StatusCode(201);
             }
             catch (Exception ex)
             {

@@ -12,6 +12,7 @@ using System.Security.Cryptography;
 using NuGet.Versioning;
 using DPMGallery.Types;
 using Microsoft.VisualBasic;
+using Amazon.S3.Model;
 
 namespace DPMGallery.Services
 {
@@ -28,6 +29,7 @@ namespace DPMGallery.Services
         private readonly PackageVersionProcessRepository _packageVersionProcessRepository;
         private readonly PackageOwnerRepository _packageOwnerRepository;
         private readonly OrganisationRepository _organisationRepository;
+        private readonly ReservedPrefixRepository _reservedPrefixRepository;
         private readonly ILogger _logger;
         private readonly ServerConfig _serverConfig;
 
@@ -35,7 +37,7 @@ namespace DPMGallery.Services
         private static readonly SemaphoreSlim _semaphoreSlim = new SemaphoreSlim(1, 1);
         public PackageIndexService(ILogger logger, IUnitOfWork unitOfWork, ApiKeyRepository apiKeyRepository, PackageRepository packageRepository, PackageVersionRepository packageVersionRepository,
                                    PackageVersionProcessRepository packageVersionProcessRepository, TargetPlatformRepository targetPlatformRepository, PackageOwnerRepository packageOwnerRepository, 
-                                   OrganisationRepository organisationRepository, ServerConfig serverConfig)
+                                   OrganisationRepository organisationRepository, ReservedPrefixRepository reservedPrefixRepository, ServerConfig serverConfig)
         {
             _logger = logger;
             _unitOfWork = unitOfWork;
@@ -46,6 +48,7 @@ namespace DPMGallery.Services
             _packageVersionProcessRepository = packageVersionProcessRepository;
             _packageOwnerRepository = packageOwnerRepository;
             _organisationRepository = organisationRepository;
+            _reservedPrefixRepository = reservedPrefixRepository;
             _serverConfig = serverConfig;
         }
 
@@ -105,8 +108,7 @@ namespace DPMGallery.Services
             return Convert.ToBase64String(bytes);
         }
 
-        //TODO : This has no way of telling the client what is wrong with a package when it's rejected.
-        public async Task<PackageIndexingResult> IndexAsync(Stream stream, int apiKeyId, CancellationToken cancellationToken)
+        public async Task<PackageIndexingResult> IndexAsync(Stream stream, int userId,  int apiKeyId, CancellationToken cancellationToken)
         {
             Package package;
             PackageVersion packageVersion;
@@ -122,9 +124,9 @@ namespace DPMGallery.Services
                         return new PackageIndexingResult()
                         {
                             Status = PackageIndexingStatus.InvalidPackage,
-                            Message = "Invalid compilerVersion" 
+                            Message = "Invalid Compiler Version"
                         };
-                       
+
                     }
 
                     if (packageTargetPlatform.Platform == Platform.UnknownPlatform)
@@ -132,7 +134,7 @@ namespace DPMGallery.Services
                         return new PackageIndexingResult()
                         {
                             Status = PackageIndexingStatus.InvalidPackage,
-                            Message = "Invalid platform"
+                            Message = "Invalid Platform"
                         };
                     }
 
@@ -157,32 +159,68 @@ namespace DPMGallery.Services
                     //    }
                     //}
 
-                    var apiKey = await _apiKeyRepository.GetApiKeyById(apiKeyId, cancellationToken);
-                    if (apiKey == null)
+                    ApiKey apiKey = null;
+                    if (apiKeyId != -1)
                     {
-                        return new PackageIndexingResult()
+                        apiKey = await _apiKeyRepository.GetApiKeyById(apiKeyId, cancellationToken);
+                        if (apiKey == null)
                         {
-                            Status = PackageIndexingStatus.Forbidden,
-                            Message = "I don't know who you are!"
-                        };
-
+                            return new PackageIndexingResult()
+                            {
+                                Status = PackageIndexingStatus.Forbidden,
+                                Message = "I don't know who you are!"
+                            };
+                        }
                     }
 
                     Package thePackage = null;
+                    
                     //we have to do this to avoid race conditions where another thread could jump in and add package or targetplatform
                     //between us checking and committing. This will slow down inserts but should not be a problem since we're unlike
                     //to get tons of concurrent inserts of the same packageid and targetplatforms (mostly in testing). 
                     await _semaphoreSlim.WaitAsync(cancellationToken);
                     try
                     {
-                        //TODO :check if there is a reserved prefix, and if so that the user is a prefix owner
                         thePackage = await _packageRepository.GetPackageByPackageIdAsync(package.PackageId, cancellationToken);
                         if (thePackage == null)
                         {
                             isNew = true;
+                            int ownerId = userId;
+
+                            string prefix = package.PackageId.Split(['.']).FirstOrDefault()?.ToLower();
+
+                            if (string.IsNullOrEmpty(prefix)) 
+                            {
+                                return new PackageIndexingResult()
+                                {
+                                    Status = PackageIndexingStatus.Error,
+                                    Message = "Invalid package id"
+                                };
+
+                            }
+
+                            var reservedPrefix = await _reservedPrefixRepository.GetPrefixByNameAsync(prefix, cancellationToken);
+                            if (reservedPrefix != null)
+                            {
+                                //check if there is a reserved prefix, and if so that the user is a prefix owner
+                                //if the prefix is owned by an org this checks if user is a member of org.
+                                (bool isOwner, int ownerId) prefixResult = await _reservedPrefixRepository.GetIsPrefixOwner(prefix, userId, cancellationToken);
+
+                                if (!prefixResult.isOwner)
+                                {
+                                    return new PackageIndexingResult()
+                                    {
+                                        Status = PackageIndexingStatus.Forbidden,
+                                        Message = $"You are not an owern of the Reserved Prefix : ${prefix}"
+                                    };
+                                }
+                                ownerId = prefixResult.ownerId;
+                                package.ReservedPrefix = reservedPrefix.Id;
+                            }
 
                             //check that the api key has permission to create package 
-                            if (!apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage))
+                            //if there is no api key and the user is authenticated then they have permission
+                            if (apiKey != null && !apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage))
                             {
                                 return new PackageIndexingResult()
                                 {
@@ -197,7 +235,7 @@ namespace DPMGallery.Services
 
                             var packageOwner = new PackageOwner()
                             {
-                                OwnerId = apiKey.UserId,
+                                OwnerId = ownerId,
                                 PackageId = thePackage.Id
                             };
 
@@ -208,7 +246,8 @@ namespace DPMGallery.Services
                         else
                         {
                             //package exists - so check if the user is a package owner. 
-                            var isOwner = GetIsOwner(thePackage.Id, apiKey.UserId, cancellationToken).Result;
+                            //we don't need to check reserved prefix here - the packageid already exists
+                            var isOwner = GetIsOwner(thePackage.Id, userId, cancellationToken).Result;
                             if (!isOwner)
                             {
                                 return new PackageIndexingResult()
@@ -219,7 +258,7 @@ namespace DPMGallery.Services
                                 
                             }
                             //check that the api key actually has permissions to push a new version
-                            if (!(apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion) || apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage)))
+                            if (apiKey != null && !(apiKey.Scopes.HasFlag(ApiKeyScope.PushPackageVersion) || apiKey.Scopes.HasFlag(ApiKeyScope.PushNewPackage)))
                             {
                                 return new PackageIndexingResult()
                                 {
@@ -233,13 +272,15 @@ namespace DPMGallery.Services
                     {
                         _semaphoreSlim.Release();
                     }
+
                     if (thePackage == null)
+                    {
                         return new PackageIndexingResult()
                         {
                             Status = PackageIndexingStatus.Error,
                             Message = "Something went wrong creating the package db entry"
                         };
-
+                    }
 
                     PackageVersion thePackageVersion;
                     PackageTargetPlatform theTargetPlatform;

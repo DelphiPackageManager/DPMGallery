@@ -94,8 +94,8 @@ const PackagesPage = () => {
 				}
 				{isLoading &&
 					<div className="z-0">
-						{skeletonRows.map(() =>
-							<PackageRowSkeleton />
+						{skeletonRows.map((value, index) =>
+							<PackageRowSkeleton key={index} />
 						)}
 
 					</div>
@@ -117,12 +117,11 @@ const PackagesPage = () => {
 				)}
 				<PackagesPaging packages={packages} nextPageClick={nextPageClick} prevPageClick={prevPageClick} />
 
-				{packages &&
-					packages?.packages.map((pkg, index) => {
-						return (
-							<PackageItemRow key={index} index={index} pkg={pkg} onTagClick={onTagClick} />
-						)
-					})}
+				{packages && packages?.packages.map((pkg, index) => {
+					return (
+						<PackageItemRow key={index} index={index} pkg={pkg} onTagClick={onTagClick} />
+					)
+				})}
 				<PackagesPaging packages={packages} nextPageClick={nextPageClick} prevPageClick={prevPageClick} />
 
 			</PageContainer>

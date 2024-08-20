@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import useAuth from "@/hooks/useAuth";
 import { ApiKey, ApiKeyCreateModel, ApiKeyScope } from "@/types/apiKeys";
 import { Constants } from "@/types/constants";
+import { OrgName } from "@/types/organisations";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useRef, useState } from "react";
 import { useForm } from "react-hook-form";
@@ -46,10 +47,6 @@ const formSchema = z.object({
 	return true;
 });
 
-type OrgName = {
-	id: number;
-	name: string;
-}
 
 export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess: (data: ApiKey) => void }) {
 	const auth = useAuth();

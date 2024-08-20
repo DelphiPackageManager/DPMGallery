@@ -34,12 +34,13 @@ namespace DPMGallery.Repositories
         public async Task<Package> InsertAsync(Package package, CancellationToken cancellationToken)
         {
 
-            const string insertSql = "INSERT INTO " + T.Package + " (packageid, downloads) " +
-                "VALUES(@packageId, 0) RETURNING id";
+            const string insertSql = "INSERT INTO " + T.Package + " (packageid, downloads, reserved_prefix_id) " +
+                "VALUES(@packageId, 0, @reserved) RETURNING id";
 
             try
             {
-                package.Id = await Context.ExecuteScalarAsync<int>(insertSql, new { packageId = package.PackageId }, cancellationToken: cancellationToken);
+                var reserved = package.ReservedPrefix;
+                package.Id = await Context.ExecuteScalarAsync<int>(insertSql, new { packageId = package.PackageId, reserved }, cancellationToken: cancellationToken);
             }
             catch (Exception ex)
             {

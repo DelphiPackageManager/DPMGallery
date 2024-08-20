@@ -26,5 +26,8 @@ namespace DPMGallery.Entities
         //first package version will set this to true.
         [Column("active")]
         public bool Active { get; set; }
+
+		[Column("reserved_prefix_id")]
+		public int? ReservedPrefix {  get; set; } 
 	}
 }

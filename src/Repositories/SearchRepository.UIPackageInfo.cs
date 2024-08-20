@@ -156,14 +156,11 @@ namespace DPMGallery.Repositories
                     foreach (var owner in owners)
                     {
                         string email = (string)owner.email;
+                        string owner_username = (string)owner.owner;
                         string emailHash = email.ToLower().ToMd5();
-                        var newOwner = new PackageOwnerModel(email, emailHash);
+                        var newOwner = new PackageOwnerModel(owner_username, emailHash);
 						model.Owners.Add(newOwner);
                     }
-
-
-
-
 
                     long currentVersionDownloads = 0;
 

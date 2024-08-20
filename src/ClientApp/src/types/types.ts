@@ -1,3 +1,4 @@
+import { futimes } from "fs";
 
 export enum SortDirection {
 	Default,
@@ -25,6 +26,24 @@ export enum CompilerVersion {
 	RS11_0 = "RS11_0",
 	RS12_0 = "RS12_0"
 }
+
+export function StrToCompilerVersion(value: string): CompilerVersion {
+	let lversion = "RS" + value.replace('.', '_');
+	return lversion as CompilerVersion;
+	//return CompilerVersion.UnknownVersion;
+}
+
+
+
+export function CompilerVersionTitle(version: CompilerVersion): string {
+	if (version == CompilerVersion.UnknownVersion) return "Unknown";
+
+	let nameOf = CompilerVersion[version];
+	let result = nameOf.slice(2);
+	result = "RAD Studio " + result.replace("_", ".");
+	return result;
+}
+
 
 export function CompilerVersionString(version: CompilerVersion): string {
 	if (version == CompilerVersion.UnknownVersion) return "Unknown";
@@ -60,6 +79,7 @@ export enum Platform {
 export function PlatformString(platform: Platform): string {
 	switch (platform) {
 		case Platform.UnknownPlatform:
+			console.log("unknown platform")
 			return "Unknown";
 
 		case Platform.Win32:
@@ -103,5 +123,56 @@ export function PlatformString(platform: Platform): string {
 
 		default:
 			throw new Error("PlatformString function is out of date with Platform Type");
+	}
+}
+
+export function StrToPlatform(value: string): Platform {
+	switch (value) {
+		case "UnknownPlatform":
+			return Platform.UnknownPlatform;
+		case "Win32":
+			return Platform.Win32;
+		case "Win64":
+			return Platform.Win64;
+		case "WinArm32":
+			return Platform.WinArm32;
+		case "WinArm64":
+			return Platform.WinArm64;
+
+		case "OSX32":
+			return Platform.OSX32;
+		case "OSX64":
+			return Platform.OSX64;
+		case "OSXARM64":
+			return Platform.OSXARM64
+
+		case "Android":
+		case "AndroidArm32":
+			return Platform.AndroidArm32;
+		case "Android64":
+		case "AndroidArm64":
+			return Platform.AndroidArm64;
+		case "AndroidIntel32":
+			return Platform.AndroidIntel32;
+		case "AndroidIntel64":
+			return Platform.AndroidIntel64;
+
+		case "iOS32":
+			return Platform.iOS32;
+		case "iOS64":
+			return Platform.iOS64;
+
+		case "LinuxIntel32":
+			return Platform.LinuxIntel32;
+		case "LinuxIntel64":
+			return Platform.LinuxIntel64;
+		case "LinuxArm32":
+			return Platform.LinuxArm32;
+		case "LinuxArm64":
+			return Platform.LinuxArm64;
+
+		default:
+			return Platform.UnknownPlatform;
+
 	}
 }

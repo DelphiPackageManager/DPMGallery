@@ -26,8 +26,9 @@ const HomePage = () => {
 						<img src="/img/dpm-large.png" className="mr-4 h-16 w-16 md:h-20 md:w-20" />
 						<h1 className="pb-4 align-middle text-lg dark:text-gray-200 md:text-4xl">DPM, the package manager for Delphi developers.</h1>
 					</div>
+					<h2 className="ml-24 text-xl font-medium">The Open source package manager for Delphi XE2 - 12.x </h2>
 
-					<h3>Open source package manager for Delphi XE2 - 11.3 </h3>
+
 				</div>
 				<div className="flex flex-row flex-wrap gap-4 md:flex-nowrap">
 					<div className="basis-full rounded-md bg-brand p-4 text-gray-100">

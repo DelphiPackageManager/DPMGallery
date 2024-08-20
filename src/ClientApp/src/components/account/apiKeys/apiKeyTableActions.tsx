@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { ApiKey } from "@/types/apiKeys";
+import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import ApiKeyCreateDialogContent from "./apiKeyCreateDialogContent";
 
@@ -31,7 +32,7 @@ export default function ApiKeyTableActions(props: ApiKeyTableActionsProps) {
 
 		<Dialog open={createOpen} onOpenChange={onCreateOpenChange} >
 			<DialogTrigger asChild>
-				<Button className="ml-6" variant="default" size="sm">Create new API Key</Button>
+				<Button className="ml-6" variant="create" size="sm"><span className="mr-2">Create new API Key</span> <PlusIcon /></Button>
 			</DialogTrigger>
 			<ApiKeyCreateDialogContent id={apiKeyDialogId} onSuccess={onSuccess} />
 		</Dialog>

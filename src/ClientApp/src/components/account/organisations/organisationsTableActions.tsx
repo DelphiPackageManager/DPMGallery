@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger } from "@/components/ui/dialog";
 import { UserOrganisation, UserOrganisationCreateModel } from "@/types/organisations";
+import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import OrganisationCreateDialogContent from "./organisationDialogCreateContent";
 
@@ -31,7 +32,7 @@ export default function OrganisationsTableActions(props: OrganisationsTableActio
 
 		<Dialog open={createOpen} onOpenChange={onCreateOpenChange}>
 			<DialogTrigger asChild>
-				<Button className="ml-6" variant="default" size="sm">Create new Organisation</Button>
+				<Button className="ml-6" variant="create" size="sm"><span className="mr-2">Create new Organisation</span> <PlusIcon /></Button>
 			</DialogTrigger>
 			<OrganisationCreateDialogContent id={dialogId} onSuccess={onSuccess} />
 		</Dialog>

@@ -30,10 +30,10 @@ import { default as ChangePasswordPage, default as PasswordSettingsPage } from "
 import ConfirmEmailChangePage from "./account/confirmEmailChange";
 import EmailSettingsPage from "./account/email";
 import ExternalLoginsPage from "./account/externalLogins";
-import MyPackagesPage from "./account/myPackages";
+import MyPackagesPage from "./account/myPackages/myPackagesPage";
 import EditOrganisationPage from "./account/organisations/editOrganisationPage";
 import OrganisationsPage from "./account/organisations/organisationsPage";
-import Layout, { LayoutLoader } from "./layout";
+import Layout from "./layout";
 import PrivacyPage from "./policies/privacyPage";
 import TermsPage from "./policies/termsPage";
 import RequireAuthRoute from "./requireAuth";
@@ -73,12 +73,12 @@ const App = () => {
 				<Route path="/.git/config" element={<RickRoll />} />
 
 				<Route element={<RequireAuthRoute allowedRoles={["RegisteredUser", "Administrator"]} />}>
-					<Route path="/upload" element={<UploadPage />} />
 					<Route path="/account" element={<AccountLayout />}>
 						<Route path="/account/email" element={<EmailSettingsPage />} />
 						<Route path="/account/changepassword" element={<ChangePasswordPage />} />
 						<Route path="/account/apikeys" element={<APIKeysPage />} />
 						<Route path="/account/packages" element={<MyPackagesPage />} />
+						<Route path="/account/packages/upload" element={<UploadPage />} />
 						<Route path="/account/externallogins" element={<ExternalLoginsPage />} />
 						<Route path="/account/twofactorauth" element={<TwoFactorAuthenticationPage />} />
 						<Route path="/account/enableauthenticator" element={<EnableAuthenticatorPage />} />

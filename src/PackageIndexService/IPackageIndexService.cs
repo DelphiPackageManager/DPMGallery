@@ -49,7 +49,7 @@ namespace DPMGallery.Services
 
     public interface IPackageIndexService
     {
-        Task<PackageIndexingResult> IndexAsync(Stream stream, int apiKeyId, CancellationToken cancellationToken);
+        Task<PackageIndexingResult> IndexAsync(Stream stream, int userId,  int apiKeyId, CancellationToken cancellationToken);
 
         Task<bool> TryDeletePackageAsync(string id, NuGetVersion version, CancellationToken cancellationToken);
     }
