@@ -27,6 +27,7 @@
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
     --radius: 0.3rem;
+	--bar-width : 20px;
   }
 
   .dark {
@@ -51,6 +52,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 48%;
+	--bar-width : 20px;
   }
   :root {
     --brand: #0071ce;
@@ -216,4 +218,36 @@
     opacity: 0;
     transform: translate(-50%, -50%) scale(0.95);
   }
+}
+
+
+@property --progress {
+  syntax: "<length-percentage>";
+  inherits: false;
+  initial-value: 0%;
+}
+
+.progress {
+  --size:16px;
+  width: var(--size);
+  aspect-ratio:1;
+  border-radius : 50%;
+  background: conic-gradient(#c00 var(--progress,0), #ccc 0);
+  display: grid;
+  place-content:center;
+    /* this works thanks to the @property at the top */
+  transition: --progress 500ms linear;
+  
+}
+.progress:after{
+  width: calc(var(--size) * .8);
+  aspect-ratio:1;
+  content: attr(data-value);
+  display: grid;
+  background: #fff;
+  border-radius : 50%;
+  display: grid;
+  font-size: calc(var(--size) * .4);;
+  place-content:center;
+  font-family: arial;
 }

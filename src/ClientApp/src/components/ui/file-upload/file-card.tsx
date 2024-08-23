@@ -4,8 +4,8 @@ import { CompilerVersion, Platform, StrToCompilerVersion, StrToPlatform } from "
 import { formatBytes } from "@/utils";
 import { ArrowUpFromLine, X } from "lucide-react";
 import { ReactNode } from "react";
+import CircleProgress from "../circle-progress/circleProgress";
 import PlatformIcon from "../PlatformIcon";
-import { Progress } from "../progress";
 import { FileInfo, FileStatus } from "./types";
 
 type FileCardProps = {
@@ -23,7 +23,7 @@ type CancelButtonProps = {
 const CancelButton = ({ fileInfo, onCancel }: CancelButtonProps) => {
 
 	return (
-		<div className="flex h-5 w-5 cursor-pointer items-center justify-center self-start rounded-full bg-white text-center ring-2 ring-gray-400 transition-all duration-300 hover:bg-destructive hover:text-white hover:ring-destructive dark:bg-gray-900 dark:hover:bg-destructive">
+		<div className="flex aspect-square h-5 cursor-pointer items-center justify-center self-start rounded-full bg-white text-center ring-2 ring-gray-400 transition-all duration-300 hover:bg-destructive hover:text-white hover:ring-destructive dark:bg-gray-900 dark:hover:bg-destructive">
 			<button title="Remove" type="button" onClick={(e) => onCancel(fileInfo)} >
 				<X size={16} />
 			</button>
@@ -62,7 +62,7 @@ const FileCard = ({ fileInfo, onRemoveFile }: FileCardProps) => {
 
 
 	function statusClassNames(status: FileStatus) {
-		console.log(status)
+		//console.log(status)
 		switch (status) {
 			case FileStatus.Invalid:
 				return "border-2 border-destructive dark:border-destructive";
@@ -71,8 +71,20 @@ const FileCard = ({ fileInfo, onRemoveFile }: FileCardProps) => {
 			case FileStatus.Ready:
 				return "";
 
-			case FileStatus.Completed:
-				return "";
+			case FileStatus.Failed:
+				return "bg-red-500";
+
+			case FileStatus.Cancelled:
+				return "bg-orange-500";
+
+			case FileStatus.InProgress:
+				return "bg-blue-500";
+			case FileStatus.Queued:
+				return "bg-yellow-500";
+
+
+			case FileStatus.Success:
+				return "bg-green-400";
 			default:
 				return "bg-red-500"
 
@@ -87,7 +99,7 @@ const FileCard = ({ fileInfo, onRemoveFile }: FileCardProps) => {
 		platform = StrToPlatform(fileInfo.packageInfo.platform);
 	}
 
-	let className = statusClassNames(fileInfo.status);
+	let className = "";// statusClassNames(fileInfo.status);
 
 	let byteCount = formatBytes(fileInfo.file.size);
 
@@ -104,7 +116,9 @@ const FileCard = ({ fileInfo, onRemoveFile }: FileCardProps) => {
 								<span>{fileInfo.packageInfo.packageId}</span>
 								<span>v{fileInfo.packageInfo.packageVersion}</span>
 							</div>
-							<StatusButton status={fileInfo.status} />
+							<div>
+								<CircleProgress size={24} value={30} />
+							</div>
 						</>
 					}
 					{!fileInfo.packageInfo &&
@@ -114,11 +128,10 @@ const FileCard = ({ fileInfo, onRemoveFile }: FileCardProps) => {
 				<div className="flex flex-row items-center gap-2">
 					<span className="text-xs">{byteCount}</span>
 					<div className="grow">
-						{fileInfo.status != FileStatus.Failed && fileInfo.progress > 0 &&
-							<Progress className="h-2" value={fileInfo.progress} max={100} />
-						}
+						{fileInfo.message}
 					</div>
 				</div>
+				<div>{fileInfo.message}</div>
 			</div>
 
 

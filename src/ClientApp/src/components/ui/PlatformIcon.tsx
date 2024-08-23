@@ -100,7 +100,7 @@ export type PlatformIconProps = {
 const PlatformIcon = ({ platform, className }: PlatformIconProps) => {
 	let clsName = cn('text-gray-800 dark:text-white ', className);
 	let platformName = PlatformString(platform);
-	console.log(platformName);
+	//console.log(platformName);
 	switch (platform) {
 		case Platform.Win32:
 		case Platform.Win64:

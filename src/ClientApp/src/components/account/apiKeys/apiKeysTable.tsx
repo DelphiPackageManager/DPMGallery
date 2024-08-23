@@ -82,8 +82,8 @@ export default function ApiKeysTable() {
 			cell: ({ row }) => {
 				let packages = row.getValue<string>("packages").split(",");
 
-				return <div>{packages.map((x: string) => {
-					return (<><span>{x}</span><br /></>)
+				return <div>{packages.map((x: string, index: number) => {
+					return (<div key={index}><span >{x}</span><br /></div>)
 				})}</div>
 			},
 			meta: {

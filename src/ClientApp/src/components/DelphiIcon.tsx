@@ -10,7 +10,7 @@ export type DelphiIconProps = {
 
 
 const DIcon = ({ version, title, className }: { title: string, version: string, className?: string }) => {
-	let clsName = cn("flex h-7 w-7 items-center text-white  justify-center rounded-full bg-[#f32735]", className)
+	let clsName = cn("flex h-7 w-7 items-center text-white  justify-center rounded-full bg-[#f32735] cursor-default", className)
 	return (
 		<div className={clsName} title={title}>
 			<span className="p-1 text-xs">{version}</span>
