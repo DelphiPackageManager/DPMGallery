@@ -117,7 +117,7 @@ const FileCard = ({ fileInfo, onRemoveFile }: FileCardProps) => {
 								<span>v{fileInfo.packageInfo.packageVersion}</span>
 							</div>
 							<div>
-								<CircleProgress size={24} value={30} />
+								<CircleProgress size={24} value={fileInfo.progress} />
 							</div>
 						</>
 					}

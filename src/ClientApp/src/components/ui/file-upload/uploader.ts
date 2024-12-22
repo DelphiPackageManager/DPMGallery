@@ -131,6 +131,10 @@ class Uploader {
 		this.inQueue.clear();
 	}
 
+	public Clear() {
+		this.inProgress.clear();
+		this.inQueue.clear();
+	}
 
 	private sendStatusChange(fileName: string, status: FileStatus, message: string) {
 		if (this.OnStatusChange) {

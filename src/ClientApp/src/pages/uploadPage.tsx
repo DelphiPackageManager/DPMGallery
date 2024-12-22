@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import FileUploader, { FileUploader2 } from "@/components/ui/file-upload";
+import { FileUploader2 } from "@/components/ui/file-upload";
 import { Input } from "@/components/ui/input";
 import { SITE_URL } from "@/types/constants";
 import { DragEvent, useState } from "react";

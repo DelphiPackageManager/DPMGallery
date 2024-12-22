@@ -113,6 +113,10 @@ namespace DPMGallery.Controllers
                             return BadRequest();
                         }
 
+                        Thread.Sleep(500);
+                        //return StatusCode(409, "Package already exists");
+
+#if !DEBUG  //turning off indexing while we debug/test uploads.
                         var result = await _packageIndexService.IndexAsync(uploadStream, user.Id, apiKeyId, cancellationToken);
                         switch (result.Status)
                         {
@@ -131,7 +135,7 @@ namespace DPMGallery.Controllers
                             default:
                                 return StatusCode(500, "Unknown error");
                         }
-
+#endif
                     }
                 }
                 return StatusCode(201);

@@ -25,6 +25,7 @@ const buttonVariants = cva(
 				sm_icon: "h-8 w-8",
 				vsm_icon: "h-7 w-7",
 				vvsm_icon: "h-5 w-5",
+				inline: "h-auto p-0 m-0",
 			},
 		},
 		defaultVariants: {
@@ -45,3 +46,4 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(({ className, va
 Button.displayName = "Button";
 
 export { Button, buttonVariants };
+

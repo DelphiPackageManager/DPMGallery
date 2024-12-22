@@ -1,10 +1,10 @@
 import axios from "@/api/axios";
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
-import { useWindowSize } from "usehooks-ts";
 import useAuth from "../hooks/useAuth";
 import DarkModeToggle from "./darkModeToggle";
 
+import { useWindowSize } from "@uidotdev/usehooks";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 
 // import useAuth so we can tell if logged in

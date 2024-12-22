@@ -60,6 +60,9 @@
   .dark {
     --brand: #005296;
   }
+
+
+
 }
 
 @layer base {
@@ -220,34 +223,83 @@
   }
 }
 
-
-@property --progress {
-  syntax: "<length-percentage>";
+@property --size {
+  initial-value: 24px; 	
   inherits: false;
-  initial-value: 0%;
+
 }
+
+ @property --progress {
+   syntax: "<length-percentage>";
+  inherits: false; 
+  initial-value: 25%; 
+} 
 
 .progress {
-  --size:16px;
   width: var(--size);
-  aspect-ratio:1;
-  border-radius : 50%;
-  background: conic-gradient(#c00 var(--progress,0), #ccc 0);
+  height: var(--size);
+  aspect-ratio: 1 / 1;
+  border-radius: 50vmax;
   display: grid;
-  place-content:center;
-    /* this works thanks to the @property at the top */
-  transition: --progress 500ms linear;
+  place-items: center;
+  background: conic-gradient(green var(--progress)  , #ccc var(--progress,0));
+  /* this works thanks to the @property at the top */
+  transition: --progress 300ms linear;  
   
 }
-.progress:after{
+
+.progress .progress-inner {
+	opacity: 0;
+}
+
+.progress::after {
+  content: attr(aria-valuenow) "%";
+  display: grid;
+  place-items: center;
+  width: 90%;
+  height: 90%;
+  aspect-ratio: 1 / 1;
+  border-radius: inherit;
+  background: white;
+  font-size: .5rem; 
+  color : white;
+  text-align: center;
+}
+
+.progress[aria-valuenow="100"]::after {
+ 	animation: progressCompleteAfter 0s forwards;
+  	animation-delay: 1000ms;		
+}
+
+
+.progress[aria-valuenow="100"] .progress-inner {
+ 	animation: progressComplete 0s forwards;
+  	animation-delay: 1000ms;	
+}
+
+@keyframes progressCompleteAfter {
+  to {
+	display: none;
+  }
+}
+
+
+@keyframes progressComplete {
+  to {
+	opacity: 1;
+	
+  }
+}
+
+
+/* .progress:after{
   width: calc(var(--size) * .8);
   aspect-ratio:1;
   content: attr(data-value);
-  display: grid;
   background: #fff;
   border-radius : 50%;
   display: grid;
-  font-size: calc(var(--size) * .4);;
+  font-size: calc(var(--size) * .4);
   place-content:center;
   font-family: arial;
-}
+} */

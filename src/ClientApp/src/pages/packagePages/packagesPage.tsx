@@ -24,7 +24,7 @@ const PackagesPage = () => {
 	const packagesQuery = useQuery({
 		queryKey: ["packages", currentPage, query],
 		queryFn: () => getPackages(currentPage, query, controller.signal),
-		staleTime: 10000,
+		staleTime: 300000, //5 min
 	});
 
 	const { isLoading } = packagesQuery;

@@ -172,7 +172,7 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 
 	// timeout reference to be used in onChange event of the username field
 	// to trigger the validation after 1 second of inactivity
-	const timeOutRef = useRef<ReturnType<typeof setTimeout>>();
+	//const timeOutRef = useRef<ReturnType<typeof setTimeout>>(null);
 
 	return (
 		<DialogContent className="max-w-fit">

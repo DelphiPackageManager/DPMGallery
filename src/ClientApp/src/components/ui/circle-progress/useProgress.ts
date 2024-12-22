@@ -8,11 +8,11 @@ const useProgress = (value: number) => {
 		if (!ref.current)
 			return;
 		ref.current.style.setProperty("--progress", value + "%");
-		ref.current.setAttribute("aria-valuenow", value.toString());
+		// ref.current.setAttribute("aria-valuenow", value.toString());
 
 	}, [value])
 
 	return { ref };
 }
 
-export default useProgress;
+export default useProgress; 

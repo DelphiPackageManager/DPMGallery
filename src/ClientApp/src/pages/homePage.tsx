@@ -1,3 +1,4 @@
+import Meta from "@/components/meta";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PackageSearchBar from "../components/packageSearchBar";
@@ -13,6 +14,7 @@ const HomePage = () => {
 
 	return (
 		<>
+			<Meta title="DPM Gallery" />
 			{/* This can't be in the page container due to sticky position */}
 			<div className="sticky top-[3.5rem] w-full bg-brand">
 				<div className="container z-10 mx-auto mt-0 flex flex-row items-center justify-center py-2 pt-1">

@@ -44,5 +44,7 @@ namespace DPMGallery.DBMigration
         public bool OwnsSchema => true;
 
         public object ApplicationContext1 { get => _applicationContext; set => _applicationContext = value; }
+
+        public bool CreateWithPrimaryKey => false;
     }
 }

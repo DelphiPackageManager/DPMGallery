@@ -55,7 +55,7 @@ const Layout = () => {
 
 	return (
 		<>
-			<Meta title="DPM - Delphi Package Manager" />
+			{/* <Meta title="DPM - Delphi Package Manager" /> */}
 			<div className="m-0 flex h-screen flex-col bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100">
 				<NavBar />
 				<div className="mt-[3.5rem] flex grow flex-col">

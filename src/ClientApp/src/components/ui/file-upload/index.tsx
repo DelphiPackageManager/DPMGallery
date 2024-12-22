@@ -133,6 +133,7 @@ export class FileUploader2 extends React.Component<FileUploadProps, FileUploadSt
 	private handleChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const targetFiles = e.currentTarget.files
 		this.updateFiles(targetFiles);
+		e.currentTarget.value = '';
 	}
 
 	private onRemoveFile = (fileInfo: FileInfo) => {
@@ -155,6 +156,7 @@ export class FileUploader2 extends React.Component<FileUploadProps, FileUploadSt
 		this.setState({
 			packageFiles: []
 		})
+		this.uploader.Clear();
 	}
 
 
