@@ -69,6 +69,7 @@
 
 
 	<ItemGroup>
+		<Folder Include="obj\PackageContentService\" />
 		<Folder Include="Serialization\" />
 		<Folder Include="wwwroot\" />
 		<Folder Include="wwwroot\assets\" />
@@ -85,10 +86,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <None Remove="postcss.config.js" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Include="obj\PackageContentService\IPackageContentService.cs" />
-	  <Compile Include="obj\PackageContentService\PackageContentService.cs" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="DPMGallery.service">
