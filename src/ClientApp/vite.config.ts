@@ -28,6 +28,7 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: (id: string) => {
+					if (id.includes("radix")) return "radix-ui";
 					if (id.includes("react")) return "react";
 					if (id.includes("node_modules")) return "vendor";
 				},
