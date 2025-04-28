@@ -19,7 +19,6 @@ namespace DPMGallery.Controllers.UI
 {
 
     [ApiController]
-    [AllowAnonymous]
     [Route("ui")]
     [DisableRateLimiting]
     public class UIPackagesController : ApiController
