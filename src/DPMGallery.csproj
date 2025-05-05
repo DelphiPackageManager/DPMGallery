@@ -33,18 +33,18 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="9.2.0" />
-		<PackageReference Include="AWSSDK.S3" Version="3.7.416.16" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="3.7.401.89" />
+		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="9.3.0" />
+		<PackageReference Include="AWSSDK.S3" Version="4.0.0.1" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="4.0.0.1" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-		<PackageReference Include="FluentMigrator" Version="6.2.0" />
-		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="6.2.0" />
+		<PackageReference Include="FluentMigrator" Version="7.1.0" />
+		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="7.1.0" />
 		<PackageReference Include="Google.Cloud.Storage.V1" Version="4.13.0" />
 		<PackageReference Include="HtmlSanitizer" Version="9.0.884" />
-		<PackageReference Include="MailKit" Version="4.11.0" />
-		<PackageReference Include="Markdig" Version="0.41.0" />
+		<PackageReference Include="MailKit" Version="4.12.0" />
+		<PackageReference Include="Markdig" Version="0.41.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="9.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.4" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.4" />
