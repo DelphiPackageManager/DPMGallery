@@ -1,5 +1,6 @@
 ﻿using Amazon;
 using Amazon.Runtime;
+using Amazon.Runtime.Credentials;
 using Amazon.S3;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -26,13 +27,16 @@ namespace DPMGallery.Storage.Amazon
 
                 if (options.UseInstanceProfile)
                 {
-                    var credentials = FallbackCredentialsFactory.GetCredentials();
+                    var credentials = DefaultAWSCredentialsIdentityResolver.GetCredentials();
+                    //var credentials = FallbackCredentialsFactory.GetCredentials();
                     return new AmazonS3Client(credentials, config);
                 }
 
                 if (!string.IsNullOrEmpty(options.AssumeRoleArn))
                 {
-                    var credentials = FallbackCredentialsFactory.GetCredentials();
+                    var credentials = DefaultAWSCredentialsIdentityResolver.GetCredentials();
+                    //var credentials = FallbackCredentialsFactory.GetCredentials();
+                    
                     var assumedCredentials = AwsIamHelper
                         .AssumeRoleAsync(credentials, options.AssumeRoleArn, $"DPM-Session-{Guid.NewGuid()}").GetAwaiter().GetResult();
 
