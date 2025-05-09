@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using DPMGallery.Entities;
+using DPMGallery.Data;
 
 namespace DPMGallery.Controllers.UI
 {
@@ -128,7 +129,7 @@ namespace DPMGallery.Controllers.UI
         [Authorize]
         [HttpGet]
         [Route("account/packages/published")]
-        public async Task<IActionResult> GetListedPackages()
+        public async Task<IActionResult> GetListedPackages([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string sort = null, [FromQuery] SortDirection sortDirection = SortDirection.Default, [FromQuery] string filter = null, CancellationToken cancellationToken = default)
         {
             string userName = HttpContext.User.Identity?.Name;
             if (userName == null)
@@ -148,7 +149,7 @@ namespace DPMGallery.Controllers.UI
         [Authorize]
         [HttpGet]
         [Route("account/packages/unlisted")]
-        public async Task<IActionResult> GetUnListedPackages()
+        public async Task<IActionResult> GetUnListedPackages([FromQuery] int page = 1, [FromQuery] int pageSize = 20, [FromQuery] string sort = null, [FromQuery] SortDirection sortDirection = SortDirection.Default, [FromQuery] string filter = null, CancellationToken cancellationToken = default)
         {
             string userName = HttpContext.User.Identity?.Name;
             if (userName == null)

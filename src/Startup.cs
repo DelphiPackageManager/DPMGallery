@@ -48,22 +48,23 @@ namespace DPMGallery
 
             //NOTE : we are using cloudfare for cors configuration
             //if running this elsewhere then uncomment and configure cors as required.
-			//services.AddCors(options =>
-			//{
-			//	options.AddPolicy("AllowSpecified", policy =>
-			//	{
-			//		policy.WithOrigins("https://delphi.dev",
-			//						   "https://localhost:5002",
-			//							"https://*.delphi.dev")
-			//		.SetIsOriginAllowedToAllowWildcardSubdomains()
-			//		.AllowAnyMethod().AllowAnyHeader();
-			//	});
-			//});
+            #if RELEASESELFHOST
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowSpecified", policy =>
+                {
+                    policy.WithOrigins("https://delphi.dev",
+                                       "https://localhost:5002",
+                                        "https://*.delphi.dev")
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .AllowAnyMethod().AllowAnyHeader();
+                });
+            });
 
+            #endif
 
-
-			//allows running behind nginx or yarp
-			services.Configure<ForwardedHeadersOptions>(options =>
+            //allows running behind nginx or yarp
+            services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
                 options.KnownNetworks.Clear();
@@ -275,43 +276,43 @@ namespace DPMGallery
         {
 			if (env.IsDevelopment())
 			{
-				//app.UseCors(config =>
-				//{
-				//	config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
-				//});
-			}
+                app.UseCors(config =>
+                {
+                    config.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                });
+            }
 			else
 			{
-				//app.UseCors(config =>
-				//{
-				//	config.WithOrigins("https://delphi.dev",
-				//					   "https://localhost:5002",
-				//						"https://*.delphi.dev")
-				//	.SetIsOriginAllowedToAllowWildcardSubdomains()
-				//	.AllowAnyMethod().AllowAnyHeader().AllowCredentials();
-				//});
+#if RELEASESELFHOST
+                //not used when using when hosted with cloudflare as it handled cors
+                app.UseCors(config =>
+                {
+                    config.WithOrigins("https://delphi.dev",
+                                       "https://localhost:5002",
+                                        "https://*.delphi.dev")
+                    .SetIsOriginAllowedToAllowWildcardSubdomains()
+                    .AllowAnyMethod().AllowAnyHeader().AllowCredentials();
+                });
 
-				//app.UseCors(builder => builder.AllowAnyOrigin()
-				//				.AllowAnyMethod()
-				//				.AllowAnyHeader());
-
-				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-				//app.UseHsts();
-			}
-
-			
+                //app.UseCors(builder => builder.AllowAnyOrigin()
+                //                .AllowAnyMethod()
+                //                .AllowAnyHeader());
+#endif
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                //app.UseHsts();
+            }
 
 
-			app.UseForwardedHeaders();
+
+
+            app.UseForwardedHeaders();
 			//app.UseIpRateLimiting(); //TODO : replace with built in rate limiting
 			app.UseHttpsRedirection();
 			
             app.UseStaticFiles();
             //app.UseSpaStaticFiles();
 
-            string[] nonSpaUrls = { "/api", "/ui", "/oauth-" };
-
-			
+            string[] nonSpaUrls = { "/api", "/ui", "/oauth-" };	
 
 			app.MapWhen(x => !nonSpaUrls.Any(y => x.Request.Path.Value.StartsWith(y)), builder =>
             {

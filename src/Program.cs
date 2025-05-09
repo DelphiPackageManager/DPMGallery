@@ -145,10 +145,14 @@ namespace DPMGallery
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
-                
+                //.UseContentRoot("wwwroot")
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseConfiguration(_configuration);
+#if RELEASESELFHOST
+                    Log.Information($"setting urls to {ServerConfig.Current.SiteBaseUrl}");
+                    webBuilder.UseUrls(ServerConfig.Current.SiteBaseUrl);
+#endif
                     webBuilder.UseStartup<Startup>();
                 }).UseSerilog();
     }

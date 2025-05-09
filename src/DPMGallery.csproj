@@ -9,6 +9,7 @@
 		<SpaRoot>ClientApp</SpaRoot>
 		<SpaProxyServerUrl>http://localhost:3175</SpaProxyServerUrl>
 		<SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
+		<Configurations>Debug;Release;ReleaseSelfHost</Configurations>
 	</PropertyGroup>
 	<PropertyGroup>
 		<RuntimeIdentifiers>win-x64;linux-x64</RuntimeIdentifiers>

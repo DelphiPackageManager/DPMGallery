@@ -12,7 +12,6 @@ import PageHeader from "../../pageHeader";
 import { TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
 import { fetchOrganisationNames } from "../organisations/organisationApi";
 import PublishedPackagesTable from "./publishedTable";
-import UnlistedPackagesTable from "./unlistedTable";
 
 const MyPackagesPage = () => {
 	const [currentTab, setCurrentTab] = useState("published");
@@ -37,14 +36,11 @@ const MyPackagesPage = () => {
 		}
 		fetchOrgNames();
 	}, [])
-
-
-
 	return (
 		<PageContainer>
 			<PageHeader title="My Packages" />
 			<div className="my-4 flex items-baseline justify-start gap-1" >
-				<Label className="min-w-fit">Filter by Owner :</Label>
+				<Label className="min-w-fit"><span>Filter by Owner :&nbsp;</span></Label>
 				<Select value={filter} onValueChange={setFilter}  >
 					<SelectTrigger className="min-w-56 max-w-fit">
 						<SelectValue />
@@ -61,20 +57,9 @@ const MyPackagesPage = () => {
 					<Button variant="create" className="ml-2"><span className="mr-2">Add New Package</span> <PlusIcon /></Button>
 				</Link>
 			</div>
-			<Tabs defaultValue="published" className="w-full" value={currentTab} onValueChange={(e) => setCurrentTab(e)}>
-				<TabsList className="">
-					<TabsTrigger value="published">Published Packages</TabsTrigger>
-					<TabsTrigger value="unlisted">UnlistedPackages</TabsTrigger>
-				</TabsList>
-				<TabsContent value="published">
-					{/* <PublishedPackagesTable filter={filter} currentUser={auth.currentUser?.userName || ""} /> */}
-					<p>TBD</p>
-				</TabsContent>
-				<TabsContent value="unlisted">
-					{/* <UnlistedPackagesTable filter={filter} /> */}
-					<p>TBD</p>
-				</TabsContent>
-			</Tabs>
+			<div>
+				<PublishedPackagesTable filter={filter} currentUser={auth.currentUser?.userName || ""} />
+			</div>
 		</PageContainer>
 	);
 };

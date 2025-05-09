@@ -9,6 +9,7 @@ export default defineConfig({
 	plugins: [
 		react(),
 		svgr(),
+
 		topLevelAwait({
 			// The export name of top-level await promise for each chunk module
 			promiseExportName: "__tla",
@@ -29,8 +30,21 @@ export default defineConfig({
 			output: {
 				manualChunks: (id: string) => {
 					if (id.includes("radix")) return "radix-ui";
-					if (id.includes("react")) return "react";
-					if (id.includes("node_modules")) return "vendor";
+					if (id.includes("sonner")) return "radix-ui";
+					if (id.includes("lucide")) return "icons";
+					if (id.includes("heroicons")) return "icons";
+					if (id.includes("@tanstack")) return "tanstack";
+					if (
+						id.includes('react-router-dom') ||
+						id.includes('@remix-run') ||
+						id.includes('react-router')
+					) {
+						return '@react-router';
+					}
+					if (id.includes('node_modules')) {
+						return 'vendor'; // Split vendor libraries
+					}
+					return null;
 				},
 			},
 		},

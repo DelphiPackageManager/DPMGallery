@@ -4,7 +4,8 @@ import { PagedList } from "@/lib/paging";
 import { Constants } from "@/types/constants";
 import { ManagePackageInfo } from "@/types/managePackages";
 import { updatePagingUsingSearchParams } from "@/utils/pagingUtils";
-import { ColumnDef } from "@tanstack/react-table";
+import { useQuery } from "@tanstack/react-query";
+import { Column, ColumnDef } from "@tanstack/react-table";
 import { Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
@@ -21,6 +22,7 @@ const PublishedPackagesTable = ({ currentUser, filter }: PublishedPackagesTableP
 	const [packageInfos, setPackageInfos] = useState<PagedList<ManagePackageInfo>>()
 	const [searchParams, setSearchParams] = useSearchParams();
 	const [error, setError] = useState("");
+
 
 	const columns: ColumnDef<ManagePackageInfo>[] = [
 		{
@@ -104,7 +106,7 @@ const PublishedPackagesTable = ({ currentUser, filter }: PublishedPackagesTableP
 			const pagenumber = parseInt(page);
 			const sort = searchParams.get("sort") ?? "name";
 			const sortDirection = searchParams.get("sortDirection") ?? "asc";
-			const filter = searchParams.get("filter") ?? "";
+			//const filter = searchParams.get("filter") ?? "";
 			const paging = { pageSize: Constants.DefaultPageSize, page: pagenumber, sort: sort, sortDirection: sortDirection, filter: filter };
 			const fetchResponse = await fetchPackageInfos(paging, false);
 			if (fetchResponse.error) {
@@ -129,7 +131,9 @@ const PublishedPackagesTable = ({ currentUser, filter }: PublishedPackagesTableP
 
 	useEffect(() => {
 		return fetchTableContent();
-	}, []);
+	}, [filter]);
+
+
 
 
 	if (!packageInfos)

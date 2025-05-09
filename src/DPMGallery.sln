@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35931.197 d17.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DPMGallery", "DPMGallery.csproj", "{30C9B6B6-768D-43D6-8F6D-23AC943920FC}"
 EndProject
@@ -9,12 +9,15 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		ReleaseSelfHost|Any CPU = ReleaseSelfHost|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{30C9B6B6-768D-43D6-8F6D-23AC943920FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{30C9B6B6-768D-43D6-8F6D-23AC943920FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{30C9B6B6-768D-43D6-8F6D-23AC943920FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{30C9B6B6-768D-43D6-8F6D-23AC943920FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30C9B6B6-768D-43D6-8F6D-23AC943920FC}.ReleaseSelfHost|Any CPU.ActiveCfg = ReleaseSelfHost|Any CPU
+		{30C9B6B6-768D-43D6-8F6D-23AC943920FC}.ReleaseSelfHost|Any CPU.Build.0 = ReleaseSelfHost|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
