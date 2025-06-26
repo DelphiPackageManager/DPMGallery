@@ -29,24 +29,39 @@ export default defineConfig({
 		rollupOptions: {
 			output: {
 				manualChunks: (id: string) => {
-					if (id.includes("radix")) return "radix-ui";
-					if (id.includes("sonner")) return "radix-ui";
-					if (id.includes("lucide")) return "icons";
-					if (id.includes("heroicons")) return "icons";
-					if (id.includes("@tanstack")) return "tanstack";
-					if (
-						id.includes('react-router-dom') ||
-						id.includes('@remix-run') ||
-						id.includes('react-router')
-					) {
-						return '@react-router';
-					}
 					if (id.includes('node_modules')) {
-						return 'vendor'; // Split vendor libraries
+						return 'vendor';
 					}
+
 					return null;
+					// if (
+					// 	id.includes("lucide") ||
+					// 	id.includes("heroicons")
+
+					// ) {
+					// 	return "icons"
+					// }
+					// // if (id === '\0commonjsHelpers.js') { return 'helpers'; }
+					// // if (
+					// // 	id.includes('react') ||
+					// // 	id.includes('@remix-run')
+					// // ) {
+					// // 	return 'react';
+					// // }
+					// // if (
+					// // 	id.includes("radix") ||
+					// // 	id.includes("sonner")
+					// // ) {
+					// // 	return "radix-ui";
+					// // }
+					// //if (id.includes("@tanstack")) return "tanstack";
+					// if (id.includes('node_modules')) {
+					// 	return 'vendor'; // Split vendor libraries
+					// }
+					// return "unknown";
 				},
 			},
+
 		},
 	},
 
