@@ -27,5 +27,6 @@ namespace DPMGallery.Configuration
 
         public bool DisablePayloadSigning { get; set; }
 
+        public bool DisableDefaultChecksumValidation { get; set; }
     }
 }

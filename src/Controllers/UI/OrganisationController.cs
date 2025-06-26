@@ -426,7 +426,7 @@ namespace DPMGallery.Controllers.UI
 
         [Authorize]
         [HttpDelete]
-        [Route("/ui/account/organisation/{id}")]
+        [Route("/ui/account/organisation/{orgId}")]
         public async Task<IActionResult> DeleteOrganisation([FromRoute] int orgId, CancellationToken cancellationToken = default)
         {
             string userName = HttpContext.User.Identity?.Name;

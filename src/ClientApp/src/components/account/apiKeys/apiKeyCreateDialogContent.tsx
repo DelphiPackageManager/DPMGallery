@@ -228,7 +228,7 @@ export default function ApiKeyCreateDialogContent(props: { id: number, onSuccess
 										<FormControl>
 											<div className="my-2 flex flex-row gap-2">
 												<div className="">
-													<Select name="packageOwner" onValueChange={field.onChange} value={field.value.toString()}>
+													<Select name="packageOwner" onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value.toString()}>
 														<SelectTrigger className="w-60">
 															<SelectValue placeholder="Select Package Owner" />
 														</SelectTrigger>

@@ -322,8 +322,13 @@ namespace DPMGallery.Repositories
                 const string deleteOrgMembersSql = "delete from " + T.OrganisationMembers + " where org_id = @Id";
                 await _dbContext.ExecuteAsync(deleteOrgMembersSql, new { Id }, cancellationToken: cancellationToken);
 
+                const string deleteOrgSettingsSql = "delete from " + T.OrganisationSettings + " where org_id = @Id";
+                await _dbContext.ExecuteAsync(deleteOrgSettingsSql, new { Id }, cancellationToken: cancellationToken);
+
                 const string deleteUserSql = "delete from " + T.Users + " where id = @Id";
                 var rowsAffected = await _dbContext.ExecuteAsync(deleteUserSql, new { Id }, cancellationToken: cancellationToken);
+
+
 
                 return rowsAffected > 0;
             }
@@ -452,7 +457,7 @@ namespace DPMGallery.Repositories
 
         public async Task<UserOrganisation> GetOrganisationByIdAsync(int orgId, CancellationToken cancellationToken)
         {
-            string sql = $@"elect u.id as org_id, u.user_name as org_name, u.email as email, u.email_confirmed, m.member_role, s.allow_contact, s.notify_on_publish from
+            string sql = $@"select u.id as org_id, u.user_name as org_name, u.email as email, u.email_confirmed, m.member_role, s.allow_contact, s.notify_on_publish from
                             {T.Users} u 
                             left join {T.OrganisationMembers} m on u.id = m.org_id
                             left join {T.OrganisationSettings} s on u.id = s.org_id

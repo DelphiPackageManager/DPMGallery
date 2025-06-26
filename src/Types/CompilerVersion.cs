@@ -36,8 +36,11 @@ namespace DPMGallery.Types
         [Description("11.0")]
         RS11_0,
 		[Description("12.0")]
-		RS12_0
-	}
+		RS12_0,
+        [Description("13.0")]
+        RS13_0
+
+    }
 
     public static class CompilerVersionExtensions
     {

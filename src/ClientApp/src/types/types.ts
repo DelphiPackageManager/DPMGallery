@@ -24,7 +24,9 @@ export enum CompilerVersion {
 	RS10_3 = "RS10_3",
 	RS10_4 = "RS10_4",
 	RS11_0 = "RS11_0",
-	RS12_0 = "RS12_0"
+	RS12_0 = "RS12_0",
+	RS13_0 = "RS13_0",
+
 }
 
 export function StrToCompilerVersion(value: string): CompilerVersion {

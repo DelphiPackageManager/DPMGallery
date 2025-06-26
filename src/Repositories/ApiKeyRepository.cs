@@ -182,7 +182,7 @@ namespace DPMGallery.Repositories
             if (string.IsNullOrWhiteSpace(key.Key))
 				throw new ArgumentException("Key cannot be empty", nameof(key.Key));
         
-            key.KeyHashed = key.Key.GetHashSha256();
+            key.KeyHashed = key.Key.ToLower().GetHashSha256();
 
             const string insertSql = $@"INSERT INTO {T.ApiKeys} (user_id, name, key_hashed, expires_utc, glob_pattern, package_list, scopes, revoked, package_owner)
                                       VALUES(@UserId, @Name, @KeyHashed, @ExpiresUTC, @GlobPattern, @Packages, @Scopes, @Revoked, @PackageOwner ) RETURNING id";

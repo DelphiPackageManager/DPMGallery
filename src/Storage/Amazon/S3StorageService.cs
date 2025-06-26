@@ -17,7 +17,7 @@ namespace DPMGallery.Storage
         private readonly AmazonS3Client _client;
         private readonly ILogger _logger;
         private readonly bool _disablePayloadSigning;
-
+        private readonly bool _disableDefaultChecksumValidation;
         public S3StorageService(ILogger logger, ServerConfig serverConfig, AmazonS3Client client)
         {
             _logger = logger;
@@ -27,6 +27,7 @@ namespace DPMGallery.Storage
             _bucket = serverConfig.Storage.S3Storage.Bucket;
             _prefix = serverConfig.Storage.S3Storage.Prefix;
             _disablePayloadSigning = serverConfig.Storage.S3Storage.DisablePayloadSigning;
+            _disableDefaultChecksumValidation = serverConfig.Storage.S3Storage.DisableDefaultChecksumValidation;
 
             _client = client ?? throw new ArgumentNullException(nameof(client));
 
@@ -89,7 +90,7 @@ namespace DPMGallery.Storage
                     await content.CopyToAsync(seekableContent, 4096, cancellationToken);
 
                     seekableContent.Seek(0, SeekOrigin.Begin);
-
+                    
                     PutObjectResponse putResponse = await _client.PutObjectAsync(new PutObjectRequest
                     {
                         BucketName = _bucket,
@@ -99,6 +100,7 @@ namespace DPMGallery.Storage
                         AutoResetStreamPosition = false,
                         AutoCloseStream = false,
                         DisablePayloadSigning = _disablePayloadSigning,
+                        DisableDefaultChecksumValidation = _disableDefaultChecksumValidation,
                     }, cancellationToken);
 
                     _logger.Information($"S3 Put response : {putResponse.HttpStatusCode}");
