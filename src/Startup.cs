@@ -54,6 +54,7 @@ namespace DPMGallery
                 options.AddPolicy("AllowSpecified", policy =>
                 {
                     policy.WithOrigins("https://delphi.dev",
+                                       "https://packages.delphi.dev",
                                        "https://localhost:5002",
                                         "https://*.delphi.dev")
                     .SetIsOriginAllowedToAllowWildcardSubdomains()
@@ -117,18 +118,7 @@ namespace DPMGallery
 
             //used in uiservice
             services.AddMemoryCache();
-
-            //TODO: Replace with built in rate limiting when we upgrade to netcore 7.0
-            //////load general configuration from appsettings.json
-            //services.Configure<IpRateLimitOptions>(_configuration.GetSection("IpRateLimitOptions"));
-            //////load ip rules from appsettings.json
-            //services.Configure<IpRateLimitPolicies>(_configuration.GetSection("IpRateLimitPolicies"));
-
-            // inject counter and rules stores
-            //services.AddInMemoryRateLimiting();
-
             services.AddDPMServices(serverConfig);
-
             //our asp.net identity implementation using dapper instead of EF
             services.AddIdentity<User, Role>(options =>
             {
@@ -140,8 +130,6 @@ namespace DPMGallery
                 options.Password.RequireLowercase = true;
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireUppercase = true;
-
-
             }).AddRoles<Role>()
             .AddDefaultTokenProviders()
             .AddDapperStores();
@@ -149,21 +137,6 @@ namespace DPMGallery
             services.ConfigureApplicationCookie(opt => {
                 opt.Cookie.Name = "DPMGallery.Identity";
             });
-
-            //services.Configure<CookiePolicyOptions>(options =>
-            //{
-            //    // This lambda determines whether user consent for non-essential 
-            //    // cookies is needed for a given request.
-            //    options.CheckConsentNeeded = context => true;
-            //    // requires using Microsoft.AspNetCore.Http;
-            //    options.MinimumSameSitePolicy = SameSiteMode.Strict;
-            //});
-
-            //services.PostConfigure<CookieAuthenticationOptions>(IdentityConstants.ApplicationScheme, option =>
-            //{
-            //	option.Cookie.Name = "Hello"; // change cookie name
-            //	option.ExpireTimeSpan = TimeSpan.FromDays(7); // change cookie expire time span
-            //});
 
             services.AddOutputCache(x =>
             {
@@ -176,48 +149,6 @@ namespace DPMGallery
             });
 
             services.AddAuthentication()
-            //services.AddAuthentication(options =>
-            //{
-            //    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-
-            //}).AddIdentityCookies();
-
-            //.AddJwtBearer(options =>
-            //{
-            //    options.SaveToken = true;
-            //    options.RequireHttpsMetadata = false;
-            //    options.TokenValidationParameters = new TokenValidationParameters()
-            //    {
-            //        ValidateIssuer = true,
-            //        ValidateAudience = true,
-            //        ValidateLifetime = true,
-            //        ValidateIssuerSigningKey = true,
-            //        ClockSkew = TimeSpan.Zero,
-            //        ValidAudience = serverConfig.Authentication.Jwt.ValidAudience,
-            //        ValidIssuer = serverConfig.Authentication.Jwt.ValidIssuer,
-            //        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(serverConfig.Authentication.Jwt.Secret))
-            //    };
-            //    options.Events = new JwtBearerEvents();
-            //    options.Events.OnMessageReceived = context => {
-            //        if (context.Request.Cookies.ContainsKey("X-Access-Token"))
-            //        {
-            //            context.Token = context.Request.Cookies["X-Access-Token"];
-            //        }
-
-            //        return Task.CompletedTask;
-            //    };
-            //    options.Events.OnAuthenticationFailed = context =>
-            //    {
-            //        if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
-            //        {
-            //            context.Response.Headers.Append("IS-TOKEN-EXPIRED", "true");
-            //        }
-            //        return Task.CompletedTask;
-            //    };
-            //})
             .AddGoogle(options =>
             {
                 options.ClientId = serverConfig.Authentication.Google.ClientId;
@@ -294,9 +225,6 @@ namespace DPMGallery
                     .AllowAnyMethod().AllowAnyHeader().AllowCredentials();
                 });
 
-                //app.UseCors(builder => builder.AllowAnyOrigin()
-                //                .AllowAnyMethod()
-                //                .AllowAnyHeader());
 #endif
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 //app.UseHsts();
