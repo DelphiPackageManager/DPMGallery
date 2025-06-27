@@ -1,21 +1,22 @@
-﻿using System;
+﻿using DPMGallery.Antivirus;
+using DPMGallery.Data;
+using DPMGallery.Entities;
+using DPMGallery.PackageExtraction;
+using DPMGallery.Repositories;
+using DPMGallery.Services;
+using DPMGallery.Types;
+using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using NuGet.Versioning;
+using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DPMGallery.Types;
-using DPMGallery.Data;
-using DPMGallery.Repositories;
-using DPMGallery.Services;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Serilog;
-using DPMGallery.Entities;
-using DPMGallery.Antivirus;
-using System.IO;
-using DPMGallery.PackageExtraction;
-using NuGet.Versioning;
 
 namespace DPMGallery.BackgroundServices
 {
@@ -25,6 +26,7 @@ namespace DPMGallery.BackgroundServices
         private readonly ILogger _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly ServerConfig _serverConfig;
+        private readonly IContentTypeProvider _contentTypeProvider;
 
         private enum CopyResult  {
             Ok,
@@ -33,14 +35,22 @@ namespace DPMGallery.BackgroundServices
          };
 
         //not ideal, but we can't inject scoped services
-        public PackageIndexBackgroundService(ILogger logger, ServerConfig serverConfig, IServiceProvider serviceProvider)
+        public PackageIndexBackgroundService(ILogger logger, ServerConfig serverConfig, IServiceProvider serviceProvider, IContentTypeProvider contentTypeProvider)
         {
             _logger = logger;
             _serverConfig = serverConfig;
             _serviceProvider = serviceProvider;
+            _contentTypeProvider = contentTypeProvider;
 
         }
 
+        private string GetIconContentType(string fileName)
+        {
+            string result = string.Empty;
+            if (_contentTypeProvider.TryGetContentType(fileName, out result))
+                return result;
+            else return cIconDefaultContentType;
+        }
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             //wait 5 seconds on startup before doing anything!
@@ -89,7 +99,7 @@ namespace DPMGallery.BackgroundServices
         private const string cPackageContentType = "binary/octet-stream";
         private const string cDspecContentType = "application/json";
         private const string cReadmeContentType = "text/markdown";
-        private const string cIconContentType = "image/xyz";
+        private const string cIconDefaultContentType = "image/xyz";
 
 
         private async Task<CopyResult> DoCopyToFileSystem(IServiceScope scope, Package package,  PackageVersion packageVersion, PackageVersionProcess item, PackageTargetPlatform targetPlatform, CancellationToken cancellationToken)
@@ -127,9 +137,10 @@ namespace DPMGallery.BackgroundServices
                         {
                             try { 
                                 remotePath = Path.ChangeExtension(remotePath, Path.GetExtension(packageVersion.Icon));
+                                string iconContentType = GetIconContentType(remotePath);
                                 _logger.Information("[{processing}] Copying icon to filesystem", "Copy to CDN - file : {remotePath}", remotePath);
                                 using var iconStream = reader.GetStream(packageVersion.Icon);
-                                putResult = await storageService.PutAsync(remotePath, iconStream, cIconContentType, cancellationToken);
+                                putResult = await storageService.PutAsync(remotePath, iconStream, iconContentType, cancellationToken);
                                 if (putResult != StoragePutResult.Success)
                                     throw new Exception("Uploadin icon failed");
                                 }
