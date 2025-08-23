@@ -115,7 +115,7 @@ namespace DPMGallery.DTO
         [JsonPropertyName("hash")]
         public string Hash { get; set; }
 
-        [JsonPropertyName("hashAlgorith")]
+        [JsonPropertyName("hashAlgorithm")]
         public string HashAlgorithm { get; set; }
 
         [JsonPropertyName("dependencies")]
