@@ -24,7 +24,8 @@ namespace DPMGallery.Types
         LinuxIntel32 = 14, //reserved for future use
         LinuxIntel64 = 15,
         LinuxArm32 = 16, //reserved for future use
-        LinuxArm64 = 17 //reserved for future use
+        LinuxArm64 = 17, //reserved for future use
+        iOSSimulator = 18,
     }
 
     public static class PlatformExtensions
