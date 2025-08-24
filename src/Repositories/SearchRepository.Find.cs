@@ -23,7 +23,7 @@ namespace DPMGallery.Repositories
                 view = includePrerelease ? V.SearchLatestVersion : V.SearchStableVersion;
             }
 
-            return @$"select packageid, compiler_version, platform, version 
+            return @$"select packageid, compiler_version, platform, version, hash, hash_algorithm 
                       from {view}";
         }
 

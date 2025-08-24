@@ -174,7 +174,7 @@ namespace DPMGallery
             {
                 j.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             });
-
+            
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "wwwroot";

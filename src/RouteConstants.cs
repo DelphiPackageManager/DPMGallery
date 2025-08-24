@@ -36,7 +36,8 @@ namespace DPMGallery
 			public const string PackageList		= "PackageList";
 			public const string PackageSearch	= "PackageSearch";
 			public const string PackageFind		= "PackageFind";
-			public const string PackageSearchIds = "PackageSearchIds";
+            public const string PackageFindLatest = "PackageFindLatest";
+            public const string PackageSearchIds = "PackageSearchIds";
 			public const string PackageVersions = "PackageVersions";
 			public const string PackageDownload = "PackageDownload";
 			public const string PackageMetadata = "PackageMetadata";
@@ -55,7 +56,8 @@ namespace DPMGallery
 			public const string PackageSearch	= "api/v1/search";
 			public const string PackageSearchIds = "api/v1/searchbyids";
 			public const string PackageFind		= "api/v1/find";
-			public const string PackageVersions = "api/v1/package";
+            public const string PackageFindLatest = "api/v1/findlatest";
+            public const string PackageVersions = "api/v1/package";
 			public const string PackageMetadata = "api/v1/package";
 			public const string PackageIcon		= "api/v1/package";
 			public const string PackageReadme	= "api/v1/package";
@@ -97,6 +99,8 @@ namespace DPMGallery
 			public const string PackageSearch			= ResourceUri.PackageSearch;
 			public const string PackageSearchIds		= ResourceUri.PackageSearchIds;
 			public const string PackageFind				= ResourceUri.PackageFind;
-		}
-	}
+            public const string PackageFindLatest		= ResourceUri.PackageFindLatest;
+
+        }
+    }
 }

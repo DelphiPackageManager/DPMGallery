@@ -71,7 +71,14 @@ namespace DPMGallery.Services
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageFind),
 						Comment = "Find endpoint of DPM Search service (GET)"
 					},
-					new ServiceIndexItemDTO()
+                    new ServiceIndexItemDTO()
+                    {
+                        ResourceType = Constants.ResourceNames.PackageFindLatest,
+                        ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageFindLatest),
+                        Comment = "Find latest package version endpoint of DPM Search service (GET)"
+                    },
+
+                    new ServiceIndexItemDTO()
 					{
 						ResourceType = Constants.ResourceNames.PackageVersionsWithDeps,
 						ResourceUrl = GenerateInternalUrl(Constants.ResourceUri.PackageVersionsWithDeps),

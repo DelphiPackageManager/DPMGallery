@@ -43,7 +43,7 @@ namespace DPMGallery.Services
             var searchResponse = await _searchRepository.SearchByIdsAsync(compilerVersion, platform, ids, cancellationToken);
 
             return Mapping<ApiSearchResponse, SearchResponseDTO>.Map(searchResponse);
-           
+
         }
 
 
@@ -56,7 +56,7 @@ namespace DPMGallery.Services
                                                                      includeTrial, cancellationToken);
 
             return Mapping<ApiSearchResponse, SearchResponseDTO>.Map(searchResponse);
-            
+
         }
 
 
@@ -73,7 +73,7 @@ namespace DPMGallery.Services
         public async Task<PackageVersionsWithDependenciesResponseDTO> GetPackageVersionsWithDependenciesOrNullAsync(string packageId, CompilerVersion compilerVersion, Platform platform, VersionRange range, bool includePrerelease, CancellationToken cancellationToken)
         {
 
-            var results = await _searchRepository.GetPackageVersionsWithDependenciesAsync(packageId, compilerVersion, platform, range, includePrerelease, cancellationToken); 
+            var results = await _searchRepository.GetPackageVersionsWithDependenciesAsync(packageId, compilerVersion, platform, range, includePrerelease, cancellationToken);
 
             var result = new PackageVersionsWithDependenciesResponseDTO()
             {
@@ -93,6 +93,14 @@ namespace DPMGallery.Services
             return Mapping<ApiFindResponse, FindResponseDTO>.Map(findResult);
         }
 
+        public async Task<SearchResultDTO> FindLatestAsync(string id, CompilerVersion compilerVersion, Platform platform, bool includePrerelease = true, CancellationToken cancellationToken = default)
+        {
+            var findResult = await _searchRepository.FindAsync(id, compilerVersion, platform, "", includePrerelease, cancellationToken);
 
+            if (findResult == null)
+                return null;
+
+            return await GetPackageInfoAsync(id, compilerVersion, platform, findResult.Version, cancellationToken);
+        }
     }
 }

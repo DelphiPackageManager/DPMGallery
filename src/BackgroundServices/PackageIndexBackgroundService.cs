@@ -35,12 +35,12 @@ namespace DPMGallery.BackgroundServices
          };
 
         //not ideal, but we can't inject scoped services
-        public PackageIndexBackgroundService(ILogger logger, ServerConfig serverConfig, IServiceProvider serviceProvider, IContentTypeProvider contentTypeProvider)
+        public PackageIndexBackgroundService(ILogger logger, ServerConfig serverConfig, IServiceProvider serviceProvider)
         {
             _logger = logger;
             _serverConfig = serverConfig;
             _serviceProvider = serviceProvider;
-            _contentTypeProvider = contentTypeProvider;
+            _contentTypeProvider = new FileExtensionContentTypeProvider();;
 
         }
 

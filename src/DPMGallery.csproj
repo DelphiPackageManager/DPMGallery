@@ -32,11 +32,10 @@
 	  <TypeScriptCompile Remove="ClientApp\**" />
 	  <TypeScriptCompile Remove="Search\**" />
 	</ItemGroup>
-
 	<ItemGroup>
 		<PackageReference Include="AspNet.Security.OAuth.GitHub" Version="9.4.0" />
-		<PackageReference Include="AWSSDK.S3" Version="4.0.3" />
-		<PackageReference Include="AWSSDK.SecurityToken" Version="4.0.1.2" />
+		<PackageReference Include="AWSSDK.S3" Version="4.0.6.8" />
+		<PackageReference Include="AWSSDK.SecurityToken" Version="4.0.2" />
 		<PackageReference Include="BlushingPenguin.JsonPath" Version="1.0.6" />
 		<PackageReference Include="Dapper" Version="2.1.66" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
@@ -46,17 +45,17 @@
 		<PackageReference Include="HtmlSanitizer" Version="9.0.886" />
 		<PackageReference Include="MailKit" Version="4.13.0" />
 		<PackageReference Include="Markdig" Version="0.41.3" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="9.0.6" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.6" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.6" />
-		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.6" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.6" />
-		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.6" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.6" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="9.0.6" />
-		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.6" />
-		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.8.3">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Facebook" Version="9.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="9.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.MicrosoftAccount" Version="9.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="9.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="9.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Systemd" Version="9.0.8" />
+		<PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="9.0.8" />
+		<PackageReference Include="Microsoft.TypeScript.MSBuild" Version="5.9.2">
 		  <PrivateAssets>all</PrivateAssets>
 		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>

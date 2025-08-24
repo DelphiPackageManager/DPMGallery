@@ -16,5 +16,11 @@ namespace DPMGallery.Entities
 
         [Column("version")]
         public string Version { get; set; }
+
+        [Column("hash")]
+        public string Hash { get; set; }
+
+        [Column("hashAlgorithm")]
+        public string HashAlgorithm { get; set; }
     }
 }

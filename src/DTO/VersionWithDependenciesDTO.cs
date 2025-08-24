@@ -20,6 +20,12 @@ namespace DPMGallery.DTO
         [JsonPropertyName("version")]
         public string Version { get; set; }
 
+        [JsonPropertyName("hash")]
+        public string Hash {  get; set; }
+
+        [JsonPropertyName("hashAlgorithm")]
+        public string HashAlgorithm { get; set; }
+
         [JsonPropertyName("dependencies")]
         public IReadOnlyList<DependencyDTO> Dependencies { get; set; }
     }

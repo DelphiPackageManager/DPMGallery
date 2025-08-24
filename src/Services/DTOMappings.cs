@@ -25,6 +25,8 @@ namespace DPMGallery.Services
             Mapping<PackageVersion, VersionWithDependenciesDTO>.Configure((v, dto) =>
             {
                 dto.Version = v.Version;
+                dto.Hash = v.Hash;
+                dto.HashAlgorithm = v.HashAlgorithm;
                 dto.Dependencies = Mapping<PackageDependency, DependencyDTO>.Map(v.Dependencies).ToList();
             });
 
@@ -96,7 +98,8 @@ namespace DPMGallery.Services
                 dto.Compiler = r.Compiler;
                 dto.Platform = r.Platform;
                 dto.Version = r.Version;    
-
+                dto.Hash = r.Hash;
+                dto.HashAlgorithm = r.HashAlgorithm;
             });
         }
     }
